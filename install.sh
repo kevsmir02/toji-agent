@@ -62,7 +62,15 @@ resolve_script_dir() {
 }
 
 resolve_source_dir() {
-  if [[ -d "$SCRIPT_DIR/.github" && -d "$SCRIPT_DIR/docs" && -f "$SCRIPT_DIR/.gitignore" ]]; then
+  # Only treat the script's directory as the source when the script is running
+  # from an actual file on disk (not piped through curl | bash).
+  local script_source="${BASH_SOURCE[0]-}"
+  local is_real_file="false"
+  if [[ -n "$script_source" && -f "$script_source" ]]; then
+    is_real_file="true"
+  fi
+
+  if [[ "$is_real_file" == "true" && -d "$SCRIPT_DIR/.github" && -d "$SCRIPT_DIR/docs" && -f "$SCRIPT_DIR/.gitignore" ]]; then
     SOURCE_DIR="$SCRIPT_DIR"
     return 0
   fi
