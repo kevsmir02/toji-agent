@@ -121,10 +121,10 @@ prompt_choice() {
     return 0
   fi
 
-  log "$prompt"
+  printf '%s\n' "$prompt" >&2
   local index=1
   for option in "${options[@]}"; do
-    log "  $index) $option"
+    printf '  %s) %s\n' "$index" "$option" >&2
     index=$((index + 1))
   done
 
