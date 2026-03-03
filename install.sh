@@ -9,6 +9,7 @@ FORCE="false"
 DRY_RUN="false"
 RUN_DETECT_STACK="false"
 AGENTS_MODE="keep-bridge"
+AGENTS_MODE_EXPLICIT="false"
 
 REPO_ARCHIVE_URL="https://codeload.github.com/kevsmir02/toji-agent/tar.gz/refs/heads/main"
 
@@ -27,7 +28,8 @@ Default behaviour (no flags):
   - .github/    always overwritten with latest Toji Agent files
   - docs/       safe merge  (existing files kept, new files added)
   - .gitignore  kept if it already exists
-  - AGENTS.md   keep-bridge (reference block appended, file not replaced)
+  - AGENTS.md   auto-detected: sidecar-only if a third-party owner is found (e.g. Laravel Boost),
+                otherwise keep-bridge (reference block appended)
 
 Options:
   --target <path>          Target project directory
@@ -313,6 +315,22 @@ update_active_stack_profile() {
   log "updated active stack profile: $instructions_path"
 }
 
+# Known third-party AGENTS.md markers — add new tools here as needed
+THIRD_PARTY_AGENTS_MARKERS=(
+  "laravel-boost-guidelines"
+)
+
+agents_file_is_third_party() {
+  local agents_path="$1"
+  for marker in "${THIRD_PARTY_AGENTS_MARKERS[@]}"; do
+    if grep -q "$marker" "$agents_path" 2>/dev/null; then
+      printf '%s\n' "$marker"
+      return 0
+    fi
+  done
+  return 1
+}
+
 handle_agents_file() {
   local agents_path="$TARGET_DIR/AGENTS.md"
   local bridge_sidecar_path="$TARGET_DIR/AGENTS.toji-bridge.md"
@@ -321,6 +339,15 @@ handle_agents_file() {
     log "AGENTS.md not found. Creating minimal bridge AGENTS.md"
     write_bridge_file "$agents_path"
     return 0
+  fi
+
+  # Auto-detect third-party ownership unless user explicitly set --agents-mode
+  if [[ "$AGENTS_MODE_EXPLICIT" == "false" && "$AGENTS_MODE" == "keep-bridge" ]]; then
+    local detected_marker
+    if detected_marker=$(agents_file_is_third_party "$agents_path"); then
+      log "Detected third-party AGENTS.md owner ($detected_marker). Switching to sidecar-only to avoid conflicts."
+      AGENTS_MODE="sidecar-only"
+    fi
   fi
 
   case "$AGENTS_MODE" in
@@ -337,7 +364,7 @@ handle_agents_file() {
       log "overwrote AGENTS.md with Toji bridge"
       ;;
     *)
-      log "Unknown --agents-mode value: $selected_mode"
+      log "Unknown --agents-mode value: $AGENTS_MODE"
       log "Expected one of: keep-bridge | sidecar-only | overwrite"
       exit 1
       ;;
@@ -388,6 +415,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --agents-mode)
       AGENTS_MODE="${2:-}"
+      AGENTS_MODE_EXPLICIT="true"
       shift 2
       ;;
     -h|--help)
