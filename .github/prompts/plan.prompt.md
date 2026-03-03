@@ -1,5 +1,5 @@
 ---
-description: Start a new feature — capture requirements, design, and plan before writing code.
+description: Plan any non-trivial work — capture requirements, design, and tasks before writing code.
 ---
 
 Start a new feature from scratch with structured documentation.

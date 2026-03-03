@@ -39,11 +39,11 @@ The result is an agent that understands before it acts, follows your conventions
 .github/
   copilot-instructions.md   # Global Copilot agent instructions
   prompts/                  # Slash commands for structured workflows (13 total)
-    new-requirement, review-requirements, review-design
-    execute-plan, update-planning, check-implementation
-    writing-test, code-review, debug
-    capture-knowledge, simplify-implementation, detect-stack
-    create-commit-message, scan-codebase
+    plan, review-plan, review-design
+    build, update-plan, verify
+    write-tests, review, debug
+    document, refactor, detect-stack
+    commit, scan
   skills/
     dev-lifecycle/SKILL.md          # End-to-end feature development phases
     debug/SKILL.md                  # Evidence-first debugging workflow
@@ -161,20 +161,20 @@ Follow this sequence for consistent, well-documented feature development:
 
 In GitHub Copilot Chat, type `/` and select the prompt:
 
-- `/new-requirement` — start a new feature, creates all phase docs
-- `/review-requirements` — review a requirements doc for completeness
+- `/plan` — plan any non-trivial work before writing code
+- `/review-plan` — review a plan doc for completeness
 - `/review-design` — review a design doc for completeness
-- `/execute-plan` — work through planning tasks one by one
-- `/update-planning` — reconcile progress with planning doc
-- `/check-implementation` — verify implementation matches design
-- `/writing-test` — write tests for a feature
-- `/code-review` — pre-push review against design docs
+- `/build` — execute a plan task by task
+- `/update-plan` — reconcile progress with the plan doc
+- `/verify` — verify implementation matches design and requirements
+- `/write-tests` — write tests for a feature or change
+- `/review` — pre-push code review against design docs
 - `/debug` — structured root-cause analysis before touching code
-- `/capture-knowledge` — document a module, file, or function
-- `/simplify-implementation` — refactor code to reduce complexity
+- `/document` — document a module, file, or function
+- `/refactor` — refactor code to reduce complexity
 - `/detect-stack` — detect stack and update active stack profile
-- `/create-commit-message` — generate a Conventional Commits message from current changes
-- `/scan-codebase` — scan the project and produce a high-level codebase map
+- `/commit` — generate a Conventional Commits message from current changes
+- `/scan` — scan the project and produce a high-level codebase map
 
 ### 5. Using skills
 

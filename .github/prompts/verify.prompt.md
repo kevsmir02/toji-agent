@@ -1,5 +1,5 @@
 ---
-description: Compare implementation with design and requirements docs to ensure alignment.
+description: Verify the implementation matches the design and requirements — identify gaps.
 ---
 
 Compare the current implementation with the design in `docs/ai/design/` and requirements in `docs/ai/requirements/`.

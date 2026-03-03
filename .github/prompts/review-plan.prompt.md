@@ -1,5 +1,5 @@
 ---
-description: Review feature requirements for completeness.
+description: Review a plan doc for completeness before starting work.
 ---
 
 Review `docs/ai/requirements/feature-{name}.md` and the base template `docs/ai/requirements/README.md` to ensure structure and content alignment.

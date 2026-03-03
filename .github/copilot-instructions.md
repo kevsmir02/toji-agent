@@ -70,17 +70,17 @@ Skills in `.github/skills/` contain domain-specific workflows. Read the relevant
 ## Using Prompts
 
 Use slash commands in `.github/prompts/` for structured workflows:
-- `/new-requirement` — start a new feature (creates all docs)
-- `/review-requirements` — validate requirements doc completeness
-- `/review-design` — validate design doc completeness
-- `/execute-plan` — work through planning tasks step by step
-- `/update-planning` — reconcile progress with planning doc
-- `/check-implementation` — verify implementation matches design
-- `/writing-test` — write tests for a feature
-- `/code-review` — pre-push review against design docs
+- `/plan` — plan any non-trivial work before writing code
+- `/review-plan` — validate a plan doc for completeness
+- `/review-design` — validate a design doc for completeness
+- `/build` — execute a plan task by task
+- `/update-plan` — reconcile progress with the plan doc
+- `/verify` — verify implementation matches design and requirements
+- `/write-tests` — write tests for a feature or change
+- `/review` — pre-push code review against design docs
 - `/debug` — structured root-cause analysis before touching code
-- `/capture-knowledge` — document a module, file, or function
-- `/simplify-implementation` — refactor code to reduce complexity
+- `/document` — document a module, file, or function
+- `/refactor` — refactor code to reduce complexity
 - `/detect-stack` — detect stack and update the Active Stack Profile in this file
-- `/create-commit-message` — generate a Conventional Commits message from current changes
-- `/scan-codebase` — scan the project and produce a high-level codebase map in `docs/ai/implementation/`
+- `/commit` — generate a Conventional Commits message from current changes
+- `/scan` — scan the project and produce a high-level codebase map in `docs/ai/implementation/`

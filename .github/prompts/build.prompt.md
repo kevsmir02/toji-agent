@@ -1,5 +1,5 @@
 ---
-description: Execute a feature plan task by task.
+description: Build — execute a plan task by task.
 ---
 
 Help me work through a feature plan one task at a time.

@@ -1,5 +1,5 @@
 ---
-description: Update planning docs to reflect current implementation progress.
+description: Update the plan to reflect current implementation progress.
 ---
 
 Help me reconcile current implementation progress with the planning documentation.

@@ -1,5 +1,5 @@
 ---
-description: Add tests for a new feature.
+description: Write tests for a feature or change.
 ---
 
 Review `docs/ai/testing/feature-{name}.md` and write tests to match the defined strategy.

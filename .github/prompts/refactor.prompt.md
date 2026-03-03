@@ -1,5 +1,5 @@
 ---
-description: Simplify existing code to reduce complexity and improve maintainability.
+description: Refactor existing code to reduce complexity and improve maintainability.
 ---
 
 Help me simplify an existing implementation while maintaining or improving its functionality.
