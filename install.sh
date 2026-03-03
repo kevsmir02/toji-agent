@@ -92,12 +92,16 @@ confirm() {
     return 0
   fi
 
-  if [[ ! -t 0 ]]; then
+  if [[ ! -t 0 && ! -r /dev/tty ]]; then
     log "(non-interactive) auto-confirming: $prompt"
     return 0
   fi
 
-  read -r -p "$prompt [y/N]: " reply
+  if [[ -t 0 ]]; then
+    read -r -p "$prompt [y/N]: " reply
+  else
+    read -r -p "$prompt [y/N]: " reply < /dev/tty
+  fi
   [[ "$reply" =~ ^[Yy]$ ]]
 }
 
@@ -107,7 +111,12 @@ prompt_choice() {
   shift 2
   local options=("$@")
 
-  if [[ "$YES" == "true" ]] || [[ ! -t 0 ]]; then
+  if [[ "$YES" == "true" ]]; then
+    printf '%s\n' "$default_value"
+    return 0
+  fi
+
+  if [[ ! -t 0 && ! -r /dev/tty ]]; then
     printf '%s\n' "$default_value"
     return 0
   fi
@@ -119,7 +128,11 @@ prompt_choice() {
     index=$((index + 1))
   done
 
-  read -r -p "Choose [default: $default_value]: " reply
+  if [[ -t 0 ]]; then
+    read -r -p "Choose [default: $default_value]: " reply
+  else
+    read -r -p "Choose [default: $default_value]: " reply < /dev/tty
+  fi
   if [[ -z "$reply" ]]; then
     printf '%s\n' "$default_value"
     return 0
