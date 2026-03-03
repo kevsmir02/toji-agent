@@ -92,6 +92,21 @@ chmod +x install.sh
 ./install.sh --target /path/to/your-project --yes
 ```
 
+## Using with MCP Servers
+
+Yes — Toji Agent is designed to work alongside MCP servers.
+
+- MCP tools (for example Laravel Boost, memory servers, or custom project servers) provide execution capabilities and structured context
+- Toji Agent provides governance: conventions, workflow, architecture discipline, and quality standards
+
+Use this precedence if guidance conflicts:
+1. Feature docs in `docs/ai/requirements/` and `docs/ai/design/`
+2. Active stack skill from `.github/skills/`
+3. `.github/copilot-instructions.md`
+4. MCP/tool suggestions
+
+In short: MCP is your tool layer; Toji is your policy layer.
+
 ## How to Use
 
 ### 1. Copy into your project
