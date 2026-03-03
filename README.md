@@ -72,8 +72,10 @@ docs/ai/
 Install directly into your existing project without cloning manually:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/install.sh | bash -s -- --target /path/to/your-project
+curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/install.sh | bash -s -- --target .
 ```
+
+Run this from your project root. Use `--target .` when you're already inside the target project.
 
 Interactive installer will ask:
 - How to handle `AGENTS.md` if it already exists (`keep-bridge`, `sidecar-only`, or `overwrite`)
