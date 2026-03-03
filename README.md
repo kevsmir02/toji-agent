@@ -188,4 +188,4 @@ This template takes a different approach: **write the context down, once, in a p
 
 The slash commands enforce the discipline that makes this work: understand the problem before writing code, design before implementing, test alongside development, review before pushing. They're not mandatory ceremonies — use the ones that fit the task. A two-line bug fix doesn't need a requirements doc. A new feature that touches the data model does.
 
-The 6 hours you spend setting this up pays back across every feature you build after it.
+
