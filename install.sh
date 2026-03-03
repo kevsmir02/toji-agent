@@ -10,6 +10,7 @@ DRY_RUN="false"
 RUN_DETECT_STACK="false"
 AGENTS_MODE="keep-bridge"
 AGENTS_MODE_EXPLICIT="false"
+SOURCE_IS_LOCAL="false"
 
 REPO_ARCHIVE_URL="https://codeload.github.com/kevsmir02/toji-agent/tar.gz/refs/heads/main"
 
@@ -72,6 +73,7 @@ resolve_source_dir() {
 
   if [[ "$is_real_file" == "true" && -d "$SCRIPT_DIR/.github" && -d "$SCRIPT_DIR/docs" && -f "$SCRIPT_DIR/.gitignore" ]]; then
     SOURCE_DIR="$SCRIPT_DIR"
+    SOURCE_IS_LOCAL="true"
     return 0
   fi
 
@@ -461,7 +463,7 @@ fi
 
 TARGET_DIR="$(cd "$TARGET_DIR" && pwd)"
 
-if [[ "$TARGET_DIR" == "$SOURCE_DIR" ]]; then
+if [[ "$SOURCE_IS_LOCAL" == "true" && "$TARGET_DIR" == "$SOURCE_DIR" ]]; then
   log "Target is this template repo itself. Nothing to install."
   exit 0
 fi
