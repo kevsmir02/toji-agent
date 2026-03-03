@@ -43,7 +43,7 @@ The result is an agent that understands before it acts, follows your conventions
     execute-plan, update-planning, check-implementation
     writing-test, code-review, debug
     capture-knowledge, simplify-implementation, detect-stack
-    create-commit-message
+    create-commit-message, scan-codebase
   skills/
     dev-lifecycle/SKILL.md          # End-to-end feature development phases
     debug/SKILL.md                  # Evidence-first debugging workflow
@@ -55,6 +55,7 @@ The result is an agent that understands before it acts, follows your conventions
     stack-mern/SKILL.md             # MERN conventions
     frontend-design/SKILL.md        # Distinctive, production-grade UI design
     ux-design/SKILL.md              # Usability, flows, forms, and interaction patterns
+    scan-codebase/SKILL.md          # Map project structure, layers, and conventions
 docs/ai/
   requirements/README.md    # Template: problem statement, user stories, success criteria
   design/README.md          # Template: architecture, data models, API design
@@ -173,6 +174,7 @@ In GitHub Copilot Chat, type `/` and select the prompt:
 - `/simplify-implementation` — refactor code to reduce complexity
 - `/detect-stack` — detect stack and update active stack profile
 - `/create-commit-message` — generate a Conventional Commits message from current changes
+- `/scan-codebase` — scan the project and produce a high-level codebase map
 
 ### 5. Using skills
 
@@ -190,6 +192,7 @@ Skills are read automatically by Copilot when the context matches their `descrip
 | `stack-mern` | Strict MERN conventions |
 | `frontend-design` | Building distinctive UI — avoids generic AI aesthetics |
 | `ux-design` | Usability, flows, forms, error states, and interaction patterns |
+| `scan-codebase` | Map project structure, entry points, layers, and conventions |
 
 ### Stack-specific behavior (non-generic mode)
 

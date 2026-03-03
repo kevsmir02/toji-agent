@@ -65,6 +65,7 @@ Skills in `.github/skills/` contain domain-specific workflows. Read the relevant
 | `stack-mern` | Strict conventions for MERN projects |
 | `frontend-design` | Building distinctive, production-grade UI — avoids generic AI aesthetics |
 | `ux-design` | Usability, flows, forms, error states, and interaction patterns (Nielsen + Laws of UX) |
+| `scan-codebase` | Mapping project structure, entry points, layers, and conventions into a codebase map |
 
 ## Using Prompts
 
@@ -82,3 +83,4 @@ Use slash commands in `.github/prompts/` for structured workflows:
 - `/simplify-implementation` — refactor code to reduce complexity
 - `/detect-stack` — detect stack and update the Active Stack Profile in this file
 - `/create-commit-message` — generate a Conventional Commits message from current changes
+- `/scan-codebase` — scan the project and produce a high-level codebase map in `docs/ai/implementation/`
