@@ -65,6 +65,33 @@ docs/ai/
   monitoring/README.md      # Template: metrics, alerting, incident response
 ```
 
+## Install Options
+
+### Option A: One-command install (recommended)
+
+Install directly into your existing project without cloning manually:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/install.sh | bash -s -- --target /path/to/your-project --yes
+```
+
+Safe defaults:
+- Merges `.github/` and `docs/` without overwriting existing files
+- Copies `.gitignore` only if missing
+
+Useful flags:
+- `--dry-run` preview changes
+- `--force` overwrite existing files (creates timestamped backups)
+
+### Option B: Local installer after clone
+
+```bash
+git clone https://github.com/kevsmir02/toji-agent.git
+cd toji-agent
+chmod +x install.sh
+./install.sh --target /path/to/your-project --yes
+```
+
 ## How to Use
 
 ### 1. Copy into your project
