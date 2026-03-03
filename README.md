@@ -72,16 +72,26 @@ docs/ai/
 Install directly into your existing project without cloning manually:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/install.sh | bash -s -- --target /path/to/your-project --yes
+curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/install.sh | bash -s -- --target /path/to/your-project
 ```
+
+Interactive installer will ask:
+- How to handle `AGENTS.md` if it already exists (`keep-bridge`, `sidecar-only`, or `overwrite`)
+- Whether to run stack detection immediately
 
 Safe defaults:
 - Merges `.github/` and `docs/` without overwriting existing files
 - Copies `.gitignore` only if missing
+- If `AGENTS.md` exists, keeps it and adds a Toji bridge reference + `AGENTS.toji-bridge.md`
+- If `AGENTS.md` is missing, creates a minimal bridge `AGENTS.md`
+- If stack detection is skipped or unsupported, Active Stack Profile stays `generic`
 
 Useful flags:
+- `--yes` non-interactive install with safe defaults
 - `--dry-run` preview changes
 - `--force` overwrite existing files (creates timestamped backups)
+- `--detect-stack` force stack detection in non-interactive mode
+- `--agents-mode keep-bridge|sidecar-only|overwrite` set AGENTS behavior explicitly
 
 ### Option B: Local installer after clone
 
