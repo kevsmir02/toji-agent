@@ -92,6 +92,11 @@ confirm() {
     return 0
   fi
 
+  if [[ ! -t 0 ]]; then
+    log "(non-interactive) auto-confirming: $prompt"
+    return 0
+  fi
+
   read -r -p "$prompt [y/N]: " reply
   [[ "$reply" =~ ^[Yy]$ ]]
 }
@@ -102,7 +107,7 @@ prompt_choice() {
   shift 2
   local options=("$@")
 
-  if [[ "$YES" == "true" ]]; then
+  if [[ "$YES" == "true" ]] || [[ ! -t 0 ]]; then
     printf '%s\n' "$default_value"
     return 0
   fi
