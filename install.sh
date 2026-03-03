@@ -6,10 +6,9 @@ SOURCE_DIR=""
 CLEANUP_DIR=""
 TARGET_DIR=""
 FORCE="false"
-YES="false"
 DRY_RUN="false"
-RUN_DETECT_STACK="ask"
-AGENTS_MODE="ask"
+RUN_DETECT_STACK="false"
+AGENTS_MODE="keep-bridge"
 
 REPO_ARCHIVE_URL="https://codeload.github.com/kevsmir02/toji-agent/tar.gz/refs/heads/main"
 
@@ -21,13 +20,18 @@ usage() {
 Install Toji Agent into an existing project.
 
 Usage:
-  ./install.sh --target /path/to/project [--yes] [--force] [--dry-run] [--detect-stack]
-  ./install.sh /path/to/project [--yes] [--force] [--dry-run] [--detect-stack]
+  ./install.sh --target /path/to/project [OPTIONS]
+  ./install.sh /path/to/project [OPTIONS]
+
+Default behaviour (no flags):
+  - .github/    always overwritten with latest Toji Agent files
+  - docs/       safe merge  (existing files kept, new files added)
+  - .gitignore  kept if it already exists
+  - AGENTS.md   keep-bridge (reference block appended, file not replaced)
 
 Options:
   --target <path>          Target project directory
-  --yes                    Skip prompts and use safe defaults
-  --force                  Overwrite existing .github/docs/.gitignore (backs up old files)
+  --force                  Backup and overwrite everything, including docs/
   --dry-run                Show what would happen without copying files
   --detect-stack           Run stack detection and update active profile after install
   --agents-mode <mode>     AGENTS.md handling: keep-bridge | sidecar-only | overwrite
@@ -86,68 +90,6 @@ resolve_source_dir() {
   fi
 }
 
-confirm() {
-  local prompt="$1"
-  if [[ "$YES" == "true" ]]; then
-    return 0
-  fi
-
-  if [[ ! -t 0 && ! -r /dev/tty ]]; then
-    log "(non-interactive) auto-confirming: $prompt"
-    return 0
-  fi
-
-  if [[ -t 0 ]]; then
-    read -r -p "$prompt [y/N]: " reply
-  else
-    read -r -p "$prompt [y/N]: " reply < /dev/tty
-  fi
-  [[ "$reply" =~ ^[Yy]$ ]]
-}
-
-prompt_choice() {
-  local prompt="$1"
-  local default_value="$2"
-  shift 2
-  local options=("$@")
-
-  if [[ "$YES" == "true" ]]; then
-    printf '%s\n' "$default_value"
-    return 0
-  fi
-
-  if [[ ! -t 0 && ! -r /dev/tty ]]; then
-    printf '%s\n' "$default_value"
-    return 0
-  fi
-
-  printf '%s\n' "$prompt" >&2
-  local index=1
-  for option in "${options[@]}"; do
-    printf '  %s) %s\n' "$index" "$option" >&2
-    index=$((index + 1))
-  done
-
-  if [[ -t 0 ]]; then
-    read -r -p "Choose [default: $default_value]: " reply
-  else
-    read -r -p "Choose [default: $default_value]: " reply < /dev/tty
-  fi
-  if [[ -z "$reply" ]]; then
-    printf '%s\n' "$default_value"
-    return 0
-  fi
-
-  if [[ "$reply" =~ ^[0-9]+$ ]]; then
-    local picked=$((reply - 1))
-    if (( picked >= 0 && picked < ${#options[@]} )); then
-      printf '%s\n' "${options[$picked]}"
-      return 0
-    fi
-  fi
-
-  printf '%s\n' "$reply"
-}
 
 backup_existing() {
   local path="$1"
@@ -381,17 +323,7 @@ handle_agents_file() {
     return 0
   fi
 
-  local selected_mode="$AGENTS_MODE"
-  if [[ "$selected_mode" == "ask" ]]; then
-    selected_mode=$(prompt_choice \
-      "AGENTS.md already exists. How should installer handle it?" \
-      "keep-bridge" \
-      "keep-bridge" \
-      "sidecar-only" \
-      "overwrite")
-  fi
-
-  case "$selected_mode" in
+  case "$AGENTS_MODE" in
     keep-bridge)
       write_bridge_file "$bridge_sidecar_path"
       append_agents_reference_block "$agents_path" "AGENTS.toji-bridge.md"
@@ -413,27 +345,13 @@ handle_agents_file() {
 }
 
 handle_stack_detection() {
-  local should_detect="$RUN_DETECT_STACK"
-  if [[ "$should_detect" == "ask" ]]; then
-    if [[ "$YES" == "true" ]]; then
-      should_detect="false"
-    else
-      if confirm "Run stack detection now and update Active Stack Profile?"; then
-        should_detect="true"
-      else
-        should_detect="false"
-      fi
-    fi
-  fi
-
-  if [[ "$should_detect" != "true" ]]; then
+  if [[ "$RUN_DETECT_STACK" != "true" ]]; then
     log "Stack detection skipped. Profile remains generic by default."
     return 0
   fi
 
-  local stack_id
+  local stack_id detected_at
   stack_id="$(detect_stack_id)"
-  local detected_at
   detected_at="$(date +%F)"
 
   if [[ "$stack_id" == "laravel-inertia-react" || "$stack_id" == "mern" ]]; then
@@ -455,10 +373,6 @@ while [[ $# -gt 0 ]]; do
     --target)
       TARGET_DIR="${2:-}"
       shift 2
-      ;;
-    --yes)
-      YES="true"
-      shift
       ;;
     --force)
       FORCE="true"
@@ -517,63 +431,75 @@ if [[ "$TARGET_DIR" == "$SOURCE_DIR" ]]; then
 fi
 
 log "Installing Toji Agent into: $TARGET_DIR"
-log "Items: .github, docs, .gitignore"
 
 if [[ "$DRY_RUN" == "true" ]]; then
   log "Dry run mode enabled (no files will be changed)."
 fi
 
-if [[ "$FORCE" != "true" ]]; then
-  if [[ -e "$TARGET_DIR/.github" || -e "$TARGET_DIR/docs" || -e "$TARGET_DIR/.gitignore" ]]; then
-    if ! confirm "Some target files already exist. Continue with safe merge (existing files are kept, new files copied)?"; then
-      log "Cancelled."
-      exit 0
+if [[ "$FORCE" == "true" ]]; then
+  # Back up and fully replace everything
+  for item in ".github" "docs" ".gitignore"; do
+    if [[ -e "$TARGET_DIR/$item" ]]; then
+      backup_existing "$TARGET_DIR/$item"
     fi
-  fi
+  done
 
   if [[ "$DRY_RUN" == "true" ]]; then
-    log "[dry-run] merge copy: $SOURCE_DIR/.github/* -> $TARGET_DIR/.github/"
-    log "[dry-run] merge copy: $SOURCE_DIR/docs/* -> $TARGET_DIR/docs/"
-    if [[ ! -e "$TARGET_DIR/.gitignore" ]]; then
-      log "[dry-run] copy file: $SOURCE_DIR/.gitignore -> $TARGET_DIR/.gitignore"
-    else
-      log "[dry-run] keep existing: $TARGET_DIR/.gitignore"
-    fi
+    log "[dry-run] overwrite: $SOURCE_DIR/.github -> $TARGET_DIR/.github"
+    log "[dry-run] overwrite: $SOURCE_DIR/docs -> $TARGET_DIR/docs"
+    log "[dry-run] overwrite: $SOURCE_DIR/.gitignore -> $TARGET_DIR/.gitignore"
     handle_agents_file
     handle_stack_detection
-    log "Install complete (dry run)."
+    log "Install complete (dry run, force mode)."
     exit 0
   fi
 
-  mkdir -p "$TARGET_DIR/.github" "$TARGET_DIR/docs"
-  cp -Rn "$SOURCE_DIR/.github/." "$TARGET_DIR/.github/"
-  cp -Rn "$SOURCE_DIR/docs/." "$TARGET_DIR/docs/"
-
-  if [[ ! -e "$TARGET_DIR/.gitignore" ]]; then
-    cp "$SOURCE_DIR/.gitignore" "$TARGET_DIR/.gitignore"
-    log "copied: .gitignore"
-  else
-    log "kept existing: .gitignore"
-  fi
+  copy_item "$SOURCE_DIR/.github" "$TARGET_DIR"
+  copy_item "$SOURCE_DIR/docs" "$TARGET_DIR"
+  copy_item "$SOURCE_DIR/.gitignore" "$TARGET_DIR"
 
   handle_agents_file
   handle_stack_detection
-
-  log "Install complete (safe merge mode)."
+  log "Install complete (force mode)."
   exit 0
 fi
 
-for item in ".github" "docs" ".gitignore"; do
-  if [[ -e "$TARGET_DIR/$item" ]]; then
-    backup_existing "$TARGET_DIR/$item"
+# Default: overwrite .github, safe-merge docs, keep .gitignore
+if [[ "$DRY_RUN" == "true" ]]; then
+  log "[dry-run] overwrite: $SOURCE_DIR/.github -> $TARGET_DIR/.github"
+  log "[dry-run] safe-merge: $SOURCE_DIR/docs -> $TARGET_DIR/docs"
+  if [[ ! -e "$TARGET_DIR/.gitignore" ]]; then
+    log "[dry-run] copy file: $SOURCE_DIR/.gitignore -> $TARGET_DIR/.gitignore"
+  else
+    log "[dry-run] keep existing: $TARGET_DIR/.gitignore"
   fi
-done
+  handle_agents_file
+  handle_stack_detection
+  log "Install complete (dry run)."
+  exit 0
+fi
 
+# Overwrite .github entirely
+if [[ -e "$TARGET_DIR/.github" ]]; then
+  rm -rf "$TARGET_DIR/.github"
+fi
 copy_item "$SOURCE_DIR/.github" "$TARGET_DIR"
-copy_item "$SOURCE_DIR/docs" "$TARGET_DIR"
-copy_item "$SOURCE_DIR/.gitignore" "$TARGET_DIR"
+log "installed: .github"
+
+# Safe-merge docs (existing files kept, new files added)
+mkdir -p "$TARGET_DIR/docs"
+cp -Rn "$SOURCE_DIR/docs/." "$TARGET_DIR/docs/"
+log "merged: docs"
+
+# Keep .gitignore if it exists
+if [[ ! -e "$TARGET_DIR/.gitignore" ]]; then
+  cp "$SOURCE_DIR/.gitignore" "$TARGET_DIR/.gitignore"
+  log "copied: .gitignore"
+else
+  log "kept existing: .gitignore"
+fi
 
 handle_agents_file
 handle_stack_detection
 
-log "Install complete (force mode)."
+log "Install complete."
