@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR=""
+SOURCE_DIR=""
+CLEANUP_DIR=""
 TARGET_DIR=""
 FORCE="false"
 YES="false"
 DRY_RUN="false"
 RUN_DETECT_STACK="ask"
 AGENTS_MODE="ask"
+
+REPO_ARCHIVE_URL="https://codeload.github.com/kevsmir02/toji-agent/tar.gz/refs/heads/main"
 
 AGENTS_BRIDGE_START="<!-- TOJI_AGENT_BRIDGE_START -->"
 AGENTS_BRIDGE_END="<!-- TOJI_AGENT_BRIDGE_END -->"
@@ -33,6 +37,53 @@ EOF
 
 log() {
   printf '%s\n' "$1"
+}
+
+cleanup() {
+  if [[ -n "$CLEANUP_DIR" && -d "$CLEANUP_DIR" ]]; then
+    rm -rf "$CLEANUP_DIR"
+  fi
+}
+
+resolve_script_dir() {
+  local script_source="${BASH_SOURCE[0]-}"
+
+  if [[ -n "$script_source" ]]; then
+    SCRIPT_DIR="$(cd "$(dirname "$script_source")" && pwd)"
+  else
+    SCRIPT_DIR="$PWD"
+  fi
+}
+
+resolve_source_dir() {
+  if [[ -d "$SCRIPT_DIR/.github" && -d "$SCRIPT_DIR/docs" && -f "$SCRIPT_DIR/.gitignore" ]]; then
+    SOURCE_DIR="$SCRIPT_DIR"
+    return 0
+  fi
+
+  log "Local template files not found; downloading from GitHub..."
+
+  CLEANUP_DIR="$(mktemp -d)"
+
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$REPO_ARCHIVE_URL" | tar -xz -C "$CLEANUP_DIR"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO- "$REPO_ARCHIVE_URL" | tar -xz -C "$CLEANUP_DIR"
+  else
+    log "Error: curl or wget is required to download template files in piped mode."
+    exit 1
+  fi
+
+  SOURCE_DIR="$(find "$CLEANUP_DIR" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+  if [[ -z "$SOURCE_DIR" ]]; then
+    log "Error: failed to extract template archive."
+    exit 1
+  fi
+
+  if [[ ! -d "$SOURCE_DIR/.github" || ! -d "$SOURCE_DIR/docs" || ! -f "$SOURCE_DIR/.gitignore" ]]; then
+    log "Error: downloaded template is missing required files."
+    exit 1
+  fi
 }
 
 confirm() {
@@ -424,6 +475,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+trap cleanup EXIT
+
+resolve_script_dir
+resolve_source_dir
+
 if [[ -z "$TARGET_DIR" ]]; then
   log "Error: target path is required."
   usage
@@ -437,7 +493,7 @@ fi
 
 TARGET_DIR="$(cd "$TARGET_DIR" && pwd)"
 
-if [[ "$TARGET_DIR" == "$SCRIPT_DIR" ]]; then
+if [[ "$TARGET_DIR" == "$SOURCE_DIR" ]]; then
   log "Target is this template repo itself. Nothing to install."
   exit 0
 fi
@@ -458,10 +514,10 @@ if [[ "$FORCE" != "true" ]]; then
   fi
 
   if [[ "$DRY_RUN" == "true" ]]; then
-    log "[dry-run] merge copy: $SCRIPT_DIR/.github/* -> $TARGET_DIR/.github/"
-    log "[dry-run] merge copy: $SCRIPT_DIR/docs/* -> $TARGET_DIR/docs/"
+    log "[dry-run] merge copy: $SOURCE_DIR/.github/* -> $TARGET_DIR/.github/"
+    log "[dry-run] merge copy: $SOURCE_DIR/docs/* -> $TARGET_DIR/docs/"
     if [[ ! -e "$TARGET_DIR/.gitignore" ]]; then
-      log "[dry-run] copy file: $SCRIPT_DIR/.gitignore -> $TARGET_DIR/.gitignore"
+      log "[dry-run] copy file: $SOURCE_DIR/.gitignore -> $TARGET_DIR/.gitignore"
     else
       log "[dry-run] keep existing: $TARGET_DIR/.gitignore"
     fi
@@ -472,11 +528,11 @@ if [[ "$FORCE" != "true" ]]; then
   fi
 
   mkdir -p "$TARGET_DIR/.github" "$TARGET_DIR/docs"
-  cp -Rn "$SCRIPT_DIR/.github/." "$TARGET_DIR/.github/"
-  cp -Rn "$SCRIPT_DIR/docs/." "$TARGET_DIR/docs/"
+  cp -Rn "$SOURCE_DIR/.github/." "$TARGET_DIR/.github/"
+  cp -Rn "$SOURCE_DIR/docs/." "$TARGET_DIR/docs/"
 
   if [[ ! -e "$TARGET_DIR/.gitignore" ]]; then
-    cp "$SCRIPT_DIR/.gitignore" "$TARGET_DIR/.gitignore"
+    cp "$SOURCE_DIR/.gitignore" "$TARGET_DIR/.gitignore"
     log "copied: .gitignore"
   else
     log "kept existing: .gitignore"
@@ -495,9 +551,9 @@ for item in ".github" "docs" ".gitignore"; do
   fi
 done
 
-copy_item "$SCRIPT_DIR/.github" "$TARGET_DIR"
-copy_item "$SCRIPT_DIR/docs" "$TARGET_DIR"
-copy_item "$SCRIPT_DIR/.gitignore" "$TARGET_DIR"
+copy_item "$SOURCE_DIR/.github" "$TARGET_DIR"
+copy_item "$SOURCE_DIR/docs" "$TARGET_DIR"
+copy_item "$SOURCE_DIR/.gitignore" "$TARGET_DIR"
 
 handle_agents_file
 handle_stack_detection
