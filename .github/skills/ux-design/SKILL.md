@@ -1,133 +1,96 @@
 ---
 name: ux-design
-description: Apply UX principles when designing or reviewing user flows, navigation, forms, states, and interactions. Use this skill when building or evaluating interfaces for usability, task completion, information architecture, error handling, or accessibility — not just visual appearance.
+description: Apply a Notion-inspired UX framework when designing or reviewing user flows, navigation, forms, states, and interactions. Use this skill when building or evaluating interfaces for usability, task completion, information architecture, error handling, or accessibility.
 ---
 
-This skill applies established UX principles to produce interfaces that are easy to use, predictable, and cognitively lightweight — without sacrificing visual quality. It complements `frontend-design` (which governs aesthetics) by governing behavior, flow, and interaction patterns.
+This skill applies a Notion-inspired UX framework: block-based architecture, progressive disclosure, and functional minimalism. It complements `frontend-design` by governing information flow, interaction density, and behavioral clarity.
 
-## Core Principle: Conventional Where It Matters, Distinctive Where It Doesn't
+## Core Principle: Calm Structure Over Visual Novelty
 
-The highest-stakes UX decisions involve interaction patterns users already know (navigation, forms, error recovery, CTAs). Break these conventions only with strong justification. Visual distinctiveness (typography, color, motion, decoration) is low-cost to learn; novel interaction patterns are high-cost.
+The default experience should feel organized, quiet, and dependable. Users should feel that content is made of understandable blocks, actions are discoverable when needed, and interface chrome stays out of the way until context calls for it.
 
----
+## Notion-Inspired UX Framework
 
-## Nielsen's 10 Usability Heuristics
+### 1. Block-Based Architecture
+- Design information and actions as composable blocks with clear boundaries.
+- Each block should represent one job: a paragraph, form section, database row group, task list, properties panel, comment thread, or action region.
+- Blocks should be individually scannable, movable in concept, and understandable without relying on surrounding decoration.
+- Use spacing, alignment, and subtle dividers to define structure instead of heavy visual containers.
+- Prefer modular page composition over monolithic screens with mixed concerns.
 
-Apply these as a checklist when designing or reviewing any interface:
+### 2. Progressive Disclosure
+- Reveal complexity only when the user needs it.
+- Keep the default surface focused on the primary task; advanced controls belong behind secondary actions, toggles, menus, expandable sections, or slash-command-style triggers.
+- Borrow from slash-command interaction patterns: make powerful actions searchable, contextual, and fast for experienced users without overwhelming first-time users.
+- Use hover states, inline toolbars, kebab menus, and command menus to preserve a calm canvas while keeping power accessible.
+- Default to showing the next useful action, not the entire system.
 
-1. **Visibility of System Status** — Always keep users informed about what is happening. Show loading states, progress indicators, success/error feedback. Never leave the user guessing whether an action registered.
+### 3. Functional Minimalism
+- Every visible element must earn its place through task support, orientation, or feedback.
+- Favor whitespace, typographic hierarchy, and subtle borders over color, gradients, or dramatic effects.
+- Minimize persistent chrome. Sidebars, headers, breadcrumbs, and toolbars should support orientation, not dominate the layout.
+- Prefer plain language and concise labels over decorative copy.
+- Make dense workflows feel manageable through rhythm and grouping, not through aggressive visual contrast.
 
-2. **Match Between System and the Real World** — Use language and concepts familiar to the user, not internal system terminology. Order information naturally. Prefer human labels over technical ones.
+## Interface Patterns
 
-3. **User Control and Freedom** — Provide clear escape routes. Support undo/redo where destructive actions exist. Never trap a user in a state with no way out.
+### Navigation and Layout
+- Use stable page scaffolding: sidebar, top bar, content column, and optional contextual panel.
+- Keep navigation lightweight and predictable. Users should always know where they are and what surface they are editing.
+- Use nested structure carefully: indentation, breadcrumbs, and hierarchy labels should clarify parent-child relationships without adding clutter.
+- Let the main content column breathe. Avoid dashboard-style fragmentation unless the task genuinely requires multiple simultaneous data views.
 
-4. **Consistency and Standards** — Follow platform conventions. Use the same words, icons, and patterns for the same actions throughout. Don't make the user re-learn the same concept twice.
+### Editing and Commands
+- Design around direct manipulation of content blocks where possible.
+- Inline editing should feel natural: click into content, edit in place, and avoid unnecessary modal interruptions.
+- Use command menus and contextual insertion patterns for advanced creation flows.
+- Secondary actions should appear near the object they affect.
+- Make undo, cancel, and recovery obvious.
 
-5. **Error Prevention** — Design to prevent problems before they occur. Confirm before destructive actions. Constrain inputs to valid options where possible. Disable actions that aren't currently valid instead of letting them fail.
+### Forms and Data Entry
+- Break long forms into logical block sections with clear headings.
+- Default to one-column form layouts.
+- Show only the fields needed for the current decision; advanced options should be collapsed by default.
+- Treat labels, helper text, validation, and inline confirmations as part of the same block.
+- Preserve entered data on failure and return users to the affected block with clear guidance.
 
-6. **Recognition Over Recall** — Make options, actions, and information visible. Minimize what the user must remember between steps. Use labels, icons with text, and persistent context cues.
+### States and Feedback
+- Empty states should teach the block model: explain what belongs here and offer a direct next action.
+- Loading states should preserve structure with calm skeletons or reserved space instead of jarring spinners everywhere.
+- Success states should be lightweight and local when possible.
+- Error states should appear close to the affected block, in plain language, with an obvious recovery action.
+- Autosave, sync, and background updates should be communicated quietly rather than interruptively.
 
-7. **Flexibility and Efficiency of Use** — Support both novice and expert users. Provide shortcuts for frequent actions. Don't force power users through beginner flows.
+## Accessibility Requirements
 
-8. **Aesthetic and Minimalist Design** — Show only what's relevant to the current task. Every extra element competes for attention. When in doubt, remove it.
+Accessibility is part of the product feel. A calm interface that fails keyboard or screen-reader users is not calm.
 
-9. **Help Users Recognize, Diagnose, and Recover from Errors** — Error messages must: (a) clearly state what went wrong in plain language, (b) explain why if non-obvious, (c) tell the user exactly what to do next. Never show raw error codes to end users.
+- Maintain WCAG AA contrast ratios.
+- Ensure every interactive control is keyboard reachable with a visible focus state.
+- Use semantic structure and consistent heading hierarchy so block relationships are understandable outside visual layout.
+- Every form input needs a visible label and linked error/help text via `aria-describedby` when relevant.
+- Use touch targets of at least 44×44px on mobile.
+- Respect `prefers-reduced-motion` for all transitions and animations.
 
-10. **Help and Documentation** — Where complexity is unavoidable, provide contextual help. Inline hints, tooltips, and empty-state guidance beat separate documentation pages.
-
----
-
-## Laws of UX (Applied)
-
-### Cognitive Load
-- **Hick's Law** — More choices = more decision time. Reduce navigation items, form fields, and option lists to only what's needed for the current task. Use progressive disclosure to reveal complexity gradually.
-- **Miller's Law** — Working memory holds ~7±2 items. Chunk information into groups of 5–7. Break long forms into steps. Paginate long lists.
-- **Cognitive Load** — Every unfamiliar pattern, unexplained label, or missing affordance costs the user mental effort. Minimize total cognitive load per task.
-
-### Interaction Design
-- **Fitts's Law** — Larger targets and shorter travel distance reduce interaction effort. Primary CTAs must be large and reachable. On mobile, touch targets minimum 44×44px. Destructive actions should be small and distant from primary actions.
-- **Postel's Law** — Be liberal in what you accept (flexible input formats), strict in what you output (consistent, clean results). Auto-format phone numbers, trim whitespace, accept both date formats.
-- **Jakob's Law** — Users spend most of their time on other products and expect your product to work the same way. Leverage established patterns (hamburger menus, breadcrumbs, inline validation) rather than reinventing them.
-
-### Perception and Attention
-- **Gestalt Principles** — Group related items visually (proximity), use consistent styling for similar items (similarity), guide the eye with alignment and flow (continuity). Grouping communicates structure without requiring labels.
-- **Von Restorff Effect** — The item that stands out is most remembered. Use visual contrast deliberately — one primary CTA, not five equally weighted buttons.
-- **Serial Position Effect** — Users remember the first and last items in a list better than middle items. Place critical navigation items and CTAs at the start or end of sequences.
-- **Doherty Threshold** — System response under 400ms keeps users in flow. Over 1 second, show a loader. Over 10 seconds, show progress with estimated time. Never show a blank or frozen UI.
-
----
-
-## UX Patterns by Context
-
-### Navigation
-- Provide persistent wayfinding — breadcrumbs, active state highlights, page titles
-- Maximum 7 top-level navigation items (Hick's Law)
-- Mobile: thumb-reachable primary navigation (bottom nav or accessible hamburger)
-- Always indicate where the user is in the hierarchy
-
-### Forms
-- One column layouts outperform multi-column for completion rates
-- Label above field, not placeholder-only (placeholders disappear on focus)
-- Inline validation on blur, not on keystroke (reduces noise)
-- Group related fields visually (Gestalt proximity)
-- Required vs optional: mark the minority — if most fields are required, mark optional ones instead
-- Show field-level errors next to the field, not only at the top of the form
-- Preserve entered data on validation errors — never clear the form on submit failure
-- Use `autocomplete` attributes on all personal data fields
-
-### Empty, Loading, and Error States
-Every data-driven UI must design all four states:
-- **Empty state** — explain what will appear here and provide a clear action to get started
-- **Loading state** — show skeleton screens for predictable layouts; spinner for indeterminate ops
-- **Error state** — plain language, reason if non-obvious, recovery action (retry, go back, contact support)
-- **Success state** — confirm action completed; indicate next step if one exists
-
-### Destructive Actions
-- Require confirmation (modal or inline confirmation step)
-- Use red/warning color to signal risk — not for primary actions
-- Place destructive buttons away from confirm/save buttons (Fitts's Law)
-- Consider soft deletes with undo over hard deletes with confirm dialogs
-
----
-
-## Accessibility as UX (WCAG AA Baseline)
-
-Accessibility failures are UX failures. Enforce these minimums:
-- **Color contrast**: 4.5:1 for body text, 3:1 for large text and UI components
-- **Keyboard navigation**: all interactive elements reachable and operable by keyboard; visible focus indicator
-- **Screen reader support**: semantic HTML, ARIA labels on icon-only controls, live regions for dynamic content
-- **Touch targets**: minimum 44×44px on mobile
-- **Motion**: all animations wrapped in `@media (prefers-reduced-motion: reduce)` fallbacks
-- **Forms**: every input has a visible, associated `<label>`; error messages linked via `aria-describedby`
-
-### Dynamic Interfaces and Inertia Updates
-- Add a persistent `aria-live="polite"` status region for flash messages, successful saves, partial reload completion, and non-blocking content updates.
-- Use `aria-live="assertive"` only for urgent failures that require immediate attention, such as destructive-action errors.
-- Mark updating regions with `aria-busy="true"` during Inertia visits, partial reloads, or async form submissions, then clear it when complete.
-- After an Inertia navigation, move focus to the primary page heading or another stable top-level landmark so screen-reader and keyboard users know the page changed.
-- After validation failures, move focus to the error summary or first invalid field and ensure each field points to its message with `aria-describedby`.
-- Keep document titles, landmarks, and heading hierarchy accurate on every Inertia page swap so route changes are announced meaningfully.
-- For optimistic or incremental UI updates, provide a visible and announced confirmation that the update succeeded or was rolled back.
-
----
+### Live Updates and Async States
+- Add a persistent `aria-live="polite"` region for non-blocking updates such as autosave confirmation, sync completion, inserted blocks, and successful inline actions.
+- Use `aria-live="assertive"` only for urgent failures or destructive-action problems that require immediate attention.
+- Mark actively refreshing areas with `aria-busy="true"` during async loads, saves, filtering, or block reordering, then clear it immediately when complete.
+- After command-menu actions or dynamic insertions, move focus to the created or updated block when that best preserves continuity.
+- After validation failures, move focus to the first invalid field or block-level error summary.
+- Do not rely on color alone to communicate saved, syncing, warning, or error states.
 
 ## UX Review Checklist
 
-Before shipping any UI, verify:
-
-- [ ] All four states handled: empty, loading, error, success
-- [ ] Error messages are plain language with recovery actions
-- [ ] No action leaves the user in an unrecoverable state
-- [ ] Navigation clearly shows the user where they are
-- [ ] Form labels are visible (not placeholder-only)
-- [ ] Primary CTA is visually dominant; destructive actions are visually subdued
-- [ ] Touch targets ≥44×44px on mobile
-- [ ] Keyboard navigable, visible focus styles
-- [ ] Contrast ratios meet WCAG AA
-- [ ] `prefers-reduced-motion` respected
-- [ ] Dynamic updates announce status via the correct `aria-live` region
-- [ ] Inertia navigations move focus to a stable heading or landmark
-- [ ] Validation errors are linked to fields and focus is managed on failure
-- [ ] Updating regions use `aria-busy` during async refreshes/submits
-- [ ] No raw error codes or stack traces exposed to users
-- [ ] Progressive disclosure used for complex or advanced options
+- [ ] The page is organized into clear, comprehensible blocks
+- [ ] Primary tasks are visible without exposing every advanced control
+- [ ] Secondary actions are progressively disclosed through contextual UI
+- [ ] Visual treatment is quiet and task-oriented rather than decorative
+- [ ] Navigation clarifies hierarchy without adding noise
+- [ ] Forms are grouped into logical block sections
+- [ ] Empty, loading, success, and error states are handled at the appropriate block level
+- [ ] Keyboard navigation works across all interactive surfaces
+- [ ] Live updates use the correct `aria-live` behavior
+- [ ] Async regions use `aria-busy` during updates
+- [ ] Validation errors move focus and explain recovery clearly
+- [ ] The interface feels calm, structured, and operationally clear

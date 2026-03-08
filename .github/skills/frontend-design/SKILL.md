@@ -1,55 +1,65 @@
 ---
 name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.
+description: Create production-grade frontend interfaces with a functional minimalist default. Use this skill when the user asks to build web components, pages, dashboards, React components, HTML/CSS layouts, or when styling any web UI.
 ---
 
-This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.
+This skill guides creation of production-grade frontend interfaces with a Notion-inspired functional minimalist baseline. The priority is system rigor: clear structure, restrained surfaces, dependable spacing, and quiet polish.
 
 The user provides frontend requirements: a component, page, application, or interface to build. They may include context about the purpose, audience, or technical constraints.
 
 ## Design Thinking
 
-Before coding, understand the context and commit to a BOLD aesthetic direction:
-- **Purpose**: What problem does this interface solve? Who uses it?
-- **Tone**: Pick an extreme: brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian, etc. There are so many flavors to choose from. Use these for inspiration but design one that is true to the aesthetic direction.
-- **Constraints**: Technical requirements (framework, performance, accessibility). Always consider `prefers-reduced-motion` for animations and WCAG AA contrast ratios for color choices.
-- **Differentiation**: What makes this UNFORGETTABLE? What's the one thing someone will remember?
+Before coding, understand the context and commit to a functional minimalist direction:
+- **Purpose**: What task does the interface support? What needs to feel effortless?
+- **Hierarchy**: What are the primary surfaces, secondary controls, and background details?
+- **Constraints**: Technical requirements, performance expectations, and accessibility requirements. Always consider `prefers-reduced-motion` and WCAG AA contrast ratios.
+- **System Rigor**: Favor consistency, legibility, and predictable composability over novelty.
 
-**CRITICAL**: Choose a clear conceptual direction and execute it with precision. Bold maximalism and refined minimalism both work — the key is intentionality, not intensity.
-
-Then implement working code (HTML/CSS/JS, React, Vue, etc.) that is:
+Then implement working code that is:
 - Production-grade and functional
-- Visually striking and memorable
-- Cohesive with a clear aesthetic point-of-view
-- Meticulously refined in every detail
+- Visually restrained and highly legible
+- Systematic in spacing, alignment, and component behavior
 - Responsive and mobile-first unless explicitly desktop-only
+- Calm enough that content and workflows stay primary
 
-## Frontend Aesthetics Guidelines
+## Functional Minimalist Defaults
 
 Focus on:
-- **Typography**: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics — unexpected, characterful font choices. Pair a distinctive display font with a refined body font.
-- **Color & Theme**: Commit to a cohesive aesthetic. Use CSS variables for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes. Verify contrast ratios meet WCAG AA (4.5:1 for body text, 3:1 for large text).
-- **Motion**: Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Framer Motion for React when available. Focus on high-impact moments: one well-orchestrated page load with staggered reveals (`animation-delay`) creates more delight than scattered micro-interactions. Use scroll-triggering and hover states that surprise. Always wrap motion in `@media (prefers-reduced-motion: reduce)` fallbacks.
-- **Spatial Composition**: Unexpected layouts. Asymmetry. Overlap. Diagonal flow. Grid-breaking elements. Generous negative space OR controlled density.
-- **Backgrounds & Visual Details**: Create atmosphere and depth rather than defaulting to solid colors. Add contextual effects and textures that match the overall aesthetic. Apply creative forms like gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, decorative borders, custom cursors, and grain overlays.
+- **Typography**: Default to Inter or a clean system stack. Use typographic hierarchy through size, weight, and spacing rather than expressive display fonts.
+- **Color**: Favor monochrome-heavy palettes with sparse accent color used only for status, focus, or primary actions. Prefer off-white surfaces, soft neutrals, charcoal text, and subtle dividers.
+- **Borders and Surfaces**: Use light borders, hairlines, and gentle background shifts to separate content. Prefer subtle surface elevation over dramatic depth.
+- **Spacing**: Use generous whitespace and consistent spacing scales to define structure. Density should feel intentional, never cramped.
+- **Motion**: Keep transitions subtle and utility-driven. Use motion to clarify state changes, not to decorate the interface. Always provide `prefers-reduced-motion` fallbacks.
+- **Shadows**: Use minimal shadows only when necessary for layering or focus. Avoid complex, colorful, or cinematic shadow treatments.
 
-## Accessibility Baseline (Non-Negotiable)
+## System Rigor Rules
 
-Even in creative, heavily-styled work, always maintain:
-- Semantic HTML structure (`nav`, `main`, `section`, `button`, not `div` soup)
-- Keyboard navigability — focus styles must be visible
-- ARIA labels on icon-only buttons and interactive decorative elements
-- `alt` text on all meaningful images
-- `prefers-reduced-motion` media query wrapping all animations
+- Prefer reusable component patterns over one-off visual flourishes.
+- Default to rectilinear layouts, clear columns, and predictable stacking behavior.
+- Keep controls understated until interaction or focus makes them relevant.
+- Use iconography sparingly and pair icon-only controls with accessible labeling.
+- Treat UI polish as precision in spacing, borders, hover states, and typography.
+- Avoid gradients, glow effects, ornamental textures, and expressive visual motifs unless explicitly requested.
+
+## Accessibility Baseline
+
+- Use semantic HTML structure.
+- Ensure keyboard navigability and visible focus styles.
+- Provide ARIA labels for icon-only controls.
+- Include meaningful alt text for informative images.
+- Respect `prefers-reduced-motion`.
+- Maintain WCAG AA contrast ratios.
 
 ## What to Avoid
 
-NEVER use generic AI-generated aesthetics:
-- Overused font families (Inter, Roboto, Arial, system-ui, Space Grotesk)
-- Clichéd color schemes (particularly purple gradients on white backgrounds)
-- Predictable layouts and component patterns
-- Cookie-cutter design that lacks context-specific character
+Do not default to:
+- Bold, high-intensity visual directions
+- Saturated palettes or colorful gradients
+- Decorative complexity that competes with content
+- Heavy shadows, glassmorphism, or layered visual effects
+- Experimental typography that reduces readability
+- Layouts optimized for visual surprise instead of task clarity
 
-Interpret creatively and make unexpected choices that feel genuinely designed for the context. No design should look the same. Vary between light and dark themes, different fonts, different aesthetics. NEVER converge on common choices across generations.
+## If Unsure
 
-**IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details. Elegance comes from executing the vision well.
+Choose the more restrained option. Prioritize calm structure, readable typography, subtle borders, and operational clarity over creative flair.

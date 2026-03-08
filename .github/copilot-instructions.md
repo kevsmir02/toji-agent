@@ -32,6 +32,11 @@ If **Mode** is `stack-specific`, treat **Active Skill** as authoritative for cod
 - Validate inputs at system boundaries
 - Never expose secrets, credentials, or internal paths in code or logs
 
+## Design Directive
+
+- Default to a Notion-inspired functional minimalist aesthetic.
+- Avoid colorful gradients and complex shadows unless explicitly requested.
+
 ## Engineering Discipline
 
 - Don't modify code until the problem is clearly understood
@@ -63,8 +68,8 @@ Skills in `.github/skills/` contain domain-specific workflows. Read the relevant
 | `stack-router` | Detecting project stack and activating stack-specific skills |
 | `stack-laravel-inertia-react` | Strict conventions for Laravel + Inertia + React |
 | `stack-mern` | Strict conventions for MERN projects |
-| `frontend-design` | Building distinctive, production-grade UI — avoids generic AI aesthetics |
-| `ux-design` | Usability, flows, forms, error states, and interaction patterns (Nielsen + Laws of UX) |
+| `frontend-design` | Create production-grade frontend interfaces with a functional minimalist default |
+| `ux-design` | Apply a Notion-inspired UX framework for flows, navigation, forms, states, and accessibility |
 | `scan-codebase` | Mapping project structure, entry points, layers, and conventions into a codebase map |
 
 ## Using Prompts
