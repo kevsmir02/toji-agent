@@ -34,7 +34,8 @@ If **Mode** is `stack-specific`, treat **Active Skill** as authoritative for cod
 
 ## Design Directive
 
-- Default to a Notion-inspired functional minimalist aesthetic.
+- When generating UI, strictly follow the Notion-inspired Functional Minimalist style.
+- For dark mode, use a soft dark gray approach (Gemini-style) and avoid high-contrast pure black.
 - Avoid colorful gradients and complex shadows unless explicitly requested.
 
 ## Engineering Discipline

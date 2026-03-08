@@ -9,12 +9,17 @@ This skill applies a Notion-inspired UX framework: block-based architecture, pro
 
 The default experience should feel organized, quiet, and dependable. Users should feel that content is made of understandable blocks, actions are discoverable when needed, and interface chrome stays out of the way until context calls for it.
 
+The interface should feel like a blank page that becomes powerful through interaction. Structure comes from modular blocks, whitespace, and subtle dividers rather than obvious framing.
+
 ## Notion-Inspired UX Framework
 
 ### 1. Block-Based Architecture
+- Treat every meaningful UI element as a self-contained, draggable-style block.
 - Design information and actions as composable blocks with clear boundaries.
 - Each block should represent one job: a paragraph, form section, database row group, task list, properties panel, comment thread, or action region.
 - Blocks should be individually scannable, movable in concept, and understandable without relying on surrounding decoration.
+- Each block should support an active, hover, and editable state without changing the overall page scaffold.
+- The block is the primary unit of composition, focus, insertion, reordering, and command targeting.
 - Use spacing, alignment, and subtle dividers to define structure instead of heavy visual containers.
 - Prefer modular page composition over monolithic screens with mixed concerns.
 
@@ -22,7 +27,8 @@ The default experience should feel organized, quiet, and dependable. Users shoul
 - Reveal complexity only when the user needs it.
 - Keep the default surface focused on the primary task; advanced controls belong behind secondary actions, toggles, menus, expandable sections, or slash-command-style triggers.
 - Borrow from slash-command interaction patterns: make powerful actions searchable, contextual, and fast for experienced users without overwhelming first-time users.
-- Use hover states, inline toolbars, kebab menus, and command menus to preserve a calm canvas while keeping power accessible.
+- Hide advanced block actions such as delete, move, duplicate, settings, and transform until a block is hovered, focused, or active.
+- Use hover states, inline toolbars, kebab menus, block handles, and command menus to preserve a calm canvas while keeping power accessible.
 - Default to showing the next useful action, not the entire system.
 
 ### 3. Functional Minimalism
@@ -31,6 +37,8 @@ The default experience should feel organized, quiet, and dependable. Users shoul
 - Minimize persistent chrome. Sidebars, headers, breadcrumbs, and toolbars should support orientation, not dominate the layout.
 - Prefer plain language and concise labels over decorative copy.
 - Make dense workflows feel manageable through rhythm and grouping, not through aggressive visual contrast.
+- Default to a blank-page feel for the main workspace: no bordered main container, no boxed canvas, and no unnecessary framing around content.
+- Create hierarchy through whitespace, indentation, block spacing, and subtle dividers rather than obvious cards or panels in the main reading/editing surface.
 
 ## Interface Patterns
 
@@ -39,6 +47,7 @@ The default experience should feel organized, quiet, and dependable. Users shoul
 - Keep navigation lightweight and predictable. Users should always know where they are and what surface they are editing.
 - Use nested structure carefully: indentation, breadcrumbs, and hierarchy labels should clarify parent-child relationships without adding clutter.
 - Let the main content column breathe. Avoid dashboard-style fragmentation unless the task genuinely requires multiple simultaneous data views.
+- The main content area should feel open and borderless, with blocks floating in a clear vertical rhythm.
 
 ### Editing and Commands
 - Design around direct manipulation of content blocks where possible.
@@ -46,6 +55,7 @@ The default experience should feel organized, quiet, and dependable. Users shoul
 - Use command menus and contextual insertion patterns for advanced creation flows.
 - Secondary actions should appear near the object they affect.
 - Make undo, cancel, and recovery obvious.
+- Block handles, drag affordances, and action menus should appear only on hover or active focus, not as persistent clutter.
 
 ### Forms and Data Entry
 - Break long forms into logical block sections with clear headings.
@@ -82,8 +92,11 @@ Accessibility is part of the product feel. A calm interface that fails keyboard 
 
 ## UX Review Checklist
 
+- [ ] Every meaningful element behaves like a self-contained block
+- [ ] The main workspace feels open and borderless rather than boxed in
 - [ ] The page is organized into clear, comprehensible blocks
 - [ ] Primary tasks are visible without exposing every advanced control
+- [ ] Advanced block actions stay hidden until hover or active state
 - [ ] Secondary actions are progressively disclosed through contextual UI
 - [ ] Visual treatment is quiet and task-oriented rather than decorative
 - [ ] Navigation clarifies hierarchy without adding noise

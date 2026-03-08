@@ -25,9 +25,14 @@ Then implement working code that is:
 ## Functional Minimalist Defaults
 
 Focus on:
-- **Typography**: Default to Inter or a clean system stack. Use typographic hierarchy through size, weight, and spacing rather than expressive display fonts.
-- **Color**: Favor monochrome-heavy palettes with sparse accent color used only for status, focus, or primary actions. Prefer off-white surfaces, soft neutrals, charcoal text, and subtle dividers.
-- **Borders and Surfaces**: Use light borders, hairlines, and gentle background shifts to separate content. Prefer subtle surface elevation over dramatic depth.
+- **Typography**: Strictly use Inter or a clean system sans-serif stack. Establish hierarchy through weight and spacing, with `600` for headings and `400` for body text, rather than relying on color shifts.
+- **Color**: Default to a soft dark theme. Never use pure black `#000000`.
+- **Dark Theme Tokens**: Use these defaults unless the user explicitly requests a different palette:
+	- Background: `#131314` or `#1e1e1e`
+	- Surface/Card: `#2b2b2b`
+	- Border: `#3c3c3c`
+	- Text: off-white or Gray-200 equivalent for readable contrast
+- **Borders and Surfaces**: Use subdued borders and low-contrast surface separation. Surfaces should feel gently layered, not sharply boxed.
 - **Spacing**: Use generous whitespace and consistent spacing scales to define structure. Density should feel intentional, never cramped.
 - **Motion**: Keep transitions subtle and utility-driven. Use motion to clarify state changes, not to decorate the interface. Always provide `prefers-reduced-motion` fallbacks.
 - **Shadows**: Use minimal shadows only when necessary for layering or focus. Avoid complex, colorful, or cinematic shadow treatments.
@@ -40,6 +45,16 @@ Focus on:
 - Use iconography sparingly and pair icon-only controls with accessible labeling.
 - Treat UI polish as precision in spacing, borders, hover states, and typography.
 - Avoid gradients, glow effects, ornamental textures, and expressive visual motifs unless explicitly requested.
+- Prefer modular, block-based composition over dashboard card mosaics.
+- Use a blank-page main content area where blocks are separated by spacing and subtle dividers rather than heavy outer containers.
+
+## Block Interaction Rules
+
+- Treat content modules as block rows within a calm vertical flow.
+- When hovering a block, apply only a very faint highlight such as `#ffffff0a`.
+- On block hover or active state, reveal a 6-dot drag handle icon as the movement affordance.
+- Keep drag handles, move controls, and block menus hidden until hover, focus, or active state.
+- Preserve low visual noise: hover states should clarify interactivity without creating strong contrast jumps.
 
 ## Accessibility Baseline
 
@@ -55,6 +70,7 @@ Focus on:
 Do not default to:
 - Bold, high-intensity visual directions
 - Saturated palettes or colorful gradients
+- Pure black backgrounds such as `#000000`
 - Decorative complexity that competes with content
 - Heavy shadows, glassmorphism, or layered visual effects
 - Experimental typography that reduces readability
@@ -62,4 +78,4 @@ Do not default to:
 
 ## If Unsure
 
-Choose the more restrained option. Prioritize calm structure, readable typography, subtle borders, and operational clarity over creative flair.
+Choose the more restrained option. Use the soft dark palette, Inter typography, subtle block hover states, and operational clarity over creative flair.
