@@ -4,9 +4,11 @@ description: Detect project stack and update active stack profile for stack-spec
 
 Detect the current project stack and update `.github/copilot-instructions.md` so stack mode is explicitly activated.
 
-1. **Scan Stack Markers** — Identify runtime/framework/frontend markers from files such as `composer.json`, `package.json`, `pyproject.toml`, `go.mod`, framework configs, and lockfiles.
+1. **Scan Stack Markers** — Identify runtime, framework, testing, and frontend markers from files such as `composer.json`, `package.json`, `pyproject.toml`, `go.mod`, `tailwind.config.*`, `vite.config.*`, `vitest.config.*`, `tests/Pest.php`, framework configs, and lockfiles.
+   - Record notable evidence like Laravel, Inertia, React, Tailwind, Pest, Vitest, Ziggy, Vite, Express, MongoDB, and TypeScript when present.
 2. **Build Stack ID** — Normalize to a kebab-case id (e.g. `laravel-inertia-react`, `mern`, `nextjs-typescript`).
    - If Laravel + Inertia + React markers exist, use `laravel-inertia-react`.
+   - Treat Ziggy, Tailwind, Pest, and Vitest as corroborating evidence when they appear alongside the core Laravel/Inertia/React markers.
    - If MongoDB/Mongoose + Express + React markers exist, use `mern`.
 3. **Resolve Skill** — Check for these files in order:
    - `.github/skills/stack-{stack-id}/SKILL.md`
@@ -26,6 +28,6 @@ Detect the current project stack and update `.github/copilot-instructions.md` so
    - Do not apply stack-specific conventions unless `Mode` is `stack-specific` in `.github/copilot-instructions.md`.
 6. **Report** — Return:
    - Detected stack id
-   - Evidence files used
+   - Evidence files and markers used
    - Updated profile values written to `.github/copilot-instructions.md`
    - Suggested skill name/path to create if missing

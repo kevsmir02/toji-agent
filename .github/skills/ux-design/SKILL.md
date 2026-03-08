@@ -100,6 +100,15 @@ Accessibility failures are UX failures. Enforce these minimums:
 - **Motion**: all animations wrapped in `@media (prefers-reduced-motion: reduce)` fallbacks
 - **Forms**: every input has a visible, associated `<label>`; error messages linked via `aria-describedby`
 
+### Dynamic Interfaces and Inertia Updates
+- Add a persistent `aria-live="polite"` status region for flash messages, successful saves, partial reload completion, and non-blocking content updates.
+- Use `aria-live="assertive"` only for urgent failures that require immediate attention, such as destructive-action errors.
+- Mark updating regions with `aria-busy="true"` during Inertia visits, partial reloads, or async form submissions, then clear it when complete.
+- After an Inertia navigation, move focus to the primary page heading or another stable top-level landmark so screen-reader and keyboard users know the page changed.
+- After validation failures, move focus to the error summary or first invalid field and ensure each field points to its message with `aria-describedby`.
+- Keep document titles, landmarks, and heading hierarchy accurate on every Inertia page swap so route changes are announced meaningfully.
+- For optimistic or incremental UI updates, provide a visible and announced confirmation that the update succeeded or was rolled back.
+
 ---
 
 ## UX Review Checklist
@@ -116,5 +125,9 @@ Before shipping any UI, verify:
 - [ ] Keyboard navigable, visible focus styles
 - [ ] Contrast ratios meet WCAG AA
 - [ ] `prefers-reduced-motion` respected
+- [ ] Dynamic updates announce status via the correct `aria-live` region
+- [ ] Inertia navigations move focus to a stable heading or landmark
+- [ ] Validation errors are linked to fields and focus is managed on failure
+- [ ] Updating regions use `aria-busy` during async refreshes/submits
 - [ ] No raw error codes or stack traces exposed to users
 - [ ] Progressive disclosure used for complex or advanced options

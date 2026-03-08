@@ -9,4 +9,4 @@ Help me debug an issue. Clarify expectations, identify gaps, and agree on a fix 
 3. **Reproduce & Isolate** — Determine reproducibility (always, intermittent, environment-specific). Capture reproduction steps. List suspected components or modules.
 4. **Analyze Potential Causes** — Brainstorm root causes (data, config, code regressions, external dependencies). Gather supporting evidence (logs, metrics, traces). Highlight unknowns needing investigation.
 5. **Resolve** — Present resolution options (quick fix, refactor, rollback, etc.) with pros/cons and risks. Ask which option to pursue. Summarize chosen approach, pre-work, success criteria, and validation steps.
-6. **Next Steps** — After selecting a fix path, continue with `/execute-plan`; when implemented, use `/check-implementation` and `/writing-test`.
+6. **Next Steps** — After selecting a fix path, continue with `/build`; when implemented, use `/verify` and `/write-tests`.

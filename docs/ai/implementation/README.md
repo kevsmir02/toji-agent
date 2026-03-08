@@ -1,5 +1,9 @@
 # Implementation Guide
 
+Use this as an optional companion to `docs/ai/features/{name}.md` when the feature brief needs deeper implementation detail.
+
+Suggested file name: `docs/ai/implementation/{name}.md`.
+
 ## Development Setup
 **How do we get started?**
 

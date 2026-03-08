@@ -16,6 +16,7 @@ REPO_ARCHIVE_URL="https://codeload.github.com/kevsmir02/toji-agent/tar.gz/refs/h
 
 AGENTS_BRIDGE_START="<!-- TOJI_AGENT_BRIDGE_START -->"
 AGENTS_BRIDGE_END="<!-- TOJI_AGENT_BRIDGE_END -->"
+STACK_MARKERS=()
 
 usage() {
   cat <<'EOF'
@@ -148,14 +149,14 @@ This file is a compatibility bridge for agent runtimes that read AGENTS.md.
 
 ## Source of Truth
 - `.github/copilot-instructions.md`
-- `docs/ai/requirements/`
-- `docs/ai/design/`
-- `docs/ai/planning/`
+- `docs/ai/features/`
 - `docs/ai/implementation/`
 - `docs/ai/testing/`
+- `docs/ai/deployment/`
+- `docs/ai/monitoring/`
 
 ## Precedence
-1. Feature docs in `docs/ai/requirements/` and `docs/ai/design/`
+1. Feature docs in `docs/ai/features/`
 2. Active stack skill from `.github/skills/`
 3. `.github/copilot-instructions.md`
 4. Tool/runtime defaults
@@ -206,53 +207,117 @@ EOF
   log "updated AGENTS reference: $agents_file"
 }
 
-contains_in_json_files() {
+contains_in_file_set() {
   local pattern="$1"
+  shift
 
-  local found_match="false"
-  while IFS= read -r -d '' file; do
-    if grep -Eiq "$pattern" "$file" 2>/dev/null; then
-      found_match="true"
-      break
-    fi
-  done < <(find "$TARGET_DIR" -maxdepth 4 -type f -name "package.json" -print0 2>/dev/null)
-
-  if [[ "$found_match" == "true" ]]; then
-    return 0
-  fi
+  local file_name file
+  for file_name in "$@"; do
+    while IFS= read -r -d '' file; do
+      if grep -Eiq "$pattern" "$file" 2>/dev/null; then
+        return 0
+      fi
+    done < <(find "$TARGET_DIR" -maxdepth 4 -type f -name "$file_name" -print0 2>/dev/null)
+  done
 
   return 1
 }
 
+contains_in_json_files() {
+  local pattern="$1"
+  contains_in_file_set "$pattern" "package.json"
+}
+
+file_exists_in_tree() {
+  local file_name
+  for file_name in "$@"; do
+    if find "$TARGET_DIR" -maxdepth 4 -type f -name "$file_name" -print -quit 2>/dev/null | grep -q .; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+record_stack_marker() {
+  local marker="$1"
+  STACK_MARKERS+=("$marker")
+}
+
 detect_stack_id() {
   local has_laravel="false"
+  local has_inertia_backend="false"
   local has_inertia_react="false"
+  local has_react="false"
+  local has_ziggy="false"
+  local has_tailwind="false"
+  local has_pest="false"
+  local has_vitest="false"
 
-  if [[ -f "$TARGET_DIR/composer.json" ]] && grep -Eiq '"laravel/framework"' "$TARGET_DIR/composer.json"; then
+  STACK_MARKERS=()
+
+  if contains_in_file_set '"laravel/framework"' "composer.json" || [[ -f "$TARGET_DIR/artisan" ]]; then
     has_laravel="true"
+    record_stack_marker "laravel"
+  fi
+
+  if contains_in_file_set '"inertiajs/inertia-laravel"' "composer.json"; then
+    has_inertia_backend="true"
+    record_stack_marker "inertia-laravel"
   fi
 
   if contains_in_json_files '@inertiajs/react'; then
     has_inertia_react="true"
+    record_stack_marker "inertia-react"
   fi
 
-  if [[ "$has_laravel" == "true" && "$has_inertia_react" == "true" ]]; then
+  if contains_in_json_files '"react"|"react-dom"'; then
+    has_react="true"
+    record_stack_marker "react"
+  fi
+
+  if contains_in_file_set 'tightenco/ziggy|ziggy-js' "composer.json" "package.json"; then
+    has_ziggy="true"
+    record_stack_marker "ziggy"
+  fi
+
+  if contains_in_json_files 'tailwindcss' || file_exists_in_tree "tailwind.config.js" "tailwind.config.cjs" "tailwind.config.mjs" "tailwind.config.ts"; then
+    has_tailwind="true"
+    record_stack_marker "tailwind"
+  fi
+
+  if contains_in_file_set 'pestphp/pest|pestphp/pest-plugin' "composer.json" || file_exists_in_tree "Pest.php"; then
+    has_pest="true"
+    record_stack_marker "pest"
+  fi
+
+  if contains_in_json_files '"vitest"' || file_exists_in_tree "vitest.config.js" "vitest.config.cjs" "vitest.config.mjs" "vitest.config.ts"; then
+    has_vitest="true"
+    record_stack_marker "vitest"
+  fi
+
+  if contains_in_json_files '"vite"'; then
+    record_stack_marker "vite"
+  fi
+
+  if [[ "$has_laravel" == "true" && "$has_react" == "true" ]] && [[ "$has_inertia_backend" == "true" || "$has_inertia_react" == "true" ]]; then
+    if [[ "$has_ziggy" == "true" || "$has_tailwind" == "true" || "$has_pest" == "true" || "$has_vitest" == "true" ]]; then
+      :
+    fi
     printf '%s\n' "laravel-inertia-react"
     return 0
   fi
 
   local has_express="false"
-  local has_react="false"
   local has_mongo="false"
 
   if contains_in_json_files '"express"'; then
     has_express="true"
-  fi
-  if contains_in_json_files '"react"'; then
-    has_react="true"
+    record_stack_marker "express"
   fi
   if contains_in_json_files '"mongoose"|"mongodb"'; then
     has_mongo="true"
+    record_stack_marker "mongodb"
   fi
 
   if [[ "$has_express" == "true" && "$has_react" == "true" && "$has_mongo" == "true" ]]; then
@@ -391,6 +456,12 @@ handle_stack_detection() {
   stack_id="$(detect_stack_id)"
   detected_at="$(date +%F)"
 
+  if [[ ${#STACK_MARKERS[@]} -gt 0 ]]; then
+    log "Detected stack markers: ${STACK_MARKERS[*]}"
+  else
+    log "Detected stack markers: none"
+  fi
+
   if [[ "$stack_id" == "laravel-inertia-react" || "$stack_id" == "mern" ]]; then
     local skill_path
     skill_path="$(resolve_stack_skill_path "$stack_id")"
@@ -401,8 +472,13 @@ handle_stack_detection() {
     fi
   fi
 
-  update_active_stack_profile "generic" "none" "none" "$detected_at"
-  log "Stack set to generic (no supported stack skill detected)."
+  update_active_stack_profile "generic" "$stack_id" "none" "$detected_at"
+
+  if [[ "$stack_id" == "none" ]]; then
+    log "Stack set to generic (no supported stack detected)."
+  else
+    log "Stack set to generic (detected $stack_id but no supported stack skill found)."
+  fi
 }
 
 while [[ $# -gt 0 ]]; do

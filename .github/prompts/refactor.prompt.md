@@ -15,4 +15,4 @@ Help me simplify an existing implementation while maintaining or improving its f
    - **Replace**: complex logic → built-in language/library features
 4. **Prioritize & Plan** — Rank by impact vs risk. Present a prioritized action plan with recommended execution order. Request approval before making changes.
 5. **Validate** — Verify no regressions, add tests for new helpers, update docs if interfaces changed.
-6. **Next Steps** — After implementation, run `/check-implementation` and `/writing-test`.
+6. **Next Steps** — After implementation, run `/verify` and `/write-tests`.

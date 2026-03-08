@@ -1,5 +1,9 @@
 # Testing Strategy
 
+Use this as an optional companion to `docs/ai/features/{name}.md` when test scope or validation details deserve a dedicated file.
+
+Suggested file name: `docs/ai/testing/{name}.md`.
+
 ## Test Coverage Goals
 **What level of testing do we aim for?**
 

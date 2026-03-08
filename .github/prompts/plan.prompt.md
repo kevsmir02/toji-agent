@@ -4,14 +4,11 @@ description: Plan any non-trivial work — capture requirements, design, and tas
 
 Start a new feature from scratch with structured documentation.
 
-1. **Gather** — Ask for: feature name (kebab-case, e.g. `user-authentication`), problem being solved, who is affected, and key user stories.
-2. **Create feature docs** by copying the `README.md` template from each `docs/ai/` subdirectory:
-   - `docs/ai/requirements/feature-{name}.md`
-   - `docs/ai/design/feature-{name}.md`
-   - `docs/ai/planning/feature-{name}.md`
-   - `docs/ai/implementation/feature-{name}.md`
-   - `docs/ai/testing/feature-{name}.md`
-3. **Fill requirements doc** — problem statement, goals/non-goals, user stories, success criteria, constraints, open questions.
-4. **Fill design doc** — architecture overview with mermaid diagram, data models, API design, component breakdown, design decisions.
-5. **Fill planning doc** — task breakdown by phase, dependencies, effort estimates, risks.
-6. **Next Steps** — Run `/review-requirements` to validate, then `/review-design`, then `/execute-plan` to implement.
+1. **Gather** — Ask for: feature name (kebab-case, e.g. `user-authentication`), problem being solved, affected users, key user stories, constraints, and known risks.
+2. **Create the primary feature brief** by copying `docs/ai/features/README.md` to `docs/ai/features/{name}.md`.
+3. **Create companion docs only if needed**:
+   - `docs/ai/implementation/{name}.md` for deeper implementation details
+   - `docs/ai/testing/{name}.md` for a dedicated testing strategy
+4. **Fill the feature brief** — capture the problem, goals/non-goals, user stories, critical flows, proposed solution, architecture, data/contracts, key decisions, delivery plan, success criteria, and open questions.
+5. **Keep planning in the same file** — put milestones, task breakdown, dependencies, and risks in the `Delivery Plan` section so implementation work can be tracked without switching documents.
+6. **Next Steps** — Run `/review-plan` to validate the brief, `/review-design` to validate the architecture sections, then `/build` to implement.

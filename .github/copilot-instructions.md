@@ -4,12 +4,12 @@ You are a senior software engineer working on this codebase. Follow these guidel
 
 ## Before Implementing Features
 
-1. **Read phase docs first** — Check `docs/ai/` for context before writing code:
-   - `docs/ai/requirements/` — what problem we're solving and why
-   - `docs/ai/design/` — architecture decisions and system structure
-   - `docs/ai/planning/` — task breakdown and current progress
-   - `docs/ai/implementation/` — patterns, conventions, and setup notes
-   - `docs/ai/testing/` — testing strategy and coverage goals
+1. **Read AI docs first** — Check `docs/ai/` for context before writing code:
+   - `docs/ai/features/` — feature briefs combining requirements, design, and delivery plan
+   - `docs/ai/implementation/` — implementation notes, patterns, conventions, and setup details
+   - `docs/ai/testing/` — testing strategy, fixtures, and coverage notes
+   - `docs/ai/deployment/` — deployment process and release checklist
+   - `docs/ai/monitoring/` — metrics, alerting, and incident response guidance
 
 2. **Use active stack profile (manual)** — Stack-specific conventions are only active when `/detect-stack` has updated the profile in this file.
 
@@ -42,7 +42,7 @@ If **Mode** is `stack-specific`, treat **Active Skill** as authoritative for cod
 ## Decision Precedence (Source of Truth)
 
 When guidance conflicts, use this order:
-1. Feature-specific docs in `docs/ai/requirements/` and `docs/ai/design/`
+1. Feature-specific docs in `docs/ai/features/`
 2. Active stack skill from the Active Stack Profile (`Mode: stack-specific`)
 3. This file (`.github/copilot-instructions.md`)
 4. Tool/MCP suggestions and generated defaults
@@ -78,9 +78,10 @@ Use slash commands in `.github/prompts/` for structured workflows:
 - `/verify` — verify implementation matches design and requirements
 - `/write-tests` — write tests for a feature or change
 - `/review` — pre-push code review against design docs
+- `/pr` — draft a pull request description from the feature brief and changes
 - `/debug` — structured root-cause analysis before touching code
 - `/document` — document a module, file, or function
 - `/refactor` — refactor code to reduce complexity
 - `/detect-stack` — detect stack and update the Active Stack Profile in this file
 - `/commit` — generate a Conventional Commits message from current changes
-- `/scan` — scan the project and produce a high-level codebase map in `docs/ai/implementation/`
+- `/scan` — scan the project, refresh the Active Stack Profile, and produce a codebase map in `docs/ai/implementation/`

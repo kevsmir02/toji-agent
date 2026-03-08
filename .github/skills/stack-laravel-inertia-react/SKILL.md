@@ -9,28 +9,35 @@ Apply these rules as authoritative when this skill is active.
 
 ## Architecture Rules
 
-- Keep controllers thin: request validation + orchestration only.
-- Put business logic in service classes/actions, not controllers or Inertia pages.
+- Keep controllers thin: authorize, validate, delegate, and return an Inertia response or redirect.
+- Put business logic in single-responsibility Action classes, not controllers or Inertia pages.
+- Prefer `app/Actions/*` over generic `app/Services/*` for feature use cases. Use service classes only for reusable infrastructure adapters or third-party integrations.
 - Use Form Requests for validation (never inline validation in controllers).
 - Use policies/gates for authorization (never rely only on UI checks).
 - Use Inertia as the API boundary for web flows; keep payloads explicit and minimal.
+- Use DTOs or data objects for Controller-to-Inertia transfer. Prefer Spatie Laravel Data or typed DTO/ViewModel classes over passing raw models or ad hoc arrays.
+- Share named routes across PHP and JavaScript with Ziggy. Use the `route()` helper in both layers instead of hardcoded URLs.
 
 ## Backend (Laravel) Conventions
 
 - Follow PSR-12 style and framework naming conventions.
-- Return typed data structures from services (arrays/DTO-like payloads), not raw model internals.
+- Controllers should call an Action, then map the result into a DTO/data object for the Inertia response.
+- Return typed payloads from Actions and data objects, not raw model internals.
 - Prefer route model binding and scoped queries.
 - Wrap multi-step writes in database transactions.
 - Prevent N+1 by eager loading relationships intentionally.
 - Use queued jobs for heavy/slow side effects (emails, external API calls, report generation).
 - Centralize domain errors and map them to user-safe messages.
+- Prefer dedicated `Data`, `DTO`, or `ViewModel` classes in `app/Data/*`, `app/DTOs/*`, or a clearly named equivalent.
 
 ## Frontend (React + Inertia) Conventions
 
 - Page components orchestrate; shared UI components stay presentational.
 - Keep server state from Inertia props as source of truth; avoid duplicating it into local state unless necessary.
-- Use typed props/interfaces for every page and shared component.
+- Use typed props/interfaces for every page and shared component, matching the DTO/data-object shape returned by Laravel.
 - Keep forms predictable: explicit defaults, validation display, submit pending states.
+- Generate links, visits, and form targets with Ziggy's `route()` helper from `ziggy-js` or the project's shared route helper setup.
+- Do not embed hardcoded route strings, controller paths, or backend-only naming assumptions in React components.
 - Avoid leaking backend-only concepts into UI components.
 
 ## Data & Security
@@ -39,18 +46,23 @@ Apply these rules as authoritative when this skill is active.
 - Authorize every mutating endpoint.
 - Never trust client-provided identifiers without ownership/tenant checks.
 - Protect against mass-assignment: explicit `$fillable`/`$guarded` strategy.
+- Map Eloquent models to DTO/data objects before exposing them to Inertia when shape, authorization, or serialization rules matter.
 - Store secrets in environment variables only.
 
 ## Testing Expectations
 
-- Feature tests for HTTP/inertia behavior and authorization paths.
-- Unit tests for service/domain logic.
+- Prefer Pest for backend tests when available.
+- Feature tests for HTTP/Inertia behavior, authorization paths, and route-to-page contracts.
+- Unit tests for Actions, DTO/data-object transformations, and domain logic.
+- Frontend tests should use Vitest when present for page/component behavior and client-side interaction logic.
 - Test validation failures and edge cases for every write path.
 - Add regression tests for bug fixes before or alongside the fix.
 
 ## Code Review Checklist
 
-- Any business logic in controllers/pages? Move to services/actions.
+- Any business logic in controllers/pages? Move it to an Action.
+- Any hardcoded URLs in PHP or JS? Replace them with named routes and Ziggy `route()` usage.
+- Are Inertia props raw models or loose arrays where a DTO/data object should define the contract?
 - Any unbounded queries or missing eager loads?
 - Are validation + authorization both enforced on write endpoints?
 - Do Inertia pages receive only the props they need?
@@ -60,10 +72,12 @@ Apply these rules as authoritative when this skill is active.
 
 - `app/Http/Controllers/*` → orchestration only
 - `app/Http/Requests/*` → validation rules
-- `app/Services/*` or `app/Actions/*` → business logic
+- `app/Actions/*` → feature-level business logic
+- `app/Data/*` or `app/DTOs/*` → typed payloads for Inertia and domain boundaries
+- `app/Services/*` → integrations, shared infrastructure, or adapter logic only
 - `resources/js/Pages/*` → Inertia pages
 - `resources/js/Components/*` → reusable presentational UI
 
 ## If Unsure
 
-Prefer the option that keeps domain logic in backend services and keeps UI components simple.
+Prefer the option that keeps domain logic in backend Actions, contracts explicit through DTO/data objects, routes centralized through Ziggy, and UI components simple.

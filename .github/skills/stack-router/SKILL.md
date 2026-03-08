@@ -15,8 +15,10 @@ Keep this template generic by default while enabling strict stack conventions on
 
 1. Scan repository markers in this order:
    - **Backend/runtime**: `composer.json`, `package.json`, `go.mod`, `pyproject.toml`, `Cargo.toml`, `pom.xml`, `build.gradle`
-   - **Framework markers**: `artisan`/`laravel` deps, `next.config.*`, `nuxt.config.*`, `svelte.config.*`, `vite.config.*`, `rails` files
-   - **Frontend markers**: React/Vue/Svelte/Angular dependencies
+   - **Framework markers**: `artisan`/`laravel` deps, Inertia packages, `next.config.*`, `nuxt.config.*`, `svelte.config.*`, `vite.config.*`, `rails` files
+   - **Frontend markers**: React/Vue/Svelte/Angular dependencies, `tailwind.config.*`, `postcss.config.*`
+   - **Testing markers**: `tests/Pest.php`, Pest packages, `vitest.config.*`, Vitest dependencies
+   - **Routing markers**: Ziggy packages or generated route helpers
    - **Infra markers**: `docker-compose.yml`, `terraform`, `k8s` manifests
 2. Build a normalized stack id, examples:
    - `laravel-inertia-react`
@@ -26,6 +28,7 @@ Keep this template generic by default while enabling strict stack conventions on
    - `django-react`
    Priority mappings:
    - If Laravel + Inertia + React markers are present → `laravel-inertia-react`
+   - Tailwind, Pest, Vitest, and Ziggy strengthen evidence for the detected stack but do not replace the core framework markers
    - If MongoDB/Mongoose + Express + React markers are present → `mern`
 3. Resolve candidate skill paths in priority order:
    - `.github/skills/stack-{stack-id}/SKILL.md`
