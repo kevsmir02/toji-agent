@@ -253,6 +253,10 @@ detect_stack_id() {
   local has_tailwind="false"
   local has_pest="false"
   local has_vitest="false"
+  local has_zod="false"
+  local has_trpc="false"
+  local has_ts_rest="false"
+  local has_typescript="false"
 
   STACK_MARKERS=()
 
@@ -296,20 +300,33 @@ detect_stack_id() {
     record_stack_marker "vitest"
   fi
 
+  if contains_in_json_files '"zod"'; then
+    has_zod="true"
+    record_stack_marker "zod"
+  fi
+
+  if contains_in_json_files '@trpc/server|@trpc/client|@trpc/react-query|@trpc/tanstack-react-query'; then
+    has_trpc="true"
+    record_stack_marker "trpc"
+  fi
+
+  if contains_in_json_files '@ts-rest/core|@ts-rest/express|@ts-rest/react-query|@ts-rest/open-api'; then
+    has_ts_rest="true"
+    record_stack_marker "ts-rest"
+  fi
+
+  if contains_in_json_files '"typescript"' || file_exists_in_tree "tsconfig.json" "tsconfig.base.json" "tsconfig.app.json"; then
+    has_typescript="true"
+    record_stack_marker "typescript"
+  fi
+
   if contains_in_json_files '"vite"'; then
     record_stack_marker "vite"
   fi
 
-  if [[ "$has_laravel" == "true" && "$has_react" == "true" ]] && [[ "$has_inertia_backend" == "true" || "$has_inertia_react" == "true" ]]; then
-    if [[ "$has_ziggy" == "true" || "$has_tailwind" == "true" || "$has_pest" == "true" || "$has_vitest" == "true" ]]; then
-      :
-    fi
-    printf '%s\n' "laravel-inertia-react"
-    return 0
-  fi
-
   local has_express="false"
   local has_mongo="false"
+  local has_mern_tooling="false"
 
   if contains_in_json_files '"express"'; then
     has_express="true"
@@ -318,6 +335,23 @@ detect_stack_id() {
   if contains_in_json_files '"mongoose"|"mongodb"'; then
     has_mongo="true"
     record_stack_marker "mongodb"
+  fi
+
+  if [[ "$has_zod" == "true" || "$has_vitest" == "true" || "$has_trpc" == "true" || "$has_ts_rest" == "true" || "$has_typescript" == "true" ]]; then
+    has_mern_tooling="true"
+  fi
+
+  if [[ "$has_express" == "true" && "$has_react" == "true" && "$has_mongo" == "true" && "$has_mern_tooling" == "true" ]]; then
+    printf '%s\n' "mern"
+    return 0
+  fi
+
+  if [[ "$has_laravel" == "true" && "$has_react" == "true" ]] && [[ "$has_inertia_backend" == "true" || "$has_inertia_react" == "true" ]]; then
+    if [[ "$has_ziggy" == "true" || "$has_tailwind" == "true" || "$has_pest" == "true" || "$has_vitest" == "true" ]]; then
+      :
+    fi
+    printf '%s\n' "laravel-inertia-react"
+    return 0
   fi
 
   if [[ "$has_express" == "true" && "$has_react" == "true" && "$has_mongo" == "true" ]]; then
