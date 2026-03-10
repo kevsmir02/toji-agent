@@ -50,7 +50,6 @@ This prompts for target path and common options.
 ### Useful flags
 - `--dry-run` preview changes only
 - `--force` backup and overwrite existing Toji-related targets
-- `--detect-stack` detect stack and update active profile
 - `--install-hooks` install local `pre-commit` + `pre-push` guards
 - `--i` or `--interactive` run guided interactive setup
 - `--ui` force colorful installer UI in terminal
@@ -105,15 +104,15 @@ Recommended minimal set for most features:
 
 ## How To Use
 1. Install Toji Agent into your project.
-2. (Optional) Run `/detect-stack`.
+2. Run `/detect-stack` in Copilot Chat to activate your stack profile.
 3. For each feature, create or update docs in `docs/ai/features/`.
 4. Use a simple flow: `/plan` -> `/build` -> `/verify` -> `/write-tests` -> `/review` -> `/pr`.
 5. If you do not want AI files in Git, install with `--install-hooks` and/or uninstall after delivery.
 
 First-run quick example:
-1. `./install.sh --target . --detect-stack --install-hooks`
+1. `./install.sh --target . --install-hooks`
 2. Open Copilot Chat and run `/plan` for your next task.
-3. Build with `/build`, then run `/verify` and `/review` before push.
+3. Run `/detect-stack`, then build with `/build`, and finish with `/verify` + `/review` before push.
 
 ## Important Notes
 - Git hooks are local by default (`.git/hooks`) and not shared unless your team standardizes hook distribution.

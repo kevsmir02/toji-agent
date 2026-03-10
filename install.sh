@@ -7,7 +7,6 @@ CLEANUP_DIR=""
 TARGET_DIR=""
 FORCE="false"
 DRY_RUN="false"
-RUN_DETECT_STACK="false"
 INSTALL_GIT_HOOKS="false"
 INTERACTIVE_MODE="false"
 AGENTS_MODE="keep-bridge"
@@ -54,7 +53,6 @@ Options:
   --target <path>          Target project directory
   --force                  Backup and overwrite everything, including docs/
   --dry-run                Show what would happen without copying files
-  --detect-stack           Run stack detection and update active profile after install
   --install-hooks          Install local git pre-commit and pre-push guards
   --i, --interactive       Run interactive setup wizard
   --ui                     Force pretty terminal UI output
@@ -206,10 +204,6 @@ run_interactive_wizard() {
     FORCE="true"
   fi
 
-  if [[ "$(ask_yes_no "Run stack detection after install?" "n" < "$input_device")" == "true" ]]; then
-    RUN_DETECT_STACK="true"
-  fi
-
   if [[ "$(ask_yes_no "Install local git hooks (pre-commit + pre-push)?" "n" < "$input_device")" == "true" ]]; then
     INSTALL_GIT_HOOKS="true"
   fi
@@ -234,7 +228,6 @@ run_interactive_wizard() {
   log "  target=$TARGET_DIR"
   log "  dry-run=$DRY_RUN"
   log "  force=$FORCE"
-  log "  detect-stack=$RUN_DETECT_STACK"
   log "  install-hooks=$INSTALL_GIT_HOOKS"
   log "  agents-mode=$AGENTS_MODE"
 
@@ -705,38 +698,7 @@ handle_agents_file() {
 }
 
 handle_stack_detection() {
-  if [[ "$RUN_DETECT_STACK" != "true" ]]; then
-    log "Stack detection skipped. Profile remains generic by default."
-    return 0
-  fi
-
-  local stack_id detected_at
-  stack_id="$(detect_stack_id)"
-  detected_at="$(date +%F)"
-
-  if [[ ${#STACK_MARKERS[@]} -gt 0 ]]; then
-    log "Detected stack markers: ${STACK_MARKERS[*]}"
-  else
-    log "Detected stack markers: none"
-  fi
-
-  if [[ "$stack_id" == "laravel-inertia-react" || "$stack_id" == "mern" ]]; then
-    local skill_path
-    skill_path="$(resolve_stack_skill_path "$stack_id")"
-    if [[ "$skill_path" != "none" ]]; then
-      update_active_stack_profile "stack-specific" "$stack_id" "$skill_path" "$detected_at"
-      log "Stack detected: $stack_id (activated $skill_path)"
-      return 0
-    fi
-  fi
-
-  update_active_stack_profile "generic" "$stack_id" "none" "$detected_at"
-
-  if [[ "$stack_id" == "none" ]]; then
-    log "Stack set to generic (no supported stack detected)."
-  else
-    log "Stack set to generic (detected $stack_id but no supported stack skill found)."
-  fi
+  log "Tip: run /detect-stack in Copilot Chat after install to activate the best stack profile."
 }
 
 install_git_hooks() {
@@ -837,10 +799,6 @@ while [[ $# -gt 0 ]]; do
       ;;
     --dry-run)
       DRY_RUN="true"
-      shift
-      ;;
-    --detect-stack)
-      RUN_DETECT_STACK="true"
       shift
       ;;
     --install-hooks)
