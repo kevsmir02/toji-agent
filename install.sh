@@ -125,9 +125,9 @@ ask_text() {
   local answer
 
   if [[ -n "$default_value" ]]; then
-    printf '%s [%s]: ' "$prompt" "$default_value"
+    printf '%s [%s]: ' "$prompt" "$default_value" >&2
   else
-    printf '%s: ' "$prompt"
+    printf '%s: ' "$prompt" >&2
   fi
 
   read -r answer
@@ -149,7 +149,7 @@ ask_yes_no() {
   fi
 
   while true; do
-    printf '%s %s: ' "$prompt" "$suffix"
+    printf '%s %s: ' "$prompt" "$suffix" >&2
     read -r answer
     answer="${answer,,}"
 
@@ -168,7 +168,7 @@ ask_yes_no() {
         ;;
     esac
 
-    printf 'Please answer y or n.\n'
+    printf 'Please answer y or n.\n' >&2
   done
 }
 
@@ -189,9 +189,9 @@ run_interactive_wizard() {
   fi
 
   if [[ "$UI_ENABLED" == "true" ]]; then
-    printf '%b\n' "${C_BOLD}No options passed. Starting interactive setup...${C_RESET}"
+    printf '%b\n' "${C_BOLD}Interactive mode enabled. Starting setup...${C_RESET}"
   else
-    printf '%s\n' "No options passed. Starting interactive setup..."
+    printf '%s\n' "Interactive mode enabled. Starting setup..."
   fi
 
   TARGET_DIR="$(ask_text "Target directory" "." < "$input_device")"
