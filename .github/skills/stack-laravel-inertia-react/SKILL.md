@@ -7,6 +7,14 @@ description: Strict conventions for Laravel + React + Inertia projects. Use when
 
 Apply these rules as authoritative when this skill is active.
 
+## Authoritative Rules
+
+- Controllers are orchestration-only. They may authorize, validate, call an Action, and return an Inertia response/redirect, but must not contain business logic.
+- Business logic MUST live in single-responsibility classes under `app/Actions/*`.
+- Raw Eloquent models MUST NOT be passed to Inertia. Controller payloads must be mapped through typed Data Objects/DTOs first.
+- Every Inertia Page MUST define a corresponding TypeScript interface that matches the backend Data Object/DTO shape.
+- Use Ziggy `route()` helpers exclusively for application routes. Hardcoded URLs are forbidden in both backend-generated links and frontend usage.
+
 ## Architecture Rules
 
 - Keep controllers thin: authorize, validate, delegate, and return an Inertia response or redirect.
@@ -60,9 +68,11 @@ Apply these rules as authoritative when this skill is active.
 
 ## Code Review Checklist
 
-- Any business logic in controllers/pages? Move it to an Action.
-- Any hardcoded URLs in PHP or JS? Replace them with named routes and Ziggy `route()` usage.
-- Are Inertia props raw models or loose arrays where a DTO/data object should define the contract?
+- `/build` must be blocked if controllers include business logic instead of delegating to `app/Actions/*`.
+- `/build` must be blocked if any business rule is not implemented in a single-responsibility Action class.
+- `/build` must be blocked if raw Eloquent models are passed to Inertia instead of typed Data Objects/DTOs.
+- `/build` must be blocked if an Inertia page does not have a matching TypeScript interface aligned to the backend Data Object/DTO shape.
+- `/build` must be blocked if any hardcoded URL exists where Ziggy `route()` should be used.
 - Any unbounded queries or missing eager loads?
 - Are validation + authorization both enforced on write endpoints?
 - Do Inertia pages receive only the props they need?
