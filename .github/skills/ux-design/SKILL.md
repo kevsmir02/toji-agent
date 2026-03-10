@@ -71,6 +71,16 @@ The interface should feel like a blank page that becomes powerful through intera
 - Error states should appear close to the affected block, in plain language, with an obvious recovery action.
 - Autosave, sync, and background updates should be communicated quietly rather than interruptively.
 
+## Strict Technical Requirements (Hard Gates)
+
+The following rules are mandatory for every UX proposal and review outcome:
+
+- Every list or table feature must include a dedicated Empty State block design with purpose text and a primary next action.
+- Every async action must use a Skeleton Loader that mirrors the final block structure and layout rhythm.
+- Every hidden menu action must have a corresponding documented keyboard shortcut.
+- All spacing must follow a strict 8px grid system for margins and padding (8, 16, 24, 32, ...).
+- Typography is limited to a maximum of 3 font sizes across the feature.
+
 ## Accessibility Requirements
 
 Accessibility is part of the product feel. A calm interface that fails keyboard or screen-reader users is not calm.
@@ -102,6 +112,11 @@ Accessibility is part of the product feel. A calm interface that fails keyboard 
 - [ ] Navigation clarifies hierarchy without adding noise
 - [ ] Forms are grouped into logical block sections
 - [ ] Empty, loading, success, and error states are handled at the appropriate block level
+- [ ] Every list/table includes a dedicated Empty State block design
+- [ ] Every async interaction uses structure-mirroring skeleton loaders
+- [ ] Hidden menu actions have documented keyboard shortcuts
+- [ ] All margins and padding follow a strict 8px grid
+- [ ] No more than 3 font sizes are used across the feature
 - [ ] Keyboard navigation works across all interactive surfaces
 - [ ] Live updates use the correct `aria-live` behavior
 - [ ] Async regions use `aria-busy` during updates

@@ -48,6 +48,16 @@ Focus on:
 - Prefer modular, block-based composition over dashboard card mosaics.
 - Use a blank-page main content area where blocks are separated by spacing and subtle dividers rather than heavy outer containers.
 
+## Strict Technical Requirements (Hard Gates)
+
+These requirements are mandatory for every feature implementation:
+
+- Every list or table feature must include an Empty State block design in the shipped UI.
+- Every async action must render Skeleton Loaders that mirror the final block structure.
+- Every hidden menu action must have a documented keyboard shortcut in feature docs or UI help text.
+- All margins and padding must align to a strict 8px grid system.
+- Use a maximum of 3 font sizes across the feature.
+
 ## Block Interaction Rules
 
 - Treat content modules as block rows within a calm vertical flow.
@@ -64,6 +74,14 @@ Focus on:
 - Include meaningful alt text for informative images.
 - Respect `prefers-reduced-motion`.
 - Maintain WCAG AA contrast ratios.
+
+## Delivery Checklist
+
+- [ ] List/table surfaces include an Empty State block
+- [ ] Async states use structure-mirroring skeleton loaders
+- [ ] Hidden menu actions include documented keyboard shortcuts
+- [ ] Spacing follows a strict 8px grid for margin and padding
+- [ ] Typography uses no more than 3 font sizes
 
 ## What to Avoid
 
