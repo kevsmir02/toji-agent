@@ -122,10 +122,11 @@ step() {
 ask_text() {
   local prompt="$1"
   local default_value="$2"
+  local default_label="${3:-$2}"
   local answer
 
   if [[ -n "$default_value" ]]; then
-    printf '%s [%s]: ' "$prompt" "$default_value" >&2
+    printf '%s [%s]: ' "$prompt" "$default_label" >&2
   else
     printf '%s: ' "$prompt" >&2
   fi
@@ -194,7 +195,7 @@ run_interactive_wizard() {
     printf '%s\n' "Interactive mode enabled. Starting setup..."
   fi
 
-  TARGET_DIR="$(ask_text "Target directory" "." < "$input_device")"
+  TARGET_DIR="$(ask_text "Target directory" "." "current directory" < "$input_device")"
 
   if [[ "$(ask_yes_no "Dry run (preview only)?" "n" < "$input_device")" == "true" ]]; then
     DRY_RUN="true"
