@@ -28,6 +28,11 @@ What you get immediately after install:
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/install.sh | bash -s -- --target .
 ```
 
+Interactive curl install:
+```bash
+curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/install.sh | bash -s -- --i
+```
+
 ### Option B: Local installer
 ```bash
 git clone https://github.com/kevsmir02/toji-agent.git
@@ -36,9 +41,9 @@ chmod +x install.sh
 ./install.sh --target /path/to/your-project
 ```
 
-Interactive mode (no args):
+Interactive mode:
 ```bash
-./install.sh
+./install.sh --i
 ```
 This prompts for target path and common options.
 
@@ -47,6 +52,7 @@ This prompts for target path and common options.
 - `--force` backup and overwrite existing Toji-related targets
 - `--detect-stack` detect stack and update active profile
 - `--install-hooks` install local `pre-commit` + `pre-push` guards
+- `--i` or `--interactive` run guided interactive setup
 - `--ui` force colorful installer UI in terminal
 - `--no-ui` disable installer UI (plain output)
 - `--agents-mode keep-bridge|sidecar-only|overwrite` control `AGENTS.md` behavior

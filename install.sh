@@ -5,11 +5,11 @@ SCRIPT_DIR=""
 SOURCE_DIR=""
 CLEANUP_DIR=""
 TARGET_DIR=""
-ORIGINAL_ARG_COUNT="$#"
 FORCE="false"
 DRY_RUN="false"
 RUN_DETECT_STACK="false"
 INSTALL_GIT_HOOKS="false"
+INTERACTIVE_MODE="false"
 AGENTS_MODE="keep-bridge"
 AGENTS_MODE_EXPLICIT="false"
 SOURCE_IS_LOCAL="false"
@@ -41,7 +41,7 @@ Install Toji Agent into an existing project.
 Usage:
   ./install.sh --target /path/to/project [OPTIONS]
   ./install.sh /path/to/project [OPTIONS]
-  ./install.sh                  # interactive wizard (TTY only)
+  ./install.sh --i              # interactive wizard (TTY required)
 
 Default behaviour (no flags):
   - .github/    always overwritten with latest Toji Agent files
@@ -56,6 +56,7 @@ Options:
   --dry-run                Show what would happen without copying files
   --detect-stack           Run stack detection and update active profile after install
   --install-hooks          Install local git pre-commit and pre-push guards
+  --i, --interactive       Run interactive setup wizard
   --ui                     Force pretty terminal UI output
   --no-ui                  Disable pretty terminal UI output
   --agents-mode <mode>     AGENTS.md handling: keep-bridge | sidecar-only | overwrite
@@ -174,12 +175,19 @@ ask_yes_no() {
 }
 
 run_interactive_wizard() {
-  if [[ "$ORIGINAL_ARG_COUNT" -ne 0 ]]; then
+  if [[ "$INTERACTIVE_MODE" != "true" ]]; then
     return 0
   fi
 
-  if [[ ! -t 0 ]]; then
-    return 0
+  local input_device=""
+  if [[ -t 0 ]]; then
+    input_device="/dev/stdin"
+  elif [[ -r /dev/tty ]]; then
+    input_device="/dev/tty"
+  else
+    log "Error: interactive mode requires a TTY."
+    log "Tip: run locally in a terminal or remove --i and pass flags directly."
+    exit 1
   fi
 
   if [[ "$UI_ENABLED" == "true" ]]; then
@@ -188,26 +196,26 @@ run_interactive_wizard() {
     printf '%s\n' "No options passed. Starting interactive setup..."
   fi
 
-  TARGET_DIR="$(ask_text "Target directory" ".")"
+  TARGET_DIR="$(ask_text "Target directory" "." < "$input_device")"
 
-  if [[ "$(ask_yes_no "Dry run (preview only)?" "n")" == "true" ]]; then
+  if [[ "$(ask_yes_no "Dry run (preview only)?" "n" < "$input_device")" == "true" ]]; then
     DRY_RUN="true"
   fi
 
-  if [[ "$(ask_yes_no "Force overwrite existing docs and files?" "n")" == "true" ]]; then
+  if [[ "$(ask_yes_no "Force overwrite existing docs and files?" "n" < "$input_device")" == "true" ]]; then
     FORCE="true"
   fi
 
-  if [[ "$(ask_yes_no "Run stack detection after install?" "n")" == "true" ]]; then
+  if [[ "$(ask_yes_no "Run stack detection after install?" "n" < "$input_device")" == "true" ]]; then
     RUN_DETECT_STACK="true"
   fi
 
-  if [[ "$(ask_yes_no "Install local git hooks (pre-commit + pre-push)?" "n")" == "true" ]]; then
+  if [[ "$(ask_yes_no "Install local git hooks (pre-commit + pre-push)?" "n" < "$input_device")" == "true" ]]; then
     INSTALL_GIT_HOOKS="true"
   fi
 
   local chosen_agents_mode
-  chosen_agents_mode="$(ask_text "AGENTS mode (keep-bridge|sidecar-only|overwrite)" "keep-bridge")"
+  chosen_agents_mode="$(ask_text "AGENTS mode (keep-bridge|sidecar-only|overwrite)" "keep-bridge" < "$input_device")"
   case "$chosen_agents_mode" in
     keep-bridge|sidecar-only|overwrite)
       AGENTS_MODE="$chosen_agents_mode"
@@ -230,7 +238,7 @@ run_interactive_wizard() {
   log "  install-hooks=$INSTALL_GIT_HOOKS"
   log "  agents-mode=$AGENTS_MODE"
 
-  if [[ "$(ask_yes_no "Continue with install?" "y")" != "true" ]]; then
+  if [[ "$(ask_yes_no "Continue with install?" "y" < "$input_device")" != "true" ]]; then
     log "Install cancelled."
     exit 0
   fi
@@ -837,6 +845,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --install-hooks)
       INSTALL_GIT_HOOKS="true"
+      shift
+      ;;
+    --i|--interactive)
+      INTERACTIVE_MODE="true"
       shift
       ;;
     --ui)
