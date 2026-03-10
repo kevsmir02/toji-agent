@@ -98,6 +98,7 @@ Use slash commands in `.github/prompts/` for structured workflows:
 - `/debug` — structured root-cause analysis before touching code
 - `/document` — document a module, file, or function
 - `/refactor` — refactor code to reduce complexity
+- `/redesign` — run a Senior UI/UX redesign workflow with visual audit, data contract check, and functional minimalist React updates
 - `/detect-stack` — detect stack and update the Active Stack Profile in this file
 - `/commit` — generate a Conventional Commits message from current changes
 - `/scan` — scan the project, refresh the Active Stack Profile, and produce a codebase map in `docs/ai/implementation/`

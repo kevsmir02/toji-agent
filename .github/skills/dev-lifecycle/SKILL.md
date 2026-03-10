@@ -1,6 +1,6 @@
 ---
 name: dev-lifecycle
-description: Structured development workflow with sequential phases and mandatory design gates before implementation. Use when the user wants to build a feature end-to-end, or run any individual phase (`/plan`, `/requirements`, `/review-plan`, `/design-db`, `/review-design`, `/build`, `/verify`, `/write-tests`, `/review`, `/pr`).
+description: Structured development workflow with sequential phases and mandatory design gates before implementation. Use when the user wants to build a feature end-to-end, run a UI/UX aesthetic overhaul, or run any individual phase (`/plan`, `/requirements`, `/review-plan`, `/design-db`, `/review-design`, `/build`, `/verify`, `/write-tests`, `/review`, `/redesign`, `/pr`).
 ---
 
 # Dev Lifecycle
@@ -67,6 +67,14 @@ Exit criteria:
 2. Locate the feature brief at `docs/ai/features/{name}.md`
 3. Check the `Delivery Plan` section for task status to determine which phase to continue from
 4. Run the appropriate phase prompt
+
+## UI/UX Redesign Command
+
+Use `/redesign` for aesthetic and interaction overhauls that must align with the Notion-inspired Functional Minimalist standard.
+
+- Run `/redesign` when the main goal is visual/interaction quality improvement rather than net-new feature scope.
+- `/redesign` must include a visual audit and a backend data-contract check before code changes.
+- If the redesign requires new backend fields, run `/refactor` first, then continue `/redesign`.
 
 ## Backward Transitions
 
