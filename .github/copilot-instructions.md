@@ -77,7 +77,9 @@ Skills in `.github/skills/` contain domain-specific workflows. Read the relevant
 
 Use slash commands in `.github/prompts/` for structured workflows:
 - `/plan` — plan any non-trivial work before writing code
+- `/requirements` — run an Interrogator-style requirements discovery pass to find hidden data gaps
 - `/review-plan` — validate a plan doc for completeness
+- `/design-db` — create and review normalized database schemas with a Mermaid.js ERD before coding
 - `/review-design` — validate a design doc for completeness
 - `/build` — execute a plan task by task
 - `/update-plan` — reconcile progress with the plan doc
