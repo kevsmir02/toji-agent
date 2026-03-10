@@ -38,6 +38,14 @@ If **Mode** is `stack-specific`, treat **Active Skill** as authoritative for cod
 - For dark mode, use a soft dark gray approach (Gemini-style) and avoid high-contrast pure black.
 - Avoid colorful gradients and complex shadows unless explicitly requested.
 
+## Documentation Directive
+
+- For all generated `README.md` files and technical documentation, default to a Notion-inspired Functional Minimalist style without requiring an explicit prompt.
+- Prioritize a blank-page feel with clear vertical rhythm and block-based sections.
+- Use strict typographic hierarchy (Inter-style tone) and avoid colorful decorations or high-contrast boxed callouts.
+- Use Mermaid.js diagrams as the primary visual for architecture and system relationships.
+- Enforce progressive disclosure: keep README content high-level and link to `docs/ai/implementation/` or related deep-dive docs for detailed technical content.
+
 ## Engineering Discipline
 
 - Don't modify code until the problem is clearly understood
