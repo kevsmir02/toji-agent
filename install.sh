@@ -5,6 +5,7 @@ SCRIPT_DIR=""
 SOURCE_DIR=""
 CLEANUP_DIR=""
 TARGET_DIR=""
+ORIGINAL_ARG_COUNT="$#"
 FORCE="false"
 DRY_RUN="false"
 RUN_DETECT_STACK="false"
@@ -12,11 +13,25 @@ INSTALL_GIT_HOOKS="false"
 AGENTS_MODE="keep-bridge"
 AGENTS_MODE_EXPLICIT="false"
 SOURCE_IS_LOCAL="false"
+UI_MODE="auto"
+UI_ENABLED="false"
+
+STEP_CURRENT=0
+STEP_TOTAL=5
+
+C_RESET=""
+C_DIM=""
+C_BOLD=""
+C_CYAN=""
+C_GREEN=""
+C_YELLOW=""
+C_RED=""
 
 REPO_ARCHIVE_URL="https://codeload.github.com/kevsmir02/toji-agent/tar.gz/refs/heads/main"
 
 AGENTS_BRIDGE_START="<!-- TOJI_AGENT_BRIDGE_START -->"
 AGENTS_BRIDGE_END="<!-- TOJI_AGENT_BRIDGE_END -->"
+HOOK_MARKER="TOJI_AGENT_HOOK"
 STACK_MARKERS=()
 
 usage() {
@@ -26,6 +41,7 @@ Install Toji Agent into an existing project.
 Usage:
   ./install.sh --target /path/to/project [OPTIONS]
   ./install.sh /path/to/project [OPTIONS]
+  ./install.sh                  # interactive wizard (TTY only)
 
 Default behaviour (no flags):
   - .github/    always overwritten with latest Toji Agent files
@@ -40,13 +56,211 @@ Options:
   --dry-run                Show what would happen without copying files
   --detect-stack           Run stack detection and update active profile after install
   --install-hooks          Install local git pre-commit and pre-push guards
+  --ui                     Force pretty terminal UI output
+  --no-ui                  Disable pretty terminal UI output
   --agents-mode <mode>     AGENTS.md handling: keep-bridge | sidecar-only | overwrite
   -h, --help               Show this help message
 EOF
 }
 
+init_ui() {
+  if [[ "$UI_MODE" == "ui" ]]; then
+    UI_ENABLED="true"
+  elif [[ "$UI_MODE" == "no-ui" ]]; then
+    UI_ENABLED="false"
+  elif [[ -t 1 && -z "${NO_COLOR:-}" && "${CI:-}" != "true" ]]; then
+    UI_ENABLED="true"
+  else
+    UI_ENABLED="false"
+  fi
+
+  if [[ "$UI_ENABLED" == "true" ]]; then
+    C_RESET='\033[0m'
+    C_DIM='\033[2m'
+    C_BOLD='\033[1m'
+    C_CYAN='\033[36m'
+    C_GREEN='\033[32m'
+    C_YELLOW='\033[33m'
+    C_RED='\033[31m'
+  fi
+}
+
+print_banner() {
+  if [[ "$UI_ENABLED" != "true" ]]; then
+    return 0
+  fi
+
+  printf '%b\n' "${C_CYAN}${C_BOLD}========================================${C_RESET}"
+  printf '%b\n' "${C_CYAN}${C_BOLD}          TOJI AGENT INSTALLER          ${C_RESET}"
+  printf '%b\n' "${C_CYAN}${C_BOLD}========================================${C_RESET}"
+}
+
+configure_steps() {
+  if [[ "$FORCE" == "true" && "$DRY_RUN" != "true" ]]; then
+    STEP_TOTAL=6
+    return 0
+  fi
+
+  if [[ "$FORCE" != "true" && "$DRY_RUN" != "true" ]]; then
+    STEP_TOTAL=6
+    return 0
+  fi
+
+  STEP_TOTAL=5
+}
+
+step() {
+  local message="$1"
+  STEP_CURRENT=$((STEP_CURRENT + 1))
+
+  if [[ "$UI_ENABLED" == "true" ]]; then
+    printf '%b\n' "${C_DIM}[${STEP_CURRENT}/${STEP_TOTAL}]${C_RESET} ${C_BOLD}${message}${C_RESET}"
+  else
+    printf '[%s/%s] %s\n' "$STEP_CURRENT" "$STEP_TOTAL" "$message"
+  fi
+}
+
+ask_text() {
+  local prompt="$1"
+  local default_value="$2"
+  local answer
+
+  if [[ -n "$default_value" ]]; then
+    printf '%s [%s]: ' "$prompt" "$default_value"
+  else
+    printf '%s: ' "$prompt"
+  fi
+
+  read -r answer
+  if [[ -z "$answer" ]]; then
+    printf '%s\n' "$default_value"
+  else
+    printf '%s\n' "$answer"
+  fi
+}
+
+ask_yes_no() {
+  local prompt="$1"
+  local default_answer="$2"
+  local suffix="[y/N]"
+  local answer
+
+  if [[ "$default_answer" == "y" ]]; then
+    suffix="[Y/n]"
+  fi
+
+  while true; do
+    printf '%s %s: ' "$prompt" "$suffix"
+    read -r answer
+    answer="${answer,,}"
+
+    if [[ -z "$answer" ]]; then
+      answer="$default_answer"
+    fi
+
+    case "$answer" in
+      y|yes)
+        printf 'true\n'
+        return 0
+        ;;
+      n|no)
+        printf 'false\n'
+        return 0
+        ;;
+    esac
+
+    printf 'Please answer y or n.\n'
+  done
+}
+
+run_interactive_wizard() {
+  if [[ "$ORIGINAL_ARG_COUNT" -ne 0 ]]; then
+    return 0
+  fi
+
+  if [[ ! -t 0 ]]; then
+    return 0
+  fi
+
+  if [[ "$UI_ENABLED" == "true" ]]; then
+    printf '%b\n' "${C_BOLD}No options passed. Starting interactive setup...${C_RESET}"
+  else
+    printf '%s\n' "No options passed. Starting interactive setup..."
+  fi
+
+  TARGET_DIR="$(ask_text "Target directory" ".")"
+
+  if [[ "$(ask_yes_no "Dry run (preview only)?" "n")" == "true" ]]; then
+    DRY_RUN="true"
+  fi
+
+  if [[ "$(ask_yes_no "Force overwrite existing docs and files?" "n")" == "true" ]]; then
+    FORCE="true"
+  fi
+
+  if [[ "$(ask_yes_no "Run stack detection after install?" "n")" == "true" ]]; then
+    RUN_DETECT_STACK="true"
+  fi
+
+  if [[ "$(ask_yes_no "Install local git hooks (pre-commit + pre-push)?" "n")" == "true" ]]; then
+    INSTALL_GIT_HOOKS="true"
+  fi
+
+  local chosen_agents_mode
+  chosen_agents_mode="$(ask_text "AGENTS mode (keep-bridge|sidecar-only|overwrite)" "keep-bridge")"
+  case "$chosen_agents_mode" in
+    keep-bridge|sidecar-only|overwrite)
+      AGENTS_MODE="$chosen_agents_mode"
+      if [[ "$chosen_agents_mode" != "keep-bridge" ]]; then
+        AGENTS_MODE_EXPLICIT="true"
+      fi
+      ;;
+    *)
+      log "Unknown AGENTS mode '$chosen_agents_mode'; using keep-bridge"
+      AGENTS_MODE="keep-bridge"
+      ;;
+  esac
+
+  printf '%s\n' ""
+  log "Interactive config summary:"
+  log "  target=$TARGET_DIR"
+  log "  dry-run=$DRY_RUN"
+  log "  force=$FORCE"
+  log "  detect-stack=$RUN_DETECT_STACK"
+  log "  install-hooks=$INSTALL_GIT_HOOKS"
+  log "  agents-mode=$AGENTS_MODE"
+
+  if [[ "$(ask_yes_no "Continue with install?" "y")" != "true" ]]; then
+    log "Install cancelled."
+    exit 0
+  fi
+}
+
 log() {
-  printf '%s\n' "$1"
+  local message="$1"
+
+  if [[ "$UI_ENABLED" != "true" ]]; then
+    printf '%s\n' "$message"
+    return 0
+  fi
+
+  case "$message" in
+    Error:*|Unknown*)
+      printf '%b\n' "${C_RED}${message}${C_RESET}"
+      ;;
+    *"[dry-run]"*)
+      printf '%b\n' "${C_DIM}${message}${C_RESET}"
+      ;;
+    *"Install complete"*)
+      printf '%b\n' "${C_GREEN}${C_BOLD}${message}${C_RESET}"
+      ;;
+    *"skipped"*|*"kept existing"*|*"skip"*)
+      printf '%b\n' "${C_YELLOW}${message}${C_RESET}"
+      ;;
+    *)
+      printf '%s\n' "$message"
+      ;;
+  esac
 }
 
 cleanup() {
@@ -555,6 +769,8 @@ install_git_hooks() {
 #!/usr/bin/env bash
 set -euo pipefail
 
+# TOJI_AGENT_HOOK: pre-commit
+
 blocked='^(\.github/(copilot-instructions\.md|prompts/|skills/)|docs/ai/|AGENTS\.toji-bridge\.md)$'
 staged="$(git diff --cached --name-only)"
 
@@ -568,6 +784,8 @@ EOF
   cat > "$pre_push_path" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+
+# TOJI_AGENT_HOOK: pre-push
 
 blocked='^(\.github/(copilot-instructions\.md|prompts/|skills/)|docs/ai/|AGENTS\.toji-bridge\.md)$'
 matches=""
@@ -621,6 +839,14 @@ while [[ $# -gt 0 ]]; do
       INSTALL_GIT_HOOKS="true"
       shift
       ;;
+    --ui)
+      UI_MODE="ui"
+      shift
+      ;;
+    --no-ui)
+      UI_MODE="no-ui"
+      shift
+      ;;
     --agents-mode)
       AGENTS_MODE="${2:-}"
       AGENTS_MODE_EXPLICIT="true"
@@ -645,6 +871,12 @@ done
 
 trap cleanup EXIT
 
+configure_steps
+init_ui
+print_banner
+run_interactive_wizard
+step "Resolving template source"
+
 resolve_script_dir
 resolve_source_dir
 
@@ -659,6 +891,7 @@ if [[ ! -d "$TARGET_DIR" ]]; then
   exit 1
 fi
 
+step "Validating target directory"
 TARGET_DIR="$(cd "$TARGET_DIR" && pwd)"
 
 if [[ "$SOURCE_IS_LOCAL" == "true" && "$TARGET_DIR" == "$SOURCE_DIR" ]]; then
@@ -673,6 +906,7 @@ if [[ "$DRY_RUN" == "true" ]]; then
 fi
 
 if [[ "$FORCE" == "true" ]]; then
+  step "Applying force install strategy"
   # Back up and fully replace everything
   for item in ".github" "docs" ".gitignore"; do
     if [[ -e "$TARGET_DIR/$item" ]]; then
@@ -684,19 +918,24 @@ if [[ "$FORCE" == "true" ]]; then
     log "[dry-run] overwrite: $SOURCE_DIR/.github -> $TARGET_DIR/.github"
     log "[dry-run] overwrite: $SOURCE_DIR/docs -> $TARGET_DIR/docs"
     log "[dry-run] overwrite: $SOURCE_DIR/.gitignore -> $TARGET_DIR/.gitignore"
+    step "Configuring AGENTS and stack profile"
     handle_agents_file
     handle_stack_detection
+    step "Installing optional git hooks"
     install_git_hooks
     log "Install complete (dry run, force mode)."
     exit 0
   fi
 
+  step "Copying files"
   copy_item "$SOURCE_DIR/.github" "$TARGET_DIR"
   copy_item "$SOURCE_DIR/docs" "$TARGET_DIR"
   copy_item "$SOURCE_DIR/.gitignore" "$TARGET_DIR"
 
+  step "Configuring AGENTS and stack profile"
   handle_agents_file
   handle_stack_detection
+  step "Installing optional git hooks"
   install_git_hooks
   log "Install complete (force mode)."
   exit 0
@@ -704,6 +943,7 @@ fi
 
 # Default: overwrite .github, safe-merge docs, keep .gitignore
 if [[ "$DRY_RUN" == "true" ]]; then
+  step "Planning file changes"
   log "[dry-run] overwrite: $SOURCE_DIR/.github -> $TARGET_DIR/.github"
   log "[dry-run] safe-merge: $SOURCE_DIR/docs -> $TARGET_DIR/docs"
   if [[ ! -e "$TARGET_DIR/.gitignore" ]]; then
@@ -711,14 +951,17 @@ if [[ "$DRY_RUN" == "true" ]]; then
   else
     log "[dry-run] keep existing: $TARGET_DIR/.gitignore"
   fi
+  step "Configuring AGENTS and stack profile"
   handle_agents_file
   handle_stack_detection
+  step "Installing optional git hooks"
   install_git_hooks
   log "Install complete (dry run)."
   exit 0
 fi
 
 # Overwrite .github entirely
+step "Copying files"
 if [[ -e "$TARGET_DIR/.github" ]]; then
   rm -rf "$TARGET_DIR/.github"
 fi
@@ -738,8 +981,10 @@ else
   log "kept existing: .gitignore"
 fi
 
+step "Configuring AGENTS and stack profile"
 handle_agents_file
 handle_stack_detection
+step "Installing optional git hooks"
 install_git_hooks
 
 log "Install complete."

@@ -6,6 +6,7 @@ DRY_RUN="false"
 
 AGENTS_BRIDGE_START="<!-- TOJI_AGENT_BRIDGE_START -->"
 AGENTS_BRIDGE_END="<!-- TOJI_AGENT_BRIDGE_END -->"
+HOOK_MARKER="TOJI_AGENT_HOOK"
 
 usage() {
   cat <<'EOF'
@@ -27,6 +28,7 @@ What this removes:
   - docs/ai/
   - AGENTS.toji-bridge.md
   - Toji bridge block inside AGENTS.md (if present)
+  - Toji-managed pre-commit and pre-push hooks (if present)
 
 Notes:
   - Unrelated files are kept.
@@ -119,6 +121,41 @@ cleanup_empty_dir() {
   rmdir "$dir_path" 2>/dev/null || true
 }
 
+remove_toji_git_hooks() {
+  if ! command -v git >/dev/null 2>&1; then
+    log "skip git hooks cleanup: git command not found"
+    return 0
+  fi
+
+  if ! git -C "$TARGET_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    log "skip git hooks cleanup: target is not a git repository"
+    return 0
+  fi
+
+  local hooks_dir
+  hooks_dir="$(git -C "$TARGET_DIR" rev-parse --git-path hooks)"
+
+  if [[ -z "$hooks_dir" || ! -d "$hooks_dir" ]]; then
+    log "skip git hooks cleanup: hooks directory not found"
+    return 0
+  fi
+
+  local hook_path
+  for hook_path in "$hooks_dir/pre-commit" "$hooks_dir/pre-push"; do
+    if [[ ! -f "$hook_path" ]]; then
+      log "skip (not found): $hook_path"
+      continue
+    fi
+
+    if ! grep -q "$HOOK_MARKER" "$hook_path"; then
+      log "skip (not managed by Toji): $hook_path"
+      continue
+    fi
+
+    remove_path "$hook_path"
+  done
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --target)
@@ -172,6 +209,7 @@ remove_path "$TARGET_DIR/AGENTS.toji-bridge.md"
 
 remove_agents_bridge_block "$TARGET_DIR/AGENTS.md"
 remove_bridge_agents_file_if_template "$TARGET_DIR/AGENTS.md"
+remove_toji_git_hooks
 
 cleanup_empty_dir "$TARGET_DIR/.github"
 cleanup_empty_dir "$TARGET_DIR/docs"

@@ -36,11 +36,19 @@ chmod +x install.sh
 ./install.sh --target /path/to/your-project
 ```
 
+Interactive mode (no args):
+```bash
+./install.sh
+```
+This prompts for target path and common options.
+
 ### Useful flags
 - `--dry-run` preview changes only
 - `--force` backup and overwrite existing Toji-related targets
 - `--detect-stack` detect stack and update active profile
 - `--install-hooks` install local `pre-commit` + `pre-push` guards
+- `--ui` force colorful installer UI in terminal
+- `--no-ui` disable installer UI (plain output)
 - `--agents-mode keep-bridge|sidecar-only|overwrite` control `AGENTS.md` behavior
 
 Default install behavior:
@@ -69,6 +77,7 @@ Uninstaller removes only Toji-related paths:
 - `docs/ai/`
 - `AGENTS.toji-bridge.md`
 - Toji bridge block from `AGENTS.md` (if present)
+- Toji-managed `.git/hooks/pre-commit` and `.git/hooks/pre-push` (if present)
 
 ## Commands / Prompts
 Run these in Copilot Chat:
