@@ -8,6 +8,7 @@ TARGET_DIR=""
 FORCE="false"
 DRY_RUN="false"
 RUN_DETECT_STACK="false"
+INSTALL_GIT_HOOKS="false"
 AGENTS_MODE="keep-bridge"
 AGENTS_MODE_EXPLICIT="false"
 SOURCE_IS_LOCAL="false"
@@ -38,6 +39,7 @@ Options:
   --force                  Backup and overwrite everything, including docs/
   --dry-run                Show what would happen without copying files
   --detect-stack           Run stack detection and update active profile after install
+  --install-hooks          Install local git pre-commit and pre-push guards
   --agents-mode <mode>     AGENTS.md handling: keep-bridge | sidecar-only | overwrite
   -h, --help               Show this help message
 EOF
@@ -515,6 +517,88 @@ handle_stack_detection() {
   fi
 }
 
+install_git_hooks() {
+  if [[ "$INSTALL_GIT_HOOKS" != "true" ]]; then
+    return 0
+  fi
+
+  if ! command -v git >/dev/null 2>&1; then
+    log "skipped git hooks install: git command not found"
+    return 0
+  fi
+
+  if ! git -C "$TARGET_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    log "skipped git hooks install: target is not a git repository"
+    return 0
+  fi
+
+  local hooks_dir
+  hooks_dir="$(git -C "$TARGET_DIR" rev-parse --git-path hooks)"
+
+  if [[ -z "$hooks_dir" ]]; then
+    log "skipped git hooks install: unable to resolve hooks directory"
+    return 0
+  fi
+
+  local pre_commit_path="$hooks_dir/pre-commit"
+  local pre_push_path="$hooks_dir/pre-push"
+
+  if [[ "$DRY_RUN" == "true" ]]; then
+    log "[dry-run] install hook: $pre_commit_path"
+    log "[dry-run] install hook: $pre_push_path"
+    return 0
+  fi
+
+  mkdir -p "$hooks_dir"
+
+  cat > "$pre_commit_path" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+blocked='^(\.github/(copilot-instructions\.md|prompts/|skills/)|docs/ai/|AGENTS\.toji-bridge\.md)$'
+staged="$(git diff --cached --name-only)"
+
+if printf '%s\n' "$staged" | grep -E "$blocked" >/dev/null 2>&1; then
+  echo "Blocked: Toji Agent files are staged."
+  echo "Unstage them or run uninstall first."
+  exit 1
+fi
+EOF
+
+  cat > "$pre_push_path" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+blocked='^(\.github/(copilot-instructions\.md|prompts/|skills/)|docs/ai/|AGENTS\.toji-bridge\.md)$'
+matches=""
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [[ -z "${local_sha:-}" ]] && continue
+
+  if [[ "$remote_sha" == "0000000000000000000000000000000000000000" ]]; then
+    changed="$(git diff-tree --no-commit-id --name-only -r "$local_sha")"
+  else
+    changed="$(git diff --name-only "$remote_sha..$local_sha")"
+  fi
+
+  hit="$(printf '%s\n' "$changed" | grep -E "$blocked" || true)"
+  if [[ -n "$hit" ]]; then
+    matches="${matches}${hit}\n"
+  fi
+done
+
+if [[ -n "$matches" ]]; then
+  echo "Blocked: push includes Toji Agent files."
+  echo "Remove these paths from pushed commits first:"
+  printf '%b' "$matches" | sort -u
+  exit 1
+fi
+EOF
+
+  chmod +x "$pre_commit_path" "$pre_push_path"
+  log "installed git hooks: $pre_commit_path, $pre_push_path"
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --target)
@@ -531,6 +615,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --detect-stack)
       RUN_DETECT_STACK="true"
+      shift
+      ;;
+    --install-hooks)
+      INSTALL_GIT_HOOKS="true"
       shift
       ;;
     --agents-mode)
@@ -598,6 +686,7 @@ if [[ "$FORCE" == "true" ]]; then
     log "[dry-run] overwrite: $SOURCE_DIR/.gitignore -> $TARGET_DIR/.gitignore"
     handle_agents_file
     handle_stack_detection
+    install_git_hooks
     log "Install complete (dry run, force mode)."
     exit 0
   fi
@@ -608,6 +697,7 @@ if [[ "$FORCE" == "true" ]]; then
 
   handle_agents_file
   handle_stack_detection
+  install_git_hooks
   log "Install complete (force mode)."
   exit 0
 fi
@@ -623,6 +713,7 @@ if [[ "$DRY_RUN" == "true" ]]; then
   fi
   handle_agents_file
   handle_stack_detection
+  install_git_hooks
   log "Install complete (dry run)."
   exit 0
 fi
@@ -649,5 +740,6 @@ fi
 
 handle_agents_file
 handle_stack_detection
+install_git_hooks
 
 log "Install complete."

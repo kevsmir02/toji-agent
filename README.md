@@ -1,243 +1,106 @@
 # Toji Agent
 
-A structured GitHub Copilot agent template for software teams who want consistent, well-reasoned AI assistance across the full development lifecycle — from requirements to deployment.
+## Quick Intro
+Toji Agent is a structured GitHub Copilot setup for real project work.
+It gives Copilot consistent guidance through:
+- project rules (`.github/copilot-instructions.md`)
+- reusable skills (`.github/skills/`)
+- slash-command workflows (`.github/prompts/`)
+- lightweight AI docs (`docs/ai/`)
 
-## Why This Exists
+Use it when you want less random AI output and more predictable engineering behavior.
 
-GitHub Copilot is powerful out of the box, but without structure it behaves inconsistently: it doesn't know your stack conventions, it skips planning, it produces visually generic UI, and it jumps to code before fully understanding the problem.
+What you get immediately after install:
+- a policy layer for Copilot decisions
+- repeatable prompts for planning, building, testing, and reviewing
+- optional local guards to prevent committing AI config files
 
-This template solves that by giving Copilot:
-- **Written context** about your project, stack, and standards — so it doesn't guess
-- **Structured workflows** (slash commands) that enforce good engineering habits
-- **Domain-specific skills** that activate the right expertise for the task at hand
-- **Feature documentation templates** that keep problem, design, and delivery decisions in one place
+## Features
+- Clear global instruction layer for coding standards and decision precedence
+- Prompt-based workflows (`/plan`, `/build`, `/verify`, `/review`, etc.)
+- Domain skills for debugging, refactoring, docs, UI/UX, and stack routing
+- Optional stack detection (`/detect-stack`) for stack-specific conventions
+- Optional local Git guards to block committing/pushing Toji AI config files
 
-The result is an agent that understands before it acts, follows your conventions without being reminded, and produces output that fits your codebase rather than generic patterns.
-
-## Who It's For
-
-- Solo developers and teams using GitHub Copilot Chat
-- Projects of any size — works equally well on new and existing codebases
-- Any stack — generic by default, with stack-specific conventions activated on demand
-
-## What It Solves
-
-| Problem | How this template addresses it |
-|---|---|
-| Agent ignores your conventions | `.github/copilot-instructions.md` sets global rules read on every interaction |
-| Generic, forgettable UI output | `frontend-design` skill enforces distinctive aesthetic direction |
-| Usability problems in generated UI | `ux-design` skill applies Nielsen's heuristics and Laws of UX |
-| Agent jumps to code before understanding | `/plan` and `/review-plan` enforce problem clarity first |
-| No consistency across features | `docs/ai/features/` keeps decisions documented and reusable |
-| Stack-specific rules get forgotten | `stack-*` skills activate authoritative conventions per project stack |
-| Debugging by guessing | `/debug` skill enforces evidence-first root cause analysis |
-| PRs and commits lack context | `/pr` and `/commit` generate reviewer-ready summaries from the actual plan and diff |
-
-## What's Included
-
-```
-.github/
-  copilot-instructions.md   # Global Copilot agent instructions
-  prompts/                  # Slash commands for structured workflows
-    plan, review-plan, review-design
-    build, update-plan, verify
-    write-tests, review, pr
-    debug, document, refactor
-    detect-stack, commit, scan
-  skills/
-    dev-lifecycle/SKILL.md          # End-to-end feature development phases
-    debug/SKILL.md                  # Evidence-first debugging workflow
-    simplify-implementation/SKILL.md # Refactoring and complexity reduction
-    capture-knowledge/SKILL.md      # Document a module, file, or function
-    technical-writer/SKILL.md       # Review and improve documentation
-    stack-router/SKILL.md           # Detect stack and route to stack-specific skill
-    stack-laravel-inertia-react/SKILL.md # Laravel + Inertia + React conventions
-    stack-mern/SKILL.md             # MERN conventions
-    frontend-design/SKILL.md        # Distinctive, production-grade UI design
-    ux-design/SKILL.md              # Usability, flows, forms, and interaction patterns
-    scan-codebase/SKILL.md          # Map project structure, layers, and conventions
-docs/ai/
-  features/README.md        # Template: problem, design, and delivery plan in one file
-  implementation/README.md  # Template: setup, patterns, error handling
-  testing/README.md         # Template: coverage goals, test cases, reporting
-  deployment/README.md      # Template: environments, process, checklist
-  monitoring/README.md      # Template: metrics, alerting, incident response
-```
-
-## Install Options
-
-### Option A: One-command install (recommended)
-
-Install directly into your existing project without cloning manually:
-
+## Installation
+### Option A: One command (recommended)
 ```bash
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/install.sh | bash -s -- --target .
 ```
 
-Run this from your project root. Use `--target .` when you're already inside the target project.
-
-Safe defaults:
-- Replaces `.github/` with the latest Toji Agent files
-- Safe-merges `docs/` without overwriting existing files
-- Copies `.gitignore` only if missing
-- If `AGENTS.md` exists, keeps it and adds a Toji bridge reference + `AGENTS.toji-bridge.md`
-- If `AGENTS.md` is missing, creates a minimal bridge `AGENTS.md`
-- If stack detection is skipped or unsupported, Active Stack Profile stays `generic`
-
-Useful flags:
-- `--dry-run` preview changes
-- `--force` overwrite existing files (creates timestamped backups)
-- `--detect-stack` force stack detection in non-interactive mode
-- `--agents-mode keep-bridge|sidecar-only|overwrite` set AGENTS behavior explicitly
-
-### Option B: Local installer after clone
-
+### Option B: Local installer
 ```bash
 git clone https://github.com/kevsmir02/toji-agent.git
 cd toji-agent
 chmod +x install.sh
-./install.sh --target /path/to/your-project --detect-stack
+./install.sh --target /path/to/your-project
 ```
 
-## Using with MCP Servers
+### Useful flags
+- `--dry-run` preview changes only
+- `--force` backup and overwrite existing Toji-related targets
+- `--detect-stack` detect stack and update active profile
+- `--install-hooks` install local `pre-commit` + `pre-push` guards
+- `--agents-mode keep-bridge|sidecar-only|overwrite` control `AGENTS.md` behavior
 
-Yes — Toji Agent is designed to work alongside MCP servers.
+Default install behavior:
+- overwrite `.github/`
+- safe-merge `docs/` (keeps existing files)
+- keep existing `.gitignore` (copy only if missing)
 
-- MCP tools (for example Laravel Boost, memory servers, or custom project servers) provide execution capabilities and structured context
-- Toji Agent provides governance: conventions, workflow, architecture discipline, and quality standards
-
-Use this precedence if guidance conflicts:
-1. Feature docs in `docs/ai/features/`
-2. Active stack skill from `.github/skills/`
-3. `.github/copilot-instructions.md`
-4. MCP/tool suggestions
-
-In short: MCP is your tool layer; Toji is your policy layer.
-
-## How to Use
-
-### 1. Copy into your project
-
-Copy the `.github/` and `docs/` folders into your project root. That's it — no install, no build step, no dependencies.
-
+## Uninstallation
+### One command
 ```bash
-cp -r .github /path/to/your-project/
-cp -r docs /path/to/your-project/
+curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/uninstall.sh | bash -s -- --target .
 ```
 
-Or use this repo as a GitHub template: click **Use this template** at the top.
-
-> **Already mid-project?** That's fine. Drop it in at any point. The skills and slash commands work immediately without any phase docs existing. For existing features you don't need to backfill requirements docs — just use the workflows going forward for new work. Run `/detect-stack` once to activate your stack's conventions.
-
-### 2. Customize
-
-- Edit `.github/copilot-instructions.md` to reflect your project's specific conventions, stack, and standards
-- Add new skills to `.github/skills/` as markdown files following the same format as `debug/SKILL.md`
-- Add new prompts to `.github/prompts/` for project-specific workflows
-
-### 3. Workflow for each feature
-
-Follow this sequence for consistent, well-documented feature development:
-
-```
-1. Create docs/ai/features/{name}.md        (copy from docs/ai/features/README.md)
-2. /review-plan          →  validate problem, scope, and delivery plan
-3. /review-design        →  verify architecture and contracts
-4. /build                →  implement task by task
-5. /verify               →  check implementation against the feature brief
-6. /write-tests          →  add test coverage
-7. /review               →  pre-push review
-8. /pr                   →  draft the PR description
+### Local
+```bash
+chmod +x uninstall.sh
+./uninstall.sh --target /path/to/your-project
 ```
 
-### 4. Using slash commands
+Use `--dry-run` to preview removals.
 
-In GitHub Copilot Chat, type `/` and select the prompt:
+Uninstaller removes only Toji-related paths:
+- `.github/copilot-instructions.md`
+- `.github/prompts/`
+- `.github/skills/`
+- `docs/ai/`
+- `AGENTS.toji-bridge.md`
+- Toji bridge block from `AGENTS.md` (if present)
 
-- `/plan` — plan any non-trivial work before writing code
-- `/review-plan` — review a plan doc for completeness
-- `/review-design` — review a design doc for completeness
-- `/build` — execute a plan task by task
-- `/update-plan` — reconcile progress with the plan doc
-- `/verify` — verify implementation matches design and requirements
-- `/write-tests` — write tests for a feature or change
-- `/review` — pre-push code review against design docs
-- `/pr` — generate a pull request description from the feature brief and diff
-- `/debug` — structured root-cause analysis before touching code
-- `/document` — document a module, file, or function
-- `/refactor` — refactor code to reduce complexity
-- `/detect-stack` — detect stack and update active stack profile
-- `/commit` — generate a Conventional Commits message from current changes
-- `/scan` — scan the project, refresh the active stack profile, and produce a high-level codebase map
+## Commands / Prompts
+Run these in Copilot Chat:
+- `/plan` plan non-trivial work
+- `/build` implement step-by-step
+- `/verify` check implementation vs requirements
+- `/write-tests` add/expand tests
+- `/review` pre-push code review
+- `/pr` draft PR description
+- `/debug` structured root-cause analysis
+- `/document` generate/update technical docs
+- `/refactor` simplify existing implementation
+- `/detect-stack` activate stack profile
+- `/commit` generate Conventional Commit message
+- `/scan` refresh stack profile and codebase map
 
-### 5. Using skills
+Recommended minimal set for most features:
+- `/plan` -> `/build` -> `/verify` -> `/write-tests` -> `/review`
 
-Skills are read automatically by Copilot when the context matches their `description`. You can also reference them explicitly:
+## How To Use
+1. Install Toji Agent into your project.
+2. (Optional) Run `/detect-stack`.
+3. For each feature, create or update docs in `docs/ai/features/`.
+4. Use a simple flow: `/plan` -> `/build` -> `/verify` -> `/write-tests` -> `/review` -> `/pr`.
+5. If you do not want AI files in Git, install with `--install-hooks` and/or uninstall after delivery.
 
-| Skill | When to use |
-|---|---|
-| `dev-lifecycle` | Building a feature end-to-end |
-| `debug` | Debugging bugs or regressions |
-| `simplify-implementation` | Refactoring complex code |
-| `capture-knowledge` | Documenting a module or function |
-| `technical-writer` | Reviewing documentation |
-| `stack-router` | Detect stack and route to stack-specific conventions |
-| `stack-laravel-inertia-react` | Strict Laravel + Inertia + React conventions |
-| `stack-mern` | Strict MERN conventions |
-| `frontend-design` | Building distinctive UI — avoids generic AI aesthetics |
-| `ux-design` | Usability, flows, forms, error states, and interaction patterns |
-| `scan-codebase` | Map project structure, entry points, layers, and conventions |
+First-run quick example:
+1. `./install.sh --target . --detect-stack --install-hooks`
+2. Open Copilot Chat and run `/plan` for your next task.
+3. Build with `/build`, then run `/verify` and `/review` before push.
 
-### Stack-specific behavior (non-generic mode)
-
-This template supports manual stack activation while staying generic by default:
-
-1. Run `/detect-stack`
-2. The command detects markers from project files and builds a normalized stack id (e.g. `laravel-inertia-react`)
-3. Evidence can include framework markers plus tooling markers such as Tailwind, Pest, Vitest, Vite, and Ziggy
-4. It resolves one of these skills if present:
-  - `.github/skills/stack-{stack-id}/SKILL.md`
-  - `.github/skills/{stack-id}/SKILL.md`
-5. It updates the **Active Stack Profile** in `.github/copilot-instructions.md`:
-   - `Mode: stack-specific` if skill found
-   - `Mode: generic` if skill not found
-6. Agent behavior follows that profile until `/detect-stack` or `/scan` is run again
-
-Example: for Laravel + Inertia + React, create:
-
-`.github/skills/stack-laravel-inertia-react/SKILL.md`
-
-Then run `/detect-stack` once per session (or after major dependency changes) to activate it.
-
-Included stack profiles in this starter:
-
-- `.github/skills/stack-laravel-inertia-react/SKILL.md`
-- `.github/skills/stack-mern/SKILL.md`
-
-### 6. Adding more skills
-
-Create `.github/skills/{skill-name}/SKILL.md` following this frontmatter format:
-
-```markdown
----
-name: your-skill
-description: When to use this skill (triggers the agent to read it automatically)
----
-
-# Skill Title
-...instructions...
-```
-
-## Philosophy
-
-Agents produce better output when they have written context. The problem with most Copilot setups is that the agent starts every conversation with no memory of your conventions, no understanding of the problem, and no awareness of decisions already made. It fills that gap with generic defaults.
-
-This template takes a different approach: **write the context down, once, in a place the agent always reads.**
-
-- `copilot-instructions.md` is global context — stack profile, code standards, engineering discipline — read on every interaction
-- `docs/ai/` is feature context — the feature brief, implementation notes, testing notes, and ops context — read when working on a specific area
-- Skills are domain expertise — authoritative rules for specific concerns (debugging, UI, UX, stack conventions) — activated when the task matches
-
-The slash commands enforce the discipline that makes this work: understand the problem before writing code, design before implementing, test alongside development, review before pushing. They're not mandatory ceremonies — use the ones that fit the task. A two-line bug fix doesn't need a requirements doc. A new feature that touches the data model does.
-
-
+## Important Notes
+- Git hooks are local by default (`.git/hooks`) and not shared unless your team standardizes hook distribution.
+- `.gitignore` helps with untracked files, but hooks are stronger protection for already tracked files.
+- If AI files were committed in the past, hooks prevent future pushes but do not rewrite history.
