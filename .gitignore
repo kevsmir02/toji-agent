@@ -3,3 +3,11 @@ node_modules/
 .env
 .env.local
 .env*.local
+vendor/
+
+# Toji Agent generated files
+.github/copilot-instructions.md
+.github/prompts/
+.github/skills/
+docs/ai/
+AGENTS.toji-bridge.md
