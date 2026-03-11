@@ -75,6 +75,7 @@ Use `/redesign` for aesthetic and interaction overhauls that must align with the
 - Run `/redesign` when the main goal is visual/interaction quality improvement rather than net-new feature scope.
 - `/redesign` must include a visual audit and a backend data-contract check before code changes.
 - If the redesign requires new backend fields, run `/refactor` first, then continue `/redesign`.
+- `/redesign` is invalid if the result is mostly refactoring or minor style tweaks; require clear before/after visual delta.
 
 ## Backward Transitions
 
