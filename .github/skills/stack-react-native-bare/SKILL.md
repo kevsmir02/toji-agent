@@ -16,12 +16,15 @@ Apply these rules as authoritative when this skill is active.
 - Shared TypeScript types belong in `src/types/`; never inline types used across more than one file.
 - Utilities in `src/utils/` must be pure functions only: no React imports and no side effects.
 - Never use Expo-specific APIs (`expo-file-system`, `expo-secure-store`, etc.); this skill targets bare workflow projects.
+- Treat React Native New Architecture as the default baseline (React Native 0.76+): do not add legacy-architecture-only guidance unless explicitly required by a compatibility constraint.
 
 ## Navigation Conventions
 
 - Use React Navigation native-stack for navigation, not JS stack.
+- Prefer React Navigation static configuration when possible; it reduces boilerplate and improves type inference.
 - Define navigation param list types in `src/types/` and type every screen's navigation and route props.
 - Never hardcode screen names as raw strings; use a typed `AppRoutes` (or equivalent) constant.
+- Keep `useNavigation` default typing when possible; use manual navigator-specific annotations only when APIs like `push` or `openDrawer` are required.
 - Always clean up navigation event listeners in `useEffect` cleanup functions.
 - Handle Android hardware back button behavior explicitly where default back behavior is incorrect.
 
@@ -33,7 +36,9 @@ Apply these rules as authoritative when this skill is active.
 - Use Axios interceptors for auth token/cookie attachment and centralized error handling — see `defensive-coding` skill for the Resilience Matrix governing error containment, async resilience, and user-facing error UX.
 - For cookie-based sessions, use `@react-native-cookies/cookies` to read/write cookies.
 - Never manually parse `Set-Cookie` headers.
-- Never store auth tokens or session cookies in component state; use AsyncStorage or a dedicated auth hook.
+- Never store auth tokens or session cookies in component state.
+- Never persist tokens in AsyncStorage; AsyncStorage is unencrypted.
+- For credentials/tokens, use secure OS-backed storage wrappers (for example `react-native-keychain`) and keep access behind a dedicated auth module.
 
 ## AsyncStorage Patterns
 
@@ -41,7 +46,7 @@ Apply these rules as authoritative when this skill is active.
 - Wrap AsyncStorage access in `try/catch`; calls can fail on low storage or platform issues.
 - Never call AsyncStorage directly in component bodies; use `useEffect` or a custom hook.
 - Use typed wrapper functions per stored key instead of scattered raw string keys.
-- For sensitive data, prefer a secure storage solution; AsyncStorage is not encrypted.
+- AsyncStorage is for non-sensitive persisted state only; never use it for secrets, passwords, or long-lived auth tokens.
 
 ## State Management
 
@@ -55,9 +60,14 @@ Apply these rules as authoritative when this skill is active.
 
 - Always use `FlatList` or `SectionList` for lists; never use `ScrollView` with `.map()` for more than roughly 10 items.
 - Provide `keyExtractor` with a stable unique string; never use array index keys.
+- Tune `FlatList` intentionally for large datasets (`initialNumToRender`, `maxToRenderPerBatch`, `updateCellsBatchingPeriod`, `windowSize`) based on device profiling.
+- Use `getItemLayout` when item dimensions are fixed.
+- Avoid anonymous `renderItem`; wrap callbacks with `useCallback`.
 - Use `useCallback` for functions passed to list items or child components to reduce unnecessary re-renders.
 - Use `useMemo` for expensive computed values only when profiling indicates benefit.
 - Avoid inline object/array creation in JSX props; extract constants or memoize where needed.
+- Profile performance in release builds, not only dev mode.
+- Avoid shipping `console.*` calls in production bundles.
 
 ## Platform & Android Specifics
 
@@ -71,6 +81,7 @@ Apply these rules as authoritative when this skill is active.
 ## TypeScript Conventions
 
 - Use strict mode and avoid `any` as a type escape hatch.
+- For React Navigation + TypeScript, ensure `moduleResolution: "bundler"` in `tsconfig.json` to match Metro behavior.
 - Define explicit interfaces for API response shapes in `src/types/`.
 - Use discriminated unions for mutually exclusive states (loading, error, success with data).
 - Type navigation params so all `route.params` access is typed.
@@ -80,6 +91,8 @@ Apply these rules as authoritative when this skill is active.
 - Never log sensitive values (tokens, passwords, cookies) to console, including debug builds.
 - Validate API responses before use; never assume server shape correctness.
 - Never store plaintext passwords in AsyncStorage.
+- Never ship secrets or private API keys inside the mobile app bundle.
+- For OAuth flows, prefer PKCE-capable implementations and never pass sensitive data in deep links.
 - Enable release obfuscation for Android with ProGuard/R8 in `android/app/build.gradle`.
 - Keep Android keystores outside the repository and document secure storage expectations in project docs.
 
@@ -90,6 +103,7 @@ Apply these rules as authoritative when this skill is active.
 - Unit test service and utility functions independently; they should be testable without device-only runtime behavior.
 - Mock `@react-native-async-storage/async-storage`, `react-native-fs`, and navigation dependencies in tests.
 - Test loading, error, and success states for every data-fetching screen.
+- Include navigation type checks in CI (TypeScript compile step) so route/params regressions fail fast.
 
 ## Code Review Checklist
 

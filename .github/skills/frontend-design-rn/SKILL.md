@@ -124,9 +124,11 @@ that is a violation.
 ## Accessibility
 
 - All interactive elements must have `accessibilityLabel` when not obvious from children.
-- Use `accessibilityRole` on custom interactive components.
+- Prefer `role` for semantic intent; when both are present, remember `role` takes precedence over `accessibilityRole`.
+- Use `accessibilityRole` for compatibility when needed, but do not conflict with `role` values.
 - Images must include `accessible={true}` and `accessibilityLabel` or
   `accessibilityHint`.
+- For dynamic status text (loading counters, async updates), use Android live-region semantics (`aria-live` or `accessibilityLiveRegion`) where appropriate.
 
 ## Code Review Checklist
 
@@ -134,6 +136,7 @@ that is a violation.
 - Are all tappable elements at least `44x44` dp?
 - Is `SafeAreaView` from `react-native-safe-area-context` used on all screens?
 - Are list screens using `FlatList` rather than `ScrollView + map`?
+- Are large lists tuned with `getItemLayout` or explicit batching/window props when needed?
 - Are loading, empty, and error states all handled?
 - Are StyleSheet definitions outside component functions?
 - Is `KeyboardAvoidingView` behavior platform-aware?

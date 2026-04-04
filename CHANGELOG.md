@@ -18,6 +18,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- changelog-entries -->
 
+## [2.1.2] - 2026-04-04
+
+### Added
+- None
+
+### Changed
+- Tighten React Native stack best-practice guidance
+- Auto-detected changed files:
+- .github/lessons-learned.md
+- .github/skills/frontend-design-rn/SKILL.md
+- .github/skills/stack-react-native-bare/SKILL.md
+- .github/skills/ux-design-rn/SKILL.md
+
+### Fixed
+- Release bump type: patch
+
+### Documentation
+- No documentation files changed in this release.
 ## [2.1.1] - 2026-04-04
 
 ### Added

@@ -13,6 +13,7 @@ Apply these rules as authoritative when this skill is active.
 - Primary navigation actions (tabs, home) belong in bottom tab bars for thumb reach.
 - Secondary/contextual actions belong in top headers or action sheets.
 - Do not place primary/secondary controls as floating actions in the screen middle.
+- Prefer native-stack transitions for deep navigation flows to keep animations on the main UI thread.
 - Destructive actions (delete, logout, reboot) must require confirmation via Alert
   dialog or explicit confirmation bottom sheet.
 - Back navigation must always work.
@@ -20,6 +21,7 @@ Apply these rules as authoritative when this skill is active.
 - Deep screens (3+ levels) should provide jump-to-root affordance (breadcrumb,
   home-tab reset, or header shortcut).
 - Use `navigation.replace()` after auth success to prevent returning to login screen.
+- Keep route params strongly typed and navigator-safe; avoid ad hoc screen-name strings in UX flow logic.
 
 ## Gestures
 
@@ -78,6 +80,7 @@ Apply these rules as authoritative when this skill is active.
 - Do not fight platform conventions without explicit reason.
 - If Android users expect back button behavior, provide it.
 - If iOS users expect swipe-back, do not disable it casually.
+- If disabling gestures/back behavior, leave an inline reason in code because this is a high-friction UX change.
 - Match `StatusBar` `barStyle` to screen background contrast.
 
 ## Performance Perception

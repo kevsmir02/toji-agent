@@ -36,3 +36,4 @@ Copilot must **read this file at the start of every task** and apply matching in
 ### #ux
 
 ### #stack
+- [#stack] RN Bare Baseline 2026: Treat New Architecture as default, keep React Navigation typing aligned with static API defaults, and prohibit AsyncStorage for tokens by defaulting sensitive persistence to OS-backed secure storage wrappers.
