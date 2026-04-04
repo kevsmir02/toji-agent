@@ -456,6 +456,11 @@ set -euo pipefail
 
 while IFS= read -r path || [[ -n "${path:-}" ]]; do
   [[ -z "${path:-}" ]] && continue
+  if [[ "$path" == .toji_tmp/* ]]; then
+    echo "❌ TOJI ERROR: Transient installer artifacts are not allowed in commits." >&2
+    echo "  Blocked path: .toji_tmp/" >&2
+    exit 1
+  fi
   if [[ "$path" == *docs/ai* ]] || [[ "$path" == *skills* ]] || [[ "$path" == *prompts* ]] || [[ "$path" == *".github/instructions/toji-stack-"* ]] || [[ "$path" == *".agent/"* ]]; then
     echo "❌ TOJI ERROR: Local governance files detected. Run git reset <file> to unstage." >&2
     echo "  Blocked path: ${path}" >&2

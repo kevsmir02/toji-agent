@@ -101,15 +101,6 @@ if [[ "$STATUS_MODE" -eq 1 ]]; then
   fi
 
   echo ""
-  echo -e "${BOLD}[ Receipt ] .toji_tmp/install-receipt.json${RESET}"
-  if [[ -f "$ROOT/.toji_tmp/install-receipt.json" ]]; then
-    echo "  $PASS  install-receipt.json present"
-    sed 's/^/  /' "$ROOT/.toji_tmp/install-receipt.json"
-  else
-    echo "  $WARN  install-receipt.json not found"
-  fi
-
-  echo ""
   exit 0
 fi
 

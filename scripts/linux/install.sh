@@ -330,16 +330,6 @@ fi
 
 finalize_rollback_snapshot
 
-mkdir -p "$ROOT/.toji_tmp"
-cat >"$ROOT/.toji_tmp/install-receipt.json" <<EOF
-{
-  "installed_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-  "mode": "$INSTALL_MODE",
-  "source": "$SOURCE"
-}
-EOF
-echo "Toji install: wrote .toji_tmp/install-receipt.json"
-
 echo "Toji install: updater scripts are not copied into consumer repositories."
 echo "Toji install: from this project root, later run one of:"
 if [[ "$SOURCE_IS_LOCAL" -eq 1 ]]; then
