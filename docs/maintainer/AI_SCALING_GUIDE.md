@@ -106,6 +106,24 @@ Use this as a mandatory preflight and completion checklist for framework evoluti
 9. **Drift sweep**: grep for stale paths/terms introduced by the change and resolve them before commit.
 10. **Document why**: update maintainer docs when behavior/contracts change.
 
+### 2.8 Artifact Hierarchy (Canonical + Derived Mirror)
+
+Maintainers must preserve a strict hierarchy between policy artifacts and execution mirrors.
+
+- **Git-Is-Truth:** Requirements, architecture decisions, and acceptance criteria live in `docs/ai/features/*.md`. If it is not committed there, it is not policy.
+- **Projection Rule:** Antigravity artifacts (`implementation_plan.md`, `task.md`, `walkthrough.md`) are derived mirrors used for execution sequencing and status only.
+- **Hierarchy of Edits:** During mid-build pivots, update the Canonical feature brief first and then re-derive mirrors.
+
+Maintainer application:
+
+1. When planning behavior changes, edit the Canonical feature brief first.
+2. Treat mirror artifacts as disposable session state and never as long-term source documents.
+3. Validate cross-surface alignment against `docs/ai/implementation/artifact-hierarchy.md`.
+
+Anti-pattern:
+
+- Never create `.agent/rules/` skill mirrors. Skills are canonical under `.github/skills/` only.
+
 ---
 
 ## 3. Anti-Patterns (What Not to Build)

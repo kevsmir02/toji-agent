@@ -75,6 +75,13 @@ These skills fire automatically via the 1% Rule. Read from `.github/skills/`:
 - `.github/skills/ambiguity-resolver/SKILL.md` — Intercept vague feature requests before planning
 - `.github/skills/baseline-validator/SKILL.md` — Plan compliance gate before build
 
+## Artifact Hierarchy
+
+- `docs/ai/features/*.md` is the Canonical source of truth for requirements, architecture decisions, and acceptance criteria.
+- `implementation_plan.md` and `task.md` are derived execution mirrors for session-scoped progress tracking.
+- Derived mirrors are never policy and must be re-derived when Canonical specs change.
+- See `docs/ai/implementation/artifact-hierarchy.md` for complete rules and pivot behavior.
+
 ## Workflow Mapping
 
 Use Antigravity workflows under `.agent/workflows/`:
@@ -89,7 +96,7 @@ Use Antigravity workflows under `.agent/workflows/`:
 | `/debug` | `toji-debug.md` |
 | `/setup-mcps` | `setup-mcps.md` |
 
-Use `.agent/implementation_plan.md` and `.agent/task.md` as runtime artifacts for plan state and execution tracking.
+Use `implementation_plan.md` and `task.md` as derived execution mirrors for session-scoped progress tracking. Treat them as secondary execution artifacts; `docs/ai/features/*.md` is Canonical. See `docs/ai/implementation/artifact-hierarchy.md`.
 
 ## Behavior
 

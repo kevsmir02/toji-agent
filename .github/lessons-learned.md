@@ -19,6 +19,7 @@ Copilot must **read this file at the start of every task** and apply matching in
 - [#arch] Profile Overlay Contract: Runtime operating profiles must tune execution style only and can never override persona-level governance, tool constraints, or instruction-priority rules.
 - [#arch] Dual Agent Profile Sync: Keep operating-profile routing sections in `.github/agents/toji.agent.md` and `.agent/agents/toji.agent.md` synchronized; parity drift creates cross-surface behavior mismatches.
 - [#arch] Canonical Skills Boundary: Keep `.github/skills/*/SKILL.md` as the only skill source of truth; treat `.agent/` as persona/workflow surface only and remove any mirrored `.agent/rules/skill-*.md` copies to prevent cross-surface drift.
+- [#arch] Canonical Artifact Hierarchy: Store requirements and acceptance criteria only in `docs/ai/features/*.md`; treat Antigravity `implementation_plan.md` and `task.md` as disposable derived mirrors that must be re-derived after spec pivots.
 
 
 ### #fix

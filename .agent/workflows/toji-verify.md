@@ -4,9 +4,9 @@ Purpose: translate Toji /verify behavior into Antigravity workflow execution.
 
 ## Inputs
 
+- docs/ai/features/{name}.md (canonical source, if present)
 - .agent/implementation_plan.md
 - .agent/task.md
-- docs/ai/features/{name}.md (if present)
 - Current diff and test outputs
 
 ## Outputs
@@ -17,7 +17,7 @@ Purpose: translate Toji /verify behavior into Antigravity workflow execution.
 ## Stages
 
 1. Spec compliance
-   - Compare implementation against acceptance criteria and critical flows.
+   - Compare implementation against acceptance criteria and critical flows in docs/ai/features/{name}.md.
    - Flag missing behavior and scope creep.
 2. Quality review
    - Check architecture, naming, maintainability, security robustness.
@@ -38,3 +38,4 @@ Purpose: translate Toji /verify behavior into Antigravity workflow execution.
 
 - Overall PASS requires all required stages to pass.
 - If any stage fails, return explicit remediation and do not mark complete.
+- Canonical feature briefs are the verification source of truth; mirror artifacts are not acceptance criteria.

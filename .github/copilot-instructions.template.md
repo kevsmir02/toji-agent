@@ -169,6 +169,8 @@ After **`/onboard`** (Legacy Integration), Toji treats pre-baseline code differe
    - `docs/ai/implementation/` — implementation notes, patterns, conventions, and setup details
    - `docs/ai/testing/` — testing strategy, fixtures, and coverage notes
 
+1.5. **Artifact Hierarchy** — `docs/ai/features/*.md` is the canonical source of truth for all planning and verification. Antigravity execution mirrors (`implementation_plan.md`, `task.md`) are ephemeral session state and must never be treated as policy or used for cross-surface resume. See `docs/ai/implementation/artifact-hierarchy.md`.
+
 2. **Classify scope** — Read `.github/skills/dev-lifecycle/SKILL.md` and classify the work as Trivial, Small, Medium, or Large before choosing a workflow. Do not apply Large-scope ceremony to Trivial work.
 
 3. **Use active stack profile** — Stack-specific conventions are only active when `/detect-stack` has updated the profile in this file.
