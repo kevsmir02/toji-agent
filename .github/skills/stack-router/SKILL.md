@@ -1,6 +1,6 @@
 ---
 name: stack-router
-description: Stack detection protocol — scan config files and dependencies, build a normalized stack ID, resolve the matching skill path, return activation data for the Active Stack Profile, and (for /detect-stack) regenerate Tier 2 path-specific .github/instructions/toji-stack-*.instructions.md plus paired .cursor/rules/toji-stack-*.mdc and .agent/rules/toji-stack-*.md. Also perform MCP-aware recommendations and Antigravity mcp_config update when applicable. Use exclusively when running /detect-stack or when the user explicitly asks to identify or switch the project stack. Do NOT use during normal coding — stack conventions come from the already-activated stack skill.
+description: Stack detection protocol — scan config files and dependencies, build a normalized stack ID, resolve the matching skill path, return activation data for the Active Stack Profile, and (for /detect-stack) regenerate Tier 2 path-specific .github/instructions/toji-stack-*.instructions.md plus .agent/rules/toji-stack-*.md. Also perform MCP-aware recommendations and Antigravity mcp_config update when applicable. Use exclusively when running /detect-stack or when the user explicitly asks to identify or switch the project stack. Do NOT use during normal coding — stack conventions come from the already-activated stack skill.
 globs: ["package.json","composer.json","pyproject.toml","go.mod","*.config.*","*.lock"]
 ---
 
@@ -67,13 +67,12 @@ If Antigravity is active (project has `.agent/` governance and stack detection i
 3. Default newly added recommended servers to `enabled: false` unless user requested auto-enable.
 4. Keep existing server values when keys already exist (non-destructive update).
 
-## Tier 2 path instructions + Cursor/Antigravity rules (`/detect-stack`)
+## Tier 2 path instructions + Antigravity rules (`/detect-stack`)
 
 After the Active Stack Profile is updated in **the same response**, **`/detect-stack`** must update Tier 2 artifacts using **diff-and-patch** (not blind delete/rewrite).
 
 1. Build a **desired manifest** of Tier 2 files for the detected stack across:
    - `.github/instructions/toji-stack-*.instructions.md`
-   - `.cursor/rules/toji-stack-*.mdc`
    - `.agent/rules/toji-stack-*.md`
 2. Enumerate the **existing manifest** from disk for the same Tier 2 patterns.
 3. For each desired file:
@@ -87,13 +86,12 @@ After the Active Stack Profile is updated in **the same response**, **`/detect-s
 ### Strict wrapper contract (no logic creep)
 
 - Tier 2 files are wrappers only and must point back to `.github/skills/*/SKILL.md`.
-- `.cursor/rules/toji-stack-*.mdc` and `.agent/rules/toji-stack-*.md` must contain only minimal metadata plus a 1-line skill pointer body.
+- `.agent/rules/toji-stack-*.md` must contain only minimal metadata plus a 1-line skill pointer body.
 - Do not duplicate stack logic, rules, or workflows inside IDE-specific wrappers.
 
 6. If **`.git/info/exclude`** does **not** already contain **`.github/instructions/toji-stack-*.instructions.md`**, append that line **once**.
-7. If **`.git/info/exclude`** does **not** already contain **`.cursor/rules/toji-stack-*.mdc`**, append that line **once**.
-8. If **`.git/info/exclude`** does **not** already contain **`.agent/rules/toji-stack-*.md`**, append that line **once**.
-9. If **`.git/info/exclude`** does **not** already contain **`.agent/*.json`**, append that line **once**.
+7. If **`.git/info/exclude`** does **not** already contain **`.agent/rules/toji-stack-*.md`**, append that line **once**.
+8. If **`.git/info/exclude`** does **not** already contain **`.agent/*.json`**, append that line **once**.
 
 **Generation matrix (examples — infer from evidence; extend analogously for new stack skills):**
 
@@ -105,16 +103,16 @@ react-native-bare:
 - Active Skill: `.github/skills/stack-react-native-bare/SKILL.md`
 - Tier 2 globs: `**/*.tsx,**/*.ts` (excluding `node_modules/`, `android/`, `ios/`)
 
-| Stack ID (example) | Copilot file | Cursor file | Antigravity file | Globs / `applyTo` (example) | Skill path (example) |
-|--------------------|-------------|-------------|-------------------|-----------------------------|------------------------|
-| `laravel-inertia-react` | `toji-stack-php.instructions.md` | `toji-stack-php.mdc` | `toji-stack-php.md` | `**/*.php` | `.github/skills/stack-laravel-inertia-react/SKILL.md` |
-| `laravel-inertia-react` | `toji-stack-tsx.instructions.md` | `toji-stack-tsx.mdc` | `toji-stack-tsx.md` | `**/*.tsx,**/*.jsx` | `.github/skills/ui-reasoning-engine/SKILL.md` |
-| `mern` | `toji-stack-js-ts.instructions.md` | `toji-stack-js-ts.mdc` | `toji-stack-js-ts.md` | `**/*.js,**/*.jsx,**/*.ts,**/*.tsx` | `.github/skills/stack-mern/SKILL.md` |
-| `react-native-bare` | `toji-stack-rn-ts.instructions.md` | `toji-stack-rn-ts.mdc` | `toji-stack-rn-ts.md` | `**/*.tsx,**/*.ts` (excluding `node_modules/`, `android/`, `ios/`) | `.github/skills/stack-react-native-bare/SKILL.md` |
+| Stack ID (example) | Copilot file | Antigravity file | Globs / `applyTo` (example) | Skill path (example) |
+|--------------------|-------------|-------------------|-----------------------------|------------------------|
+| `laravel-inertia-react` | `toji-stack-php.instructions.md` | `toji-stack-php.md` | `**/*.php` | `.github/skills/stack-laravel-inertia-react/SKILL.md` |
+| `laravel-inertia-react` | `toji-stack-tsx.instructions.md` | `toji-stack-tsx.md` | `**/*.tsx,**/*.jsx` | `.github/skills/ui-reasoning-engine/SKILL.md` |
+| `mern` | `toji-stack-js-ts.instructions.md` | `toji-stack-js-ts.md` | `**/*.js,**/*.jsx,**/*.ts,**/*.tsx` | `.github/skills/stack-mern/SKILL.md` |
+| `react-native-bare` | `toji-stack-rn-ts.instructions.md` | `toji-stack-rn-ts.md` | `**/*.tsx,**/*.ts` (excluding `node_modules/`, `android/`, `ios/`) | `.github/skills/stack-react-native-bare/SKILL.md` |
 
-For other stack ids with a matching **`stack-*/SKILL.md`**, emit triplet wrappers per **primary source extensions** and apply diff-and-patch semantics.
+For other stack ids with a matching **`stack-*/SKILL.md`**, emit doublet wrappers per **primary source extensions** and apply diff-and-patch semantics.
 
-**Invisible Governance:** **`toji-stack-*.instructions.md`**, **`toji-stack-*.mdc`**, and **`toji-stack-*.md`** are excluded locally via **`install.sh` / `update.sh`**. Tier 1 shippables (no `toji-stack-` prefix) stay committable in the framework repo.
+**Invisible Governance:** **`toji-stack-*.instructions.md`** and **`toji-stack-*.md`** are excluded locally via **`install.sh` / `update.sh`**. Tier 1 shippables (no `toji-stack-` prefix) stay committable in the framework repo.
 
 ## Output Contract
 
@@ -124,5 +122,5 @@ When routing, report:
 - Activated skill path (or fallback to generic)
 - Any missing stack skill recommendation (if fallback)
 - **Re-run hint:** Recommend **`/detect-stack`** again when **either** (a) **`.github/lessons-learned.md`** `## Instincts` mentions frameworks, databases, or runtimes **not** reflected in the current **Active Skill** / **Stack ID**, **or** (b) **new** primary framework/runtime dependencies appear in `package.json`, `composer.json`, or the repo’s main lockfile **since** **Last Detected** in the profile (use file mtimes or version bumps as signal—lightweight, not a full audit).
-- **Path instructions:** Confirm Tier 2 regeneration: which **`toji-stack-*.instructions.md`**, **`toji-stack-*.mdc`**, and **`toji-stack-*.md`** files were removed and which were written (or “none — generic mode”), matching this section’s rules.
+- **Path instructions:** Confirm Tier 2 regeneration: which **`toji-stack-*.instructions.md`** and **`toji-stack-*.md`** files were removed and which were written (or “none — generic mode”), matching this section’s rules.
 - **MCP recommendations:** List beneficial MCP servers for the detected stack and state whether `.agent/mcp_config.json` was generated/updated (or skipped with reason).
