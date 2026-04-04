@@ -38,13 +38,14 @@ const CHANGELOG_HEADER = [
 ].join('\n');
 
 function usage() {
-  console.log('Usage: node scripts/release/prepare-release.js --bump <major|minor|patch> [--summary "text"]');
+  console.log('Usage: node scripts/release/prepare-release.js --bump <major|minor|patch> [--summary "text"] [--allow-missing-docs]');
 }
 
 function parseArgs(argv) {
   const args = {
     bump: null,
     summary: '',
+    allowMissingDocs: false,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -59,6 +60,11 @@ function parseArgs(argv) {
     if (current === '--summary') {
       args.summary = argv[i + 1] || '';
       i += 1;
+      continue;
+    }
+
+    if (current === '--allow-missing-docs') {
+      args.allowMissingDocs = true;
       continue;
     }
 
@@ -163,7 +169,7 @@ function main() {
   const changedFiles = getChangedFiles();
   const docsCheck = isDocumentationUpdateRequired(changedFiles);
 
-  if (docsCheck.requiresDocumentationUpdate) {
+  if (docsCheck.requiresDocumentationUpdate && !args.allowMissingDocs) {
     console.error('Documentation update required before release bump.');
     console.error('Impactful non-doc changes were detected without README/DOCUMENTATION/docs updates.');
     console.error('Changed files:');

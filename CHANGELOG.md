@@ -18,6 +18,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- changelog-entries -->
 
+## [2.1.1] - 2026-04-04
+
+### Added
+- None
+
+### Changed
+- Maintainer pre-commit automation
+- Auto-detected changed files:
+- .github/lessons-learned.md
+- scripts/linux/update.sh
+- scripts/release/precommit-release-automation.test.js
+- scripts/release/prepare-release.js
+
+### Fixed
+- Release bump type: patch
+
+### Documentation
+- No documentation files changed in this release.
 ## [2.1.0] - 2026-04-04
 
 ### Added

@@ -17,8 +17,18 @@ function runTests() {
   );
 
   assert.ok(
+    updateScript.includes('--allow-missing-docs'),
+    'pre-commit hook template must allow auto-release prep when docs were not changed'
+  );
+
+  assert.ok(
     updateScript.includes('git add .github/toji-version.json CHANGELOG.md'),
     'pre-commit hook template must stage release metadata files after auto-prep'
+  );
+
+  assert.ok(
+    updateScript.includes('has_non_metadata_changes=1'),
+    'pre-commit hook template must trigger release prep for any non-metadata staged changes'
   );
 
   console.log('pre-commit release automation tests passed');

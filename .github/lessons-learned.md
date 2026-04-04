@@ -28,6 +28,7 @@ Copilot must **read this file at the start of every task** and apply matching in
 - [#fix] check.sh Flag Contract: Any flag passed by `update.sh` to `check.sh` must be explicitly handled in `check.sh`'s argument parser. An unrecognized flag causes `check.sh` to exit non-zero, which triggers `update.sh`'s rollback mechanism, silently reverting the entire update.
 - [#fix] Transient Artifact Discipline: Never generate install-time receipt files under `.toji_tmp/` unless they are consumed by behavior; transient metadata creates commit noise and should be blocked by pre-commit guards.
 - [#fix] Maintainer Release Hook Gap: Release metadata discipline must be enforced in the pre-commit hook template for source repos; documenting prepare-release alone does not prevent unbumped commits.
+- [#fix] Commit-Time Release Automation: For source repos, pre-commit release prep should trigger on any non-metadata staged change and pass a docs-check bypass flag, otherwise normal maintainer commits can be blocked instead of auto-versioned.
 
 
 ### #perf

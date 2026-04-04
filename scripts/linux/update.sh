@@ -471,7 +471,7 @@ while IFS= read -r path || [[ -n "${path:-}" ]]; do
 done <<< "$STAGED_PATHS"
 
 if [[ -f "docs/maintainer/AI_SCALING_GUIDE.md" && -f "scripts/release/prepare-release.js" ]]; then
-  needs_release_metadata=0
+  has_non_metadata_changes=0
   version_staged=0
   changelog_staged=0
 
@@ -485,16 +485,12 @@ if [[ -f "docs/maintainer/AI_SCALING_GUIDE.md" && -f "scripts/release/prepare-re
       changelog_staged=1
     fi
 
-    case "$path" in
-      README.md|DOCUMENTATION.md|docs/*|CHANGELOG.md|.github/toji-version.json)
-        ;;
-      scripts/*|.github/skills/*|.github/prompts/*|.github/agents/*|.github/instructions/*|.github/workflows/*|.github/copilot-instructions.md|.github/copilot-instructions.template.md|.agent/agents/*|.agent/workflows/*|AGENTS.md)
-        needs_release_metadata=1
-        ;;
-    esac
+    if [[ "$path" != "CHANGELOG.md" && "$path" != ".github/toji-version.json" ]]; then
+      has_non_metadata_changes=1
+    fi
   done <<< "$STAGED_PATHS"
 
-  if [[ "$needs_release_metadata" -eq 1 && ( "$version_staged" -eq 0 || "$changelog_staged" -eq 0 ) ]]; then
+  if [[ "$has_non_metadata_changes" -eq 1 && ( "$version_staged" -eq 0 || "$changelog_staged" -eq 0 ) ]]; then
     if ! command -v node >/dev/null 2>&1; then
       echo "❌ TOJI ERROR: node is required for maintainer release automation." >&2
       echo "  Install Node.js, then retry commit." >&2
@@ -505,7 +501,7 @@ if [[ -f "docs/maintainer/AI_SCALING_GUIDE.md" && -f "scripts/release/prepare-re
     summary="${TOJI_RELEASE_SUMMARY:-Maintainer pre-commit automation}"
 
     echo "Toji pre-commit: release metadata missing; running prepare-release ($bump_type)." >&2
-    if ! node scripts/release/prepare-release.js --bump "$bump_type" --summary "$summary"; then
+    if ! node scripts/release/prepare-release.js --bump "$bump_type" --summary "$summary" --allow-missing-docs; then
       echo "❌ TOJI ERROR: release preparation failed." >&2
       echo "  Update docs as needed, or run prepare-release manually and retry commit." >&2
       exit 1
