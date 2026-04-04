@@ -27,6 +27,7 @@ Copilot must **read this file at the start of every task** and apply matching in
 - [#fix] Invisible Governance Self-Blocking: When committing new files inside the Toji source repo itself, Toji's own pre-commit hook and `.git/info/exclude` rules will silently prevent `git add` from staging `.github/skills/` files. Use `--no-verify` only for framework source commits, never for consumer projects.
 - [#fix] check.sh Flag Contract: Any flag passed by `update.sh` to `check.sh` must be explicitly handled in `check.sh`'s argument parser. An unrecognized flag causes `check.sh` to exit non-zero, which triggers `update.sh`'s rollback mechanism, silently reverting the entire update.
 - [#fix] Transient Artifact Discipline: Never generate install-time receipt files under `.toji_tmp/` unless they are consumed by behavior; transient metadata creates commit noise and should be blocked by pre-commit guards.
+- [#fix] Maintainer Release Hook Gap: Release metadata discipline must be enforced in the pre-commit hook template for source repos; documenting prepare-release alone does not prevent unbumped commits.
 
 
 ### #perf
