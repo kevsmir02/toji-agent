@@ -454,6 +454,8 @@ write_pre_commit_hook() {
 # Toji Invisible Governance — pre-commit guard (install.sh)
 set -euo pipefail
 
+STAGED_PATHS="$(git diff --cached --name-only --diff-filter=ACMRTUXB)"
+
 while IFS= read -r path || [[ -n "${path:-}" ]]; do
   [[ -z "${path:-}" ]] && continue
   if [[ "$path" == .toji_tmp/* ]]; then
@@ -466,7 +468,53 @@ while IFS= read -r path || [[ -n "${path:-}" ]]; do
     echo "  Blocked path: ${path}" >&2
     exit 1
   fi
-done < <(git diff --cached --name-only --diff-filter=ACMRTUXB)
+done <<< "$STAGED_PATHS"
+
+if [[ -f "docs/maintainer/AI_SCALING_GUIDE.md" && -f "scripts/release/prepare-release.js" ]]; then
+  needs_release_metadata=0
+  version_staged=0
+  changelog_staged=0
+
+  while IFS= read -r path || [[ -n "${path:-}" ]]; do
+    [[ -z "${path:-}" ]] && continue
+
+    if [[ "$path" == ".github/toji-version.json" ]]; then
+      version_staged=1
+    fi
+    if [[ "$path" == "CHANGELOG.md" ]]; then
+      changelog_staged=1
+    fi
+
+    case "$path" in
+      README.md|DOCUMENTATION.md|docs/*|CHANGELOG.md|.github/toji-version.json)
+        ;;
+      scripts/*|.github/skills/*|.github/prompts/*|.github/agents/*|.github/instructions/*|.github/workflows/*|.github/copilot-instructions.md|.github/copilot-instructions.template.md|.agent/agents/*|.agent/workflows/*|AGENTS.md)
+        needs_release_metadata=1
+        ;;
+    esac
+  done <<< "$STAGED_PATHS"
+
+  if [[ "$needs_release_metadata" -eq 1 && ( "$version_staged" -eq 0 || "$changelog_staged" -eq 0 ) ]]; then
+    if ! command -v node >/dev/null 2>&1; then
+      echo "❌ TOJI ERROR: node is required for maintainer release automation." >&2
+      echo "  Install Node.js, then retry commit." >&2
+      exit 1
+    fi
+
+    bump_type="${TOJI_RELEASE_BUMP:-patch}"
+    summary="${TOJI_RELEASE_SUMMARY:-Maintainer pre-commit automation}"
+
+    echo "Toji pre-commit: release metadata missing; running prepare-release ($bump_type)." >&2
+    if ! node scripts/release/prepare-release.js --bump "$bump_type" --summary "$summary"; then
+      echo "❌ TOJI ERROR: release preparation failed." >&2
+      echo "  Update docs as needed, or run prepare-release manually and retry commit." >&2
+      exit 1
+    fi
+
+    git add .github/toji-version.json CHANGELOG.md
+    echo "Toji pre-commit: staged .github/toji-version.json and CHANGELOG.md" >&2
+  fi
+fi
 
 if git diff --cached --name-only --diff-filter=ACMRTUXB -- "AGENTS.md" | grep -q '^AGENTS.md$'; then
   echo "❌ TOJI ERROR: Local governance files detected. Run git reset <file> to unstage." >&2
