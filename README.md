@@ -135,6 +135,26 @@ Result: governance is always active locally, while client-facing commit history 
 - `/review` - adversarial quality gate before push
 - `/debug` - evidence-first root cause workflow
 
+## Maintainer Release Workflow
+
+Before maintainer commits that change behavior, run:
+
+```bash
+node scripts/release/prepare-release.js --bump <major|minor|patch> --summary "what changed"
+```
+
+Semantic Versioning quick guide:
+
+- `major`: breaking changes or contract changes that require migration.
+- `minor`: new backward-compatible feature (most maintainer feature additions).
+- `patch`: backward-compatible fixes, wording updates, or small internal corrections.
+
+What the command does:
+
+- bumps `.github/toji-version.json`
+- blocks release prep if impactful non-doc changes were made without README/DOCUMENTATION/docs updates
+- appends a new entry to `CHANGELOG.md` using detected changed files
+
 ## Read Next
 
 - [DOCUMENTATION.md](DOCUMENTATION.md) for full architecture, script behavior, install and uninstall procedures, and governance internals.

@@ -84,6 +84,8 @@ flowchart TD
 | `scripts/linux/update.sh` | In-place sync and heal without clobbering local memory. |
 | `scripts/linux/check.sh` | Installation integrity checker. |
 | `scripts/linux/uninstall.sh` | Removes Toji-managed artifacts and governance hooks. |
+| `scripts/release/prepare-release.js` | Maintainer release prep: semver bump, docs-update guard, and changelog entry generation. |
+| `scripts/release/release-utils.js` | Shared semantic-version and docs-impact logic for release automation. |
 | `scripts/windows/windows_install.ps1` | Windows launcher for `install.sh` through Bash. |
 | `scripts/windows/windows_update.ps1` | Windows launcher for `update.sh` through Bash. |
 | `scripts/windows/windows_check.ps1` | Windows launcher for `check.sh` through Bash. |
@@ -192,6 +194,26 @@ Notable updater behavior:
 - re-applies Invisible Governance excludes idempotently
 - installs or refreshes Toji pre-commit guardrails
 - supports dry run and mode-specific updates
+
+### 6.1 Maintainer Release Prep (SemVer + Changelog)
+
+Run this before maintainer commits that should update release metadata:
+
+```bash
+node scripts/release/prepare-release.js --bump <major|minor|patch> --summary "what changed"
+```
+
+The command performs three actions atomically:
+
+1. Bumps `.github/toji-version.json` using Semantic Versioning.
+2. Verifies docs hygiene: if impactful non-doc changes are detected without README/DOCUMENTATION/docs updates, it exits non-zero and blocks the release prep.
+3. Appends a new release entry to `CHANGELOG.md` with summary, bump type, and auto-detected changed files.
+
+SemVer reference:
+
+- `major`: breaking changes, migration-required behavior, or compatibility breaks.
+- `minor`: backward-compatible feature additions.
+- `patch`: backward-compatible fixes and maintenance updates.
 
 ## 7. Uninstall Guide
 
