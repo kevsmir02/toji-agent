@@ -70,3 +70,26 @@ IMPORTANT: Match implementation complexity to the aesthetic vision.
 - **Minimalism/Refinement**: Restraint, surgical precision, and exact attention to spacing and typography. 
 
 Elegance comes from executing the specific vision remarkably well. NEVER produce predictable, cookie-cutter "AI slop." Every execution must be fiercely unique.
+
+## Engineering & Execution Guidelines (Vercel Standards)
+While your aesthetic vision defines *how the UI looks*, these Vercel-derived standards strictly govern *how you build it*. You must perfectly execute these mechanical rules regardless of the aesthetic direction:
+
+### 1. Interactions & Accessibility
+- **Keyboard First**: Ensure 100% keyboard operability. Apply visible focus rings using `:focus-visible` (not `:focus`) to avoid distracting pointer users.
+- **Hit Targets**: All interactive elements must have a generous hit target (minimum 24px visually, 44px on mobile hit targets). Expand `<input>` font sizes to `16px` on mobile to prevent iOS Safari auto-zoom.
+- **Forgiving UX**: Never leave "dead zones" on controls. Label everything accurately (`aria-label` for icon-only buttons), and use native elements (`<button>`, `<a>`) before falling back to `aria-*` tags.
+
+### 2. Form & Input Mechanics
+- **Frictionless Input**: Never block typing or pasting in `<input>` or `<textarea>`. Do not disable pastes. If a field only accepts numbers, allow the typing but show validation feedack instead of swallowing keystrokes.
+- **Submit Behavior**: Keep submit buttons enabled to allow incomplete form submissions to surface native validation feedback.
+- **Labels**: Ensure clicking a `<label>` correctly focuses its associated control.
+
+### 3. Bulletproof Animations & Layout
+- **Compositor Friendly**: Explicitly list properties you intend to animate (avoid `transition: all`). Only animate GPU-accelerated properties (`transform`, `opacity`) and avoid properties that trigger layout thrash (`width`, `height`, `left`).
+- **Motion Restraint**: Provide `prefers-reduced-motion` fallbacks. Only animate when it clarifies cause & effect or adds deliberate delight.
+- **Optical & Intrinsic Sizing**: Rely on Flexbox/Grid intrinsic sizing over calculating measurements in JS. Adjust layouts by `±1px` optically when perception beats raw geometry.
+
+### 4. Content & Resilience
+- **Skeletons**: Loading skeletons must perfectly mirror final content to prevent layout shifts.
+- **Active Voice & Typography**: Use active, action-oriented language. Apply tabular numbers (`font-variant-numeric: tabular-nums`) for comparisons and correctly place non-breaking spaces before units (e.g., `10&nbsp;MB`).
+- **Error Exits**: Error messages must guide the exit—tell the user exactly how to fix the error, not just that an error occurred.
