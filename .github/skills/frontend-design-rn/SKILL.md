@@ -1,6 +1,6 @@
 ---
 name: frontend-design-rn
-description: Authoritative UI and styling rules for React Native apps — StyleSheet conventions, density-independent spacing, touch targets, platform-aware design, safe areas, typography scale. Apply when the Active Stack Profile shows Stack ID: react-native-bare (or any react-native-* stack). Overrides frontend-design for React Native files.
+description: "Authoritative UI and styling rules for React Native apps — StyleSheet conventions, density-independent spacing, touch targets, platform-aware design, safe areas, typography scale. Apply when the Active Stack Profile shows Stack ID: react-native-bare (or any react-native-* stack). Overrides frontend-design for React Native files."
 globs: ["**/*.tsx","**/*.jsx","**/screens/**","**/components/**"]
 ---
 

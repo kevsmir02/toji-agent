@@ -1,6 +1,6 @@
 ---
 name: stack-mern
-description: Authoritative architecture rules for MERN — thin Express handlers, Use Case classes, Zod-first schemas, ts-rest or tRPC contracts, centralized error middleware, Mongoose conventions, Vitest frontend tests. Apply ONLY when the Active Stack Profile in copilot-instructions.md shows Mode: stack-specific and Stack ID: mern. Overrides generic coding conventions for all TypeScript and JavaScript files in that stack.
+description: "Authoritative architecture rules for MERN — thin Express handlers, Use Case classes, Zod-first schemas, ts-rest or tRPC contracts, centralized error middleware, Mongoose conventions, Vitest frontend tests. Apply ONLY when the Active Stack Profile in copilot-instructions.md shows Mode: stack-specific and Stack ID: mern. Overrides generic coding conventions for all TypeScript and JavaScript files in that stack."
 globs: ["**/*.ts","**/*.js","**/routes/**","**/models/**","**/services/**","**/components/**"]
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: stack-react-native-bare
-description: Authoritative architecture rules for React Native bare workflow — thin screens, custom hooks for logic, centralized API services, typed navigation, AsyncStorage patterns, Android/iOS permission handling, performance-aware lists. Apply ONLY when the Active Stack Profile in copilot-instructions.md shows Mode: stack-specific and Stack ID: react-native-bare. Overrides generic coding conventions for all TypeScript and React Native files in that stack.
+description: "Authoritative architecture rules for React Native bare workflow — thin screens, custom hooks for logic, centralized API services, typed navigation, AsyncStorage patterns, Android/iOS permission handling, performance-aware lists. Apply ONLY when the Active Stack Profile in copilot-instructions.md shows Mode: stack-specific and Stack ID: react-native-bare. Overrides generic coding conventions for all TypeScript and React Native files in that stack."
 globs: ["**/*.tsx","**/*.ts","**/screens/**","**/navigation/**"]
 ---
 

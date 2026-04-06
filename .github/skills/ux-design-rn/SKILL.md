@@ -1,6 +1,6 @@
 ---
 name: ux-design-rn
-description: UX flow and interaction rules for React Native apps — navigation patterns, gesture conventions, feedback, mobile-first flows, thumb zones, offline states. Apply when the Active Stack Profile shows Stack ID: react-native-bare (or any react-native-* stack). Overrides ux-design for React Native files.
+description: "UX flow and interaction rules for React Native apps — navigation patterns, gesture conventions, feedback, mobile-first flows, thumb zones, offline states. Apply when the Active Stack Profile shows Stack ID: react-native-bare (or any react-native-* stack). Overrides ux-design for React Native files."
 globs: ["**/*.tsx","**/screens/**","**/navigation/**"]
 ---
 

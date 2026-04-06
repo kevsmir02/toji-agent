@@ -1,6 +1,6 @@
 ---
 name: stack-laravel-inertia-react
-description: Authoritative architecture rules for Laravel + Inertia + React — thin controllers, Action classes, typed DTOs, Ziggy routes, Pest tests, Vitest frontend tests. Apply ONLY when the Active Stack Profile in copilot-instructions.md shows Mode: stack-specific and Stack ID: laravel-inertia-react. Overrides generic coding conventions for all PHP and frontend files in that stack.
+description: "Authoritative architecture rules for Laravel + Inertia + React — thin controllers, Action classes, typed DTOs, Ziggy routes, Pest tests, Vitest frontend tests. Apply ONLY when the Active Stack Profile in copilot-instructions.md shows Mode: stack-specific and Stack ID: laravel-inertia-react. Overrides generic coding conventions for all PHP and frontend files in that stack."
 globs: ["**/*.php","**/*.tsx","**/*.jsx","**/routes/**","**/resources/**"]
 ---
 
