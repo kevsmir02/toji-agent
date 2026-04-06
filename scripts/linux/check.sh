@@ -5,7 +5,7 @@
 # installation is complete and all expected governance files are in place.
 #
 # Usage:
-#   bash scripts/linux/check.sh [--antigravity | --both]
+#   bash scripts/linux/check.sh [--antigravity | --copilot-cli | --both | --all]
 #   curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/check.sh | bash
 #
 # Exit codes:
@@ -30,6 +30,8 @@ WARN="${YELLOW}!${RESET}"
 ROOT="$(pwd)"
 ANTIGRAVITY_FLAG=0
 BOTH_FLAG=0
+COPILOT_CLI_FLAG=0
+ALL_FLAG=0
 STATUS_MODE=0
 TOTAL=0
 PASSED=0
@@ -42,12 +44,14 @@ usage() {
 Toji check.sh — verify that the Toji installation is complete.
 
 Usage:
-  bash scripts/linux/check.sh [--antigravity | --both | --status]
+  bash scripts/linux/check.sh [--antigravity | --copilot-cli | --both | --all | --status]
 
 Flags:
   (none)         Check Copilot install (default)
   --antigravity  Check Antigravity install
+  --copilot-cli  Check Copilot CLI install surfaces
   --both         Check Copilot and Antigravity install
+  --all          Check Copilot, Copilot CLI, and Antigravity install
   --status       Print local governance diagnostic status and exit
   --from-install Internal no-op flag accepted for installer compatibility
   --from-update  Internal no-op flag accepted for updater compatibility
@@ -61,7 +65,9 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --copilot)      shift ;;
     --antigravity)  ANTIGRAVITY_FLAG=1; shift ;;
+    --copilot-cli)  COPILOT_CLI_FLAG=1; shift ;;
     --both)         BOTH_FLAG=1; shift ;;
+    --all)          ALL_FLAG=1; shift ;;
     --status)       STATUS_MODE=1; shift ;;
     --from-install) shift ;;
     --from-update)  shift ;;
@@ -69,6 +75,12 @@ while [[ $# -gt 0 ]]; do
     *) echo "Unknown argument: $1"; usage ;;
   esac
 done
+
+SELECTED_MODES=$((ANTIGRAVITY_FLAG + COPILOT_CLI_FLAG + BOTH_FLAG + ALL_FLAG))
+if [[ "$SELECTED_MODES" -gt 1 ]]; then
+  echo "check.sh: --antigravity, --copilot-cli, --both, and --all are mutually exclusive. Use one mode flag, or no flag for Copilot only."
+  exit 1
+fi
 
 if [[ "$STATUS_MODE" -eq 1 ]]; then
   echo ""
@@ -205,8 +217,16 @@ if [[ "$ANTIGRAVITY_FLAG" -eq 0 ]] || [[ "$BOTH_FLAG" -eq 1 ]]; then
   check_dir    "agents/ (@toji agent)"           ".github/agents"
 fi
 
+# ── Copilot CLI checks ───────────────────────────────────────────────────────
+if [[ "$COPILOT_CLI_FLAG" -eq 1 ]] || [[ "$ALL_FLAG" -eq 1 ]]; then
+  section "[ Copilot CLI ] shared instruction surfaces"
+  check_file "copilot-instructions.md (repository-wide instructions)" ".github/copilot-instructions.md"
+  check_dir_nonempty "instructions/ (path-specific instructions)" ".github/instructions"
+  check_file "AGENTS.md (agent instructions)" "AGENTS.md"
+fi
+
 # ── Antigravity checks ────────────────────────────────────────────────────────
-if [[ "$ANTIGRAVITY_FLAG" -eq 1 ]] || [[ "$BOTH_FLAG" -eq 1 ]]; then
+if [[ "$ANTIGRAVITY_FLAG" -eq 1 ]] || [[ "$BOTH_FLAG" -eq 1 ]] || [[ "$ALL_FLAG" -eq 1 ]]; then
   section "[ Antigravity ] .agent/"
   check_file "toji.agent.md (Antigravity persona)" ".agent/agents/toji.agent.md"
   check_file_contains "toji.agent.md has governance markers" ".agent/agents/toji.agent.md" "toji-governance:start"

@@ -2,7 +2,9 @@
 param(
     [string]$Source = "https://github.com/kevsmir02/toji-agent.git",
     [switch]$Antigravity,
+    [switch]$CopilotCli,
     [switch]$Both,
+    [switch]$All,
     [switch]$Help
 )
 
@@ -14,12 +16,14 @@ function Show-Usage {
 Toji windows_check.ps1 — Windows launcher for check.sh.
 
 Usage:
-  ./windows_check.ps1 [-Source <path|url>] [-Antigravity | -Both]
+    ./windows_check.ps1 [-Source <path|url>] [-Antigravity | -CopilotCli | -Both | -All]
 
 Flags:
   (none)         Check Copilot install (default)
   -Antigravity   Check Antigravity install
+    -CopilotCli    Check Copilot CLI install surfaces
   -Both          Check Copilot and Antigravity install
+    -All           Check Copilot, Copilot CLI, and Antigravity install
   -Help          Show this help message
 
 Notes:
@@ -35,8 +39,8 @@ if ($Help) {
     exit 0
 }
 
-if ($Antigravity -and $Both) {
-    Write-Error "windows_check.ps1: -Antigravity and -Both are mutually exclusive."
+if ((@($Antigravity, $CopilotCli, $Both, $All) | Where-Object { $_ }).Count -gt 1) {
+    Write-Error "windows_check.ps1: -Antigravity, -CopilotCli, -Both, and -All are mutually exclusive."
     exit 1
 }
 
@@ -78,11 +82,17 @@ try {
     }
 
     $checkArgs = @($checkPath)
-    if ($Antigravity) {
-        $checkArgs += "--antigravity"
+    if ($All) {
+        $checkArgs += "--all"
     }
     elseif ($Both) {
         $checkArgs += "--both"
+    }
+    elseif ($Antigravity) {
+        $checkArgs += "--antigravity"
+    }
+    elseif ($CopilotCli) {
+        $checkArgs += "--copilot-cli"
     }
 
     & $bashCmd.Source @checkArgs

@@ -16,22 +16,25 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check shell syntax (install.sh)
-        run: bash -n install.sh
+        run: bash -n scripts/linux/install.sh
 
       - name: Check shell syntax (update.sh)
-        run: bash -n update.sh
+        run: bash -n scripts/linux/update.sh
 
       - name: Check shell syntax (uninstall.sh)
-        run: bash -n uninstall.sh
+        run: bash -n scripts/linux/uninstall.sh
 
       - name: Check shell syntax (check.sh)
-        run: bash -n check.sh
+        run: bash -n scripts/linux/check.sh
 
       - name: Dry-run install (copilot)
-        run: bash install.sh --source . --dry-run 2>&1 || true
+        run: bash scripts/linux/install.sh --source . --dry-run 2>&1 || true
+
+      - name: Dry-run update (copilot-cli)
+        run: bash scripts/linux/update.sh --source . --dry-run --copilot-cli
 
       - name: Dry-run update (all modes)
-        run: bash update.sh --source . --dry-run --both
+        run: bash scripts/linux/update.sh --source . --dry-run --both
 
       - name: Dry-run uninstall (all modes)
-        run: bash uninstall.sh --target . --dry-run --both
+        run: bash scripts/linux/uninstall.sh --target . --dry-run --both

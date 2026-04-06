@@ -6,6 +6,8 @@ DRY_RUN="false"
 UNINSTALL_MODE=copilot
 ANTIGRAVITY_FLAG=0
 BOTH_FLAG=0
+COPILOT_CLI_FLAG=0
+ALL_FLAG=0
 
 TOJI_SECTION_START="<!-- toji:start -->"
 TOJI_SECTION_END="<!-- toji:end -->"
@@ -22,13 +24,15 @@ Usage:
 Options:
   --target <path>          Target project directory
   --antigravity            Remove Antigravity Toji files only (.agent/* Toji-managed)
+  --copilot-cli            Remove Copilot CLI instruction surfaces only
   --both                   Remove Copilot and Antigravity Toji bundles
+  --all                    Remove Copilot, Copilot CLI, and Antigravity bundles
   --dry-run                Show what would be removed without changing files
   -h, --help               Show this help message
 
-Default (no --antigravity / --both): Copilot path — .github/* Toji files, docs/ai/, etc.
+Default (no mode flag): Copilot path — .github/* Toji files, docs/ai/, etc.
 
-Note: --antigravity and --both are mutually exclusive.
+Note: --antigravity, --copilot-cli, --both, and --all are mutually exclusive.
 
 What this removes (default / Copilot):
   - .github/copilot-instructions.md
@@ -51,7 +55,11 @@ What this removes (default / Copilot):
 
 --antigravity: only .agent Toji files/rules/workflows listed above; unrelated .agent files kept.
 
+--copilot-cli: same repository instruction surfaces as Copilot mode.
+
 --both: Copilot list above plus Antigravity Toji files.
+
+--all: Copilot + Copilot CLI + Antigravity Toji files.
 
 Notes:
   - Unrelated files are kept.
@@ -241,13 +249,16 @@ remove_toji_exclude_lines() {
   tmp_file="$(mktemp)"
 
   case "$mode" in
-  both)
+  both|all)
     awk '
       $0 == "# Toji Agent — Invisible Governance (install.sh)" {next}
       $0 == "docs/ai/" {next}
       $0 == ".github/skills/" {next}
       $0 == ".github/prompts/" {next}
+      $0 == ".github/instructions/" {next}
       $0 == ".github/instructions/toji-stack-*.instructions.md" {next}
+      $0 == ".github/agents/" {next}
+      $0 == ".github/copilot-instructions.md" {next}
       $0 == ".github/lessons-learned.md" {next}
       $0 == ".github/toji-version.json" {next}
       $0 == "AGENTS.md" {next}
@@ -304,8 +315,16 @@ while [[ $# -gt 0 ]]; do
     ANTIGRAVITY_FLAG=1
     shift
     ;;
+  --copilot-cli)
+    COPILOT_CLI_FLAG=1
+    shift
+    ;;
   --both)
     BOTH_FLAG=1
+    shift
+    ;;
+  --all)
+    ALL_FLAG=1
     shift
     ;;
   -h | --help)
@@ -325,16 +344,20 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-SELECTED_MODES=$((ANTIGRAVITY_FLAG + BOTH_FLAG))
+SELECTED_MODES=$((ANTIGRAVITY_FLAG + COPILOT_CLI_FLAG + BOTH_FLAG + ALL_FLAG))
 if [[ "$SELECTED_MODES" -gt 1 ]]; then
-  log "Error: --antigravity and --both are mutually exclusive."
+  log "Error: --antigravity, --copilot-cli, --both, and --all are mutually exclusive."
   usage
   exit 1
 fi
-if [[ "$BOTH_FLAG" -eq 1 ]]; then
+if [[ "$ALL_FLAG" -eq 1 ]]; then
+  UNINSTALL_MODE=all
+elif [[ "$BOTH_FLAG" -eq 1 ]]; then
   UNINSTALL_MODE=both
 elif [[ "$ANTIGRAVITY_FLAG" -eq 1 ]]; then
   UNINSTALL_MODE=antigravity
+elif [[ "$COPILOT_CLI_FLAG" -eq 1 ]]; then
+  UNINSTALL_MODE=copilot-cli
 else
   UNINSTALL_MODE=copilot
 fi
@@ -380,6 +403,26 @@ copilot)
   cleanup_empty_dir "$TARGET_DIR/.agent"
   cleanup_empty_dir "$TARGET_DIR/docs"
   ;;
+copilot-cli)
+  remove_path "$TARGET_DIR/.github/copilot-instructions.md"
+  remove_path "$TARGET_DIR/.github/prompts"
+  remove_path "$TARGET_DIR/.github/instructions"
+  remove_path "$TARGET_DIR/.github/skills"
+  remove_path "$TARGET_DIR/.github/agents"
+  remove_path "$TARGET_DIR/.github/lessons-learned.md"
+  remove_path "$TARGET_DIR/.github/toji-version.json"
+  remove_toji_agent_files "$TARGET_DIR"
+  remove_path "$TARGET_DIR/docs/ai"
+  remove_path "$TARGET_DIR/AGENTS.toji-bridge.md"
+  remove_toji_agents_section "$TARGET_DIR/AGENTS.md"
+  remove_toji_git_hooks
+  remove_toji_exclude_lines "$TARGET_DIR" both
+  cleanup_empty_dir "$TARGET_DIR/.github"
+  cleanup_empty_dir "$TARGET_DIR/.agent/rules"
+  cleanup_empty_dir "$TARGET_DIR/.agent/workflows"
+  cleanup_empty_dir "$TARGET_DIR/.agent"
+  cleanup_empty_dir "$TARGET_DIR/docs"
+  ;;
 antigravity)
   remove_toji_agent_files "$TARGET_DIR"
   remove_toji_git_hooks
@@ -389,6 +432,26 @@ antigravity)
   cleanup_empty_dir "$TARGET_DIR/.agent"
   ;;
 both)
+  remove_path "$TARGET_DIR/.github/copilot-instructions.md"
+  remove_path "$TARGET_DIR/.github/prompts"
+  remove_path "$TARGET_DIR/.github/instructions"
+  remove_path "$TARGET_DIR/.github/skills"
+  remove_path "$TARGET_DIR/.github/agents"
+  remove_path "$TARGET_DIR/.github/lessons-learned.md"
+  remove_path "$TARGET_DIR/.github/toji-version.json"
+  remove_toji_agent_files "$TARGET_DIR"
+  remove_path "$TARGET_DIR/docs/ai"
+  remove_path "$TARGET_DIR/AGENTS.toji-bridge.md"
+  remove_toji_agents_section "$TARGET_DIR/AGENTS.md"
+  remove_toji_git_hooks
+  remove_toji_exclude_lines "$TARGET_DIR" both
+  cleanup_empty_dir "$TARGET_DIR/.github"
+  cleanup_empty_dir "$TARGET_DIR/.agent/rules"
+  cleanup_empty_dir "$TARGET_DIR/.agent/workflows"
+  cleanup_empty_dir "$TARGET_DIR/.agent"
+  cleanup_empty_dir "$TARGET_DIR/docs"
+  ;;
+all)
   remove_path "$TARGET_DIR/.github/copilot-instructions.md"
   remove_path "$TARGET_DIR/.github/prompts"
   remove_path "$TARGET_DIR/.github/instructions"

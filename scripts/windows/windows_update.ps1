@@ -3,7 +3,9 @@ param(
     [string]$Source = "https://github.com/kevsmir02/toji-agent.git",
     [switch]$DryRun,
     [switch]$Antigravity,
+    [switch]$CopilotCli,
     [switch]$Both,
+    [switch]$All,
     [switch]$Help
 )
 
@@ -15,13 +17,15 @@ function Show-Usage {
 Toji windows_update.ps1 — Windows launcher for update.sh.
 
 Usage:
-  ./windows_update.ps1 [-Source <path|url>] [-DryRun] [-Antigravity | -Both]
+    ./windows_update.ps1 [-Source <path|url>] [-DryRun] [-Antigravity | -CopilotCli | -Both | -All]
 
 Flags:
   (none)         Sync GitHub Copilot bundle (default)
   -DryRun        Show planned update actions without changing files
   -Antigravity   Sync Antigravity files only
+    -CopilotCli    Sync GitHub Copilot CLI instruction surfaces
   -Both          Sync Copilot and Antigravity files
+    -All           Sync Copilot, Copilot CLI, and Antigravity files
   -Help          Show this help message
 
 Notes:
@@ -37,8 +41,8 @@ if ($Help) {
     exit 0
 }
 
-if ($Antigravity -and $Both) {
-    Write-Error "windows_update.ps1: -Antigravity and -Both are mutually exclusive."
+if ((@($Antigravity, $CopilotCli, $Both, $All) | Where-Object { $_ }).Count -gt 1) {
+    Write-Error "windows_update.ps1: -Antigravity, -CopilotCli, -Both, and -All are mutually exclusive."
     exit 1
 }
 
@@ -83,11 +87,17 @@ try {
     if ($DryRun) {
         $updateArgs += "--dry-run"
     }
-    if ($Antigravity) {
-        $updateArgs += "--antigravity"
+    if ($All) {
+        $updateArgs += "--all"
     }
     elseif ($Both) {
         $updateArgs += "--both"
+    }
+    elseif ($Antigravity) {
+        $updateArgs += "--antigravity"
+    }
+    elseif ($CopilotCli) {
+        $updateArgs += "--copilot-cli"
     }
 
     & $bashCmd.Source @updateArgs
