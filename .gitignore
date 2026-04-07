@@ -1,0 +1,7 @@
+# Toji Agent
+node_modules/
+.env
+.env.local
+.env*.local
+vendor/
+.toji_tmp/

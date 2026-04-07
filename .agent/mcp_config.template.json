@@ -1,0 +1,93 @@
+{
+  "mcpServers": {
+    "laravel-boost": {
+      "enabled": false,
+      "transport": "stdio",
+      "command": "php",
+      "args": [
+        "artisan",
+        "boost:mcp"
+      ],
+      "description": "Laravel Boost MCP bridge for Laravel application introspection."
+    },
+    "mongodb-mcp": {
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mongodb-mcp",
+        "mongodb://USER:PASSWORD@HOST:27017/DB_NAME"
+      ],
+      "description": "MongoDB MCP server for MERN schema and data inspection."
+    },
+    "node-logs-mcp": {
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "node-logs-mcp"
+      ],
+      "description": "Node runtime log access MCP server for MERN and Node stacks."
+    },
+    "github-mcp": {
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "github-mcp"
+      ],
+      "description": "GitHub MCP server for repository and API documentation discovery."
+    },
+    "fetch-mcp": {
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "fetch-mcp"
+      ],
+      "description": "Web fetch MCP server for external documentation and references."
+    },
+    "db-postgres-inspector": {
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://USER:PASSWORD@HOST:5432/DB_NAME"
+      ],
+      "description": "PostgreSQL schema/data inspector MCP server."
+    },
+    "db-mysql-inspector": {
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-mysql",
+        "mysql://USER:PASSWORD@HOST:3306/DB_NAME"
+      ],
+      "description": "MySQL schema/data inspector MCP server."
+    },
+    "db-sqlite-inspector": {
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite",
+        "./database/database.sqlite"
+      ],
+      "description": "SQLite inspector MCP server for local projects."
+    }
+  },
+  "notes": [
+    "Copy this file to .agent/mcp_config.json and enable only required servers.",
+    "Replace placeholder credentials before enabling database servers.",
+    "Prefer least-privilege database accounts for MCP inspectors."
+  ]
+}
