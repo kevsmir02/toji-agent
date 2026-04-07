@@ -1,7 +1,7 @@
 ---
 name: mcp-manager
 description: MCP discovery and usage discipline — discover active MCP tools before planning/debugging, map tool priority tiers, and prevent guessing when a fact can be retrieved from a live MCP source. Use before plan/design and during debugging across all stacks.
-globs: ["**"]
+globs: ["*mcp*"]
 ---
 
 # MCP Manager

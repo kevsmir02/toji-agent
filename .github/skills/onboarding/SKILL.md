@@ -1,7 +1,7 @@
 ---
 name: onboarding
 description: Repository onboarding — Fresh Start vs Legacy Integration; Legalization Scan; legacy baseline for routes/components; Line in the Sand in docs/ai. Use when the user runs /onboard, adopts Toji mid-project, or must baseline existing UI before governance. Do NOT use for routine feature work (use dev-lifecycle + plan).
-globs: ["**"]
+globs: []
 ---
 
 # Onboarding

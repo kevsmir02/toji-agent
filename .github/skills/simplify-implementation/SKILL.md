@@ -1,7 +1,7 @@
 ---
 name: simplify-implementation
 description: "Complexity reduction protocol — identify nesting, duplication, tight coupling, and over-abstraction in existing code, then propose and apply targeted simplifications. Enforces a hard rule: no changes until the user approves a plan. Use when code already exists and needs to be made cleaner, smaller, or easier to read. Do NOT use when the goal is to add new behaviour or fix a broken feature (use debug for broken code)."
-globs: ["**"]
+globs: []
 ---
 
 # Simplify Implementation Assistant

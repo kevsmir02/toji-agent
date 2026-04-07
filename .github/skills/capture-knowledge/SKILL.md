@@ -1,7 +1,7 @@
 ---
 name: capture-knowledge
 description: Structured code documentation — analyse a specific file, folder, function, or API entry point, build a dependency map, and write a knowledge doc to docs/ai/implementation/. Use when the goal is to understand or document an existing piece of code in depth. Do NOT use for general README writing or project-level scanning (use scan-codebase or technical-writer for those).
-globs: ["**/*.ts","**/*.php","**/*.py","**/*.go","**/*.js","**/*.md"]
+globs: ["docs/ai/**/*.md", ".github/lessons-learned.md"]
 ---
 
 # Knowledge Capture Assistant

@@ -1,7 +1,7 @@
 ---
 name: scan-codebase
 description: Full-project structural scan — refresh Active Stack Profile, map directories, identify entry points, architectural layers, and key conventions, then write docs/ai/implementation/codebase-map.md. Use when the user explicitly asks to scan or map the codebase, or when starting a Large-scope feature that needs a fresh structural baseline. Do NOT use for understanding a single file or module (use capture-knowledge for that).
-globs: ["**"]
+globs: []
 ---
 
 # Codebase Scanner

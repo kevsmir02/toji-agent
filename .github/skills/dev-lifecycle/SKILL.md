@@ -1,7 +1,7 @@
 ---
 name: dev-lifecycle
 description: Scope classification and workflow routing — determines whether work is Trivial, Small, Medium, or Large, then maps it to the correct sequence of prompts and gates. Use when starting any new feature or task to decide how much process to apply. Do NOT apply this skill's full gate sequence to Trivial or Small work.
-globs: ["**"]
+globs: []
 ---
 
 # Dev Lifecycle

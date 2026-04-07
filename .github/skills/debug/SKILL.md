@@ -1,7 +1,7 @@
 ---
 name: debug
 description: Evidence-first debugging with mandatory root-cause investigation before any fix, boundary logging in multi-component systems, and a three-attempt fix limit. Use when something is broken, a test fails, an error is thrown, or behavior diverges from the requirement. Do NOT use for refactoring or greenfield features.
-globs: ["**"]
+globs: []
 ---
 
 # Local Debugging Assistant — Iron Law of Debugging
