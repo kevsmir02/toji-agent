@@ -54,9 +54,13 @@ Start a new feature with **zero-context planning**: every task must be executabl
      - **Specific shell commands** for verification after each task (exact test command, lint command, or build command as used in this repo).
    - **No placeholders:** Forbidden in the Delivery Plan: `TODO`, `TBD`, `...`, “implement appropriately”, “add validation”, “handle errors” without explicit behavior, types, and locations. Every requirement must be **explicitly specified** in the plan text or embedded code blocks.
 
-9. **Keep planning in the same file** — milestones, task breakdown, dependencies, and risks stay in the feature brief’s `Delivery Plan` section.
+9. **Physical Memory (mandatory for Small+ scope)** — Write `.agent/task.md` with a Mission Header and the Delivery Plan checkboxes. Also write `.agent/implementation_plan.md` with the full plan. These files are **Physical Memory** and persist across sessions until deleted on mission completion. If scope is **Small**, a full feature brief is not required, but these physical files must still be created.
 
-10. **Next Steps** — Run `/review-plan` to validate the brief, `/review-design` for architecture sections when applicable, then `/build` or `/build-tdd` to implement. Frontend work must follow **ui-reasoning-engine**: user confirmation of **Visual Strategy** before UI code (see skill **Pre-flight Design Lock**).
+10. **Conflict Check** — If `.agent/task.md` already exists, you MUST warn the user and ask whether to delete-and-replace or continue the existing mission before overwriting.
+
+11. **Keep planning in the same file** — milestones, task breakdown, dependencies, and risks stay in the feature brief’s `Delivery Plan` section and are reflected in `.agent/task.md`.
+
+12. **Next Steps** — Run `/review-plan` to validate the brief, `/review-design` for architecture sections when applicable, then `/build` or `/build-tdd` to implement. Frontend work must follow **ui-reasoning-engine**: user confirmation of **Visual Strategy** before UI code (see skill **Pre-flight Design Lock**).
 
 ## Enforcement
 

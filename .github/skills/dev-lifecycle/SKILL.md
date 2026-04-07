@@ -30,11 +30,13 @@ No planning docs. No gates. Skip clarification. Just implement directly and expl
 
 ### Small
 ```
-/plan (lightweight) → /build → /verify
+/plan → /build → /verify
 ```
-- `/plan` produces a short task list in the chat or a minimal feature brief — not a full doc unless the user asks for one.
+- `/plan` MUST produce `.agent/implementation_plan.md` and `.agent/task.md` on disk. Chat-only plans are a governance violation.
+- A lightweight feature brief in `docs/ai/features/` is optional but recommended.
 - Skip `/requirements`, `/design-db`, and `/review-plan`.
 - `/verify` is a quick sanity check, not a formal review.
+
 
 ### Medium
 ```
@@ -75,17 +77,16 @@ No planning docs. No gates. Skip clarification. Just implement directly and expl
 
 1. **Classify scope** using the table above.
 2. **Infer** feature name (kebab-case), problem, and users from the message and `docs/ai/features/`; **at most one** question only if none can be named.
-3. At **Small** scope: capture a lightweight task list in chat.
-4. At **Medium+** scope: create `docs/ai/features/{name}.md` from `docs/ai/features/README.md`.
-5. At **Large** scope: also create companion docs when depth is needed.
-6. Follow the workflow for the classified scope.
+3. At **Small** scope: create Physical Memory artifacts (`.agent/implementation_plan.md`, `.agent/task.md`) immediately.
+4. At **Medium+** scope: create `docs/ai/features/{name}.md` from `docs/ai/features/README.md` first, then derive Physical Memory.
+5. Follow the workflow for the classified scope.
 
-## Resuming an Existing Feature
-
-1. Check current branch: `git branch --show-current`
-2. Locate the feature brief at `docs/ai/features/{name}.md` (if one exists)
-3. Check the `Delivery Plan` section for task status
-4. Continue from the appropriate phase
+1. Check if `.agent/task.md` exists. If so, resume as Physical Memory dictates.
+2. If no physical memory exists:
+   - Check current branch: `git branch --show-current`
+   - Locate the feature brief at `docs/ai/features/{name}.md` (if one exists)
+   - Check the `Delivery Plan` section for task status
+3. Continue from the appropriate phase.
 
 ## Build vs Build-TDD
 

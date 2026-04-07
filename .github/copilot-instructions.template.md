@@ -19,6 +19,18 @@ At the **start of every task** (before planning, coding, or answering substantiv
 - **De-duplication is mandatory**: before appending, scan the relevant category section in `.github/lessons-learned.md` and skip append when an equivalent insight already exists.
 - **`/lesson`** is the manual override path for user-forced memory capture (preferences, team conventions, or business rules that auto-capture may reject), but still requires tags and de-duplication.
 
+### Session Resumption (Physical Memory)
+
+At the **start of every session or context recovery**, before any other work:
+
+1. Check if `.agent/task.md` exists.
+2. If it exists, read it and `.agent/implementation_plan.md` silently.
+3. Resume from the first unchecked (`[ ]`) or in-progress (`[/]`) task.
+4. State your recovered position: `[Resuming: <task description>]`
+5. If neither file exists, proceed normally with the user's request.
+
+This ensures context eviction, session restarts, and interface switches do not lose progress.
+
 ### Copilot Memory (ephemeral)
 
 **GitHub Copilot Memory** (Pro, on by default, repository-scoped) is **complementary** to **`.github/lessons-learned.md`**, not a replacement: native Memory **expires after ~28 days**. **`lessons-learned.md`** is the **permanent** instinct layer — any rule worth keeping beyond that window **must** be written there explicitly. **Do not** rely on Memory alone for durable project knowledge.
@@ -52,6 +64,7 @@ If you stay in the same mode as your prior turn, you may omit the line unless am
 - **RCA Rule**: For debugging, collect evidence and identify root cause before applying a fix.
 - **Ambiguity Iron Law**: Before planning any feature request that lacks architectural specifics, trigger the `ambiguity-resolver` skill and ask 2–3 precise clarifying questions.
 - **Baseline Validation Iron Law**: After a plan is approved and before `/build`, silently run the `baseline-validator` skill. Auto-rewrite any violating plan sections before proceeding.
+- **Physical Memory Iron Law**: For any task classified as Small scope or larger, generate `.agent/implementation_plan.md` before coding and `.agent/task.md` before executing. Update task.md checkboxes (`[ ]` → `[/]` → `[x]`) after completing each logical unit of work. On session start, read `.agent/task.md` first to recover position. When all tasks are `[x]`, delete both files to clear the mission slate. Trivial scope is exempt.
 
 ## Profile Selection
 
@@ -169,7 +182,7 @@ After **`/onboard`** (Legacy Integration), Toji treats pre-baseline code differe
    - `docs/ai/implementation/` — implementation notes, patterns, conventions, and setup details
    - `docs/ai/testing/` — testing strategy, fixtures, and coverage notes
 
-1.5. **Artifact Hierarchy** — `docs/ai/features/*.md` is the canonical source of truth for all planning and verification. Antigravity execution mirrors (`implementation_plan.md`, `task.md`) are ephemeral session state and must never be treated as policy or used for cross-surface resume. See `docs/ai/implementation/artifact-hierarchy.md`.
+1.5. **Artifact Hierarchy** — `docs/ai/features/*.md` is the canonical source of truth for requirements and acceptance criteria. `.agent/implementation_plan.md` and `.agent/task.md` are **Physical Memory** — durable execution state that persists across sessions until the mission is complete, then deleted. They are not policy but they are not disposable mid-mission. See `docs/ai/implementation/artifact-hierarchy.md`.
 
 2. **Classify scope** — Read `.github/skills/dev-lifecycle/SKILL.md` and classify the work as Trivial, Small, Medium, or Large before choosing a workflow. Do not apply Large-scope ceremony to Trivial work.
 
