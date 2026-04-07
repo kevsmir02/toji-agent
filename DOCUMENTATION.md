@@ -116,22 +116,10 @@ Antigravity-only:
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --antigravity
 ```
 
-Copilot CLI-only:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --copilot-cli
-```
-
 Both bundles:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --both
-```
-
-All bundles:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --all
 ```
 
 ### 5.2 Windows (PowerShell wrappers)
@@ -149,22 +137,10 @@ Antigravity-only:
 ./windows_install.ps1 -Antigravity
 ```
 
-Copilot CLI-only:
-
-```powershell
-./windows_install.ps1 -CopilotCli
-```
-
 Both bundles:
 
 ```powershell
 ./windows_install.ps1 -Both
-```
-
-All bundles:
-
-```powershell
-./windows_install.ps1 -All
 ```
 
 ### 5.3 Prerequisites
@@ -204,18 +180,6 @@ Linux and macOS:
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/update.sh | bash
 ```
 
-Copilot CLI-only update:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/update.sh | bash -s -- --copilot-cli
-```
-
-All-surfaces update:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/update.sh | bash -s -- --all
-```
-
 Windows:
 
 ```powershell
@@ -248,22 +212,10 @@ Antigravity-only uninstall:
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/uninstall.sh | bash -s -- --target . --antigravity
 ```
 
-Copilot CLI-only uninstall:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/uninstall.sh | bash -s -- --target . --copilot-cli
-```
-
 Both bundles:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/uninstall.sh | bash -s -- --target . --both
-```
-
-All bundles:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/uninstall.sh | bash -s -- --target . --all
 ```
 
 ### 7.2 Windows
@@ -287,22 +239,10 @@ Antigravity-only:
 ./windows_uninstall.ps1 -Target . -Antigravity
 ```
 
-Copilot CLI-only:
-
-```powershell
-./windows_uninstall.ps1 -Target . -CopilotCli
-```
-
 Both bundles:
 
 ```powershell
 ./windows_uninstall.ps1 -Target . -Both
-```
-
-All bundles:
-
-```powershell
-./windows_uninstall.ps1 -Target . -All
 ```
 
 ## 8. Workflow Commands

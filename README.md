@@ -42,22 +42,10 @@ Install Antigravity-only mode:
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --antigravity
 ```
 
-Install Copilot CLI-only mode:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --copilot-cli
-```
-
 Install both bundles:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --both
-```
-
-Install all bundles:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --all
 ```
 
 ### Windows (PowerShell wrapper)
@@ -77,22 +65,10 @@ Antigravity-only:
 ./windows_install.ps1 -Antigravity
 ```
 
-Copilot CLI-only:
-
-```powershell
-./windows_install.ps1 -CopilotCli
-```
-
 Both bundles:
 
 ```powershell
 ./windows_install.ps1 -Both
-```
-
-All bundles:
-
-```powershell
-./windows_install.ps1 -All
 ```
 
 ## Daily Lifecycle

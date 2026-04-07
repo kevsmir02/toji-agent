@@ -21,8 +21,6 @@ DRY_RUN=false
 UPDATE_MODE=copilot
 ANTIGRAVITY_FLAG=0
 BOTH_FLAG=0
-COPILOT_CLI_FLAG=0
-ALL_FLAG=0
 MIN_GIT_VERSION="2.20.0"
 MIN_AWK_VERSION="1.0.0"
 MIN_SED_VERSION="4.0.0"
@@ -35,17 +33,15 @@ usage() {
 Toji update.sh — sync framework files from upstream (preserves project memory).
 
 Usage:
-  TOJI_SOURCE=/abs/path/to/toji-agent bash /abs/path/to/toji-agent/scripts/linux/update.sh [--source <path|git-url>] [--dry-run] [--antigravity | --copilot-cli | --both | --all]
-  curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/update.sh | bash -s -- [--source <path|git-url>] [--dry-run] [--antigravity | --copilot-cli | --both | --all]
+  TOJI_SOURCE=/abs/path/to/toji-agent bash /abs/path/to/toji-agent/scripts/linux/update.sh [--source <path|git-url>] [--dry-run] [--antigravity | --both]
+  curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/update.sh | bash -s -- [--source <path|git-url>] [--dry-run] [--antigravity | --both]
 
 Flags:
   (none)         Sync GitHub Copilot bundle under .github/ (default)
   --antigravity  Sync Antigravity Tier 1 rules/workflows under .agent/ with .github bridge files
-  --copilot-cli  Sync GitHub Copilot CLI instruction surfaces under .github/ and AGENTS.md
   --both         Sync Copilot and Antigravity Tier 1 files
-  --all          Sync Copilot, Copilot CLI, and Antigravity Tier 1 files
 
-Note: --antigravity, --copilot-cli, --both, and --all are mutually exclusive.
+Note: --antigravity and --both are mutually exclusive.
 
 Environment:
   TOJI_SOURCE   Default URL or path if --source omitted
@@ -242,16 +238,8 @@ while [[ $# -gt 0 ]]; do
     ANTIGRAVITY_FLAG=1
     shift
     ;;
-  --copilot-cli)
-    COPILOT_CLI_FLAG=1
-    shift
-    ;;
   --both)
     BOTH_FLAG=1
-    shift
-    ;;
-  --all)
-    ALL_FLAG=1
     shift
     ;;
   -h | --help)
@@ -264,19 +252,15 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-SELECTED_MODES=$((ANTIGRAVITY_FLAG + COPILOT_CLI_FLAG + BOTH_FLAG + ALL_FLAG))
+SELECTED_MODES=$((ANTIGRAVITY_FLAG + BOTH_FLAG))
 if [[ "$SELECTED_MODES" -gt 1 ]]; then
-  echo "update.sh: --antigravity, --copilot-cli, --both, and --all are mutually exclusive. Use one mode flag, or no flag for Copilot only." >&2
+  echo "update.sh: --antigravity and --both are mutually exclusive. Use one mode flag, or no flag for Copilot only." >&2
   exit 1
 fi
-if [[ "$ALL_FLAG" -eq 1 ]]; then
-  UPDATE_MODE=all
-elif [[ "$BOTH_FLAG" -eq 1 ]]; then
+if [[ "$BOTH_FLAG" -eq 1 ]]; then
   UPDATE_MODE=both
 elif [[ "$ANTIGRAVITY_FLAG" -eq 1 ]]; then
   UPDATE_MODE=antigravity
-elif [[ "$COPILOT_CLI_FLAG" -eq 1 ]]; then
-  UPDATE_MODE=copilot-cli
 else
   UPDATE_MODE=copilot
 fi
@@ -336,7 +320,7 @@ copy_file() {
 }
 
 prune_antigravity_files_for_mode() {
-  if [[ "$UPDATE_MODE" != "copilot" && "$UPDATE_MODE" != "copilot-cli" ]]; then
+  if [[ "$UPDATE_MODE" != "copilot" ]]; then
     return 0
   fi
 
@@ -513,17 +497,6 @@ apply_excludes_for_mode() {
 
     ensure_exclude_line "AGENTS.md"
     ;;
-  copilot-cli)
-    ensure_exclude_line "docs/ai/"
-    ensure_exclude_line ".github/skills/"
-    ensure_exclude_line ".github/prompts/"
-    ensure_exclude_line ".github/instructions/"
-    ensure_exclude_line ".github/agents/"
-    ensure_exclude_line ".github/copilot-instructions.md"
-    ensure_exclude_line ".github/lessons-learned.md"
-
-    ensure_exclude_line "AGENTS.md"
-    ;;
   antigravity)
     ensure_exclude_line "docs/ai/"
     ensure_exclude_line ".github/skills/"
@@ -554,26 +527,11 @@ apply_excludes_for_mode() {
     ensure_exclude_line ".agent/*.json"
     ensure_exclude_line ".agent/agents/"
     ;;
-  all)
-    ensure_exclude_line "docs/ai/"
-    ensure_exclude_line ".github/skills/"
-    ensure_exclude_line ".github/prompts/"
-    ensure_exclude_line ".github/instructions/"
-    ensure_exclude_line ".github/agents/"
-    ensure_exclude_line ".github/copilot-instructions.md"
-    ensure_exclude_line ".github/lessons-learned.md"
-
-    ensure_exclude_line "AGENTS.md"
-    ensure_exclude_line ".agent/"
-    ensure_exclude_line ".agent/rules/toji-stack-*.md"
-    ensure_exclude_line ".agent/*.json"
-    ensure_exclude_line ".agent/agents/"
-    ;;
   esac
 }
 
 # --- Copilot / .github/ sync ---
-if [[ "$UPDATE_MODE" == copilot || "$UPDATE_MODE" == copilot-cli || "$UPDATE_MODE" == antigravity || "$UPDATE_MODE" == both || "$UPDATE_MODE" == all ]]; then
+if [[ "$UPDATE_MODE" == copilot || "$UPDATE_MODE" == antigravity || "$UPDATE_MODE" == both ]]; then
   # Prefer the consumer-safe template; fall back to the live file if the template is absent
   _ci_src=""
   if [[ -f "$SRC_ROOT/.github/copilot-instructions.template.md" ]]; then
@@ -665,6 +623,21 @@ if [[ "$UPDATE_MODE" == copilot || "$UPDATE_MODE" == copilot-cli || "$UPDATE_MOD
 
   # Sync .github/agents/ directory (Copilot custom agents)
   if [[ -d "$SRC_ROOT/.github/agents" ]]; then
+    if [[ -d "$ROOT/.github/agents" ]]; then
+      for local_file in "$ROOT/.github/agents"/*; do
+        [[ -f "$local_file" ]] || continue
+        file_name=$(basename "$local_file")
+        if [[ ! -f "$SRC_ROOT/.github/agents/$file_name" ]]; then
+          if [[ "$DRY_RUN" == true ]]; then
+            echo "[dry-run] would remove obsolete agent: .github/agents/$file_name"
+          else
+            rm -f "$local_file"
+            echo "Toji update: swept obsolete agent: $file_name"
+          fi
+        fi
+      done
+    fi
+
     mkdir -p "$ROOT/.github/agents"
     while IFS= read -r -d '' f; do
       rel="${f#"$SRC_ROOT/.github/agents"/}"
@@ -716,8 +689,23 @@ cleanup_legacy_antigravity_rules() {
 }
 
 # --- Antigravity Tier 1 sync ---
-if [[ "$UPDATE_MODE" == antigravity || "$UPDATE_MODE" == both || "$UPDATE_MODE" == all ]]; then
+if [[ "$UPDATE_MODE" == antigravity || "$UPDATE_MODE" == both ]]; then
   if [[ -d "$SRC_ROOT/.agent/workflows" ]]; then
+    if [[ -d "$ROOT/.agent/workflows" ]]; then
+      for local_file in "$ROOT/.agent/workflows"/toji-*.md; do
+        [[ -f "$local_file" ]] || continue
+        file_name=$(basename "$local_file")
+        if [[ ! -f "$SRC_ROOT/.agent/workflows/$file_name" ]]; then
+          if [[ "$DRY_RUN" == true ]]; then
+            echo "[dry-run] would remove obsolete workflow: .agent/workflows/$file_name"
+          else
+            rm -f "$local_file"
+            echo "Toji update: swept obsolete workflow: $file_name"
+          fi
+        fi
+      done
+    fi
+
     while IFS= read -r -d '' f; do
       rel="${f#"$SRC_ROOT/.agent/workflows"/}"
       [[ -z "$rel" ]] && continue
@@ -742,6 +730,21 @@ if [[ "$UPDATE_MODE" == antigravity || "$UPDATE_MODE" == both || "$UPDATE_MODE" 
 
   # Sync .agent/agents/ directory (Antigravity agent personas)
   if [[ -d "$SRC_ROOT/.agent/agents" ]]; then
+    if [[ -d "$ROOT/.agent/agents" ]]; then
+      for local_file in "$ROOT/.agent/agents"/*; do
+        [[ -f "$local_file" ]] || continue
+        file_name=$(basename "$local_file")
+        if [[ ! -f "$SRC_ROOT/.agent/agents/$file_name" ]]; then
+          if [[ "$DRY_RUN" == true ]]; then
+            echo "[dry-run] would remove obsolete agent persona: .agent/agents/$file_name"
+          else
+            rm -f "$local_file"
+            echo "Toji update: swept obsolete agent persona: $file_name"
+          fi
+        fi
+      done
+    fi
+
     mkdir -p "$ROOT/.agent/agents"
     while IFS= read -r -d '' f; do
       rel="${f#"$SRC_ROOT/.agent/agents"/}"
@@ -763,7 +766,7 @@ write_pre_commit_hook "$UPDATE_MODE"
 
 echo ""
 echo "Toji update: finished (mode=$UPDATE_MODE). Project data preserved: lessons-learned (if existed), global design-system/ rules, docs/ai/ (untouched)."
-if [[ "$UPDATE_MODE" == antigravity || "$UPDATE_MODE" == both || "$UPDATE_MODE" == all ]]; then
+if [[ "$UPDATE_MODE" == antigravity || "$UPDATE_MODE" == both ]]; then
   echo "Toji update: MCP template available at .agent/mcp_config.template.json (copy to .agent/mcp_config.json and enable required servers)."
 fi
 

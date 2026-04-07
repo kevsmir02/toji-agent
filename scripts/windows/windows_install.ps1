@@ -2,9 +2,7 @@
 param(
     [string]$Source = "https://github.com/kevsmir02/toji-agent.git",
     [switch]$Antigravity,
-    [switch]$CopilotCli,
     [switch]$Both,
-    [switch]$All,
     [switch]$Help
 )
 
@@ -16,14 +14,12 @@ function Show-Usage {
 Toji windows_install.ps1 — Windows launcher for install.sh.
 
 Usage:
-    ./windows_install.ps1 [-Source <path|url>] [-Antigravity | -CopilotCli | -Both | -All]
+    ./windows_install.ps1 [-Source <path|url>] [-Antigravity | -Both]
 
 Flags:
   (none)         Install GitHub Copilot support (default)
   -Antigravity   Install Antigravity support only
-    -CopilotCli    Install GitHub Copilot CLI support only
   -Both          Install Copilot and Antigravity support
-    -All           Install Copilot, Copilot CLI, and Antigravity support
   -Help          Show this help message
 
 Notes:
@@ -39,8 +35,8 @@ if ($Help) {
     exit 0
 }
 
-if ((@($Antigravity, $CopilotCli, $Both, $All) | Where-Object { $_ }).Count -gt 1) {
-    Write-Error "windows_install.ps1: -Antigravity, -CopilotCli, -Both, and -All are mutually exclusive."
+if ((@($Antigravity, $Both) | Where-Object { $_ }).Count -gt 1) {
+    Write-Error "windows_install.ps1: -Antigravity and -Both are mutually exclusive."
     exit 1
 }
 
@@ -82,17 +78,11 @@ try {
     }
 
     $installArgs = @($installPath, "--source", $Source)
-    if ($All) {
-        $installArgs += "--all"
-    }
-    elseif ($Both) {
+    if ($Both) {
         $installArgs += "--both"
     }
     elseif ($Antigravity) {
         $installArgs += "--antigravity"
-    }
-    elseif ($CopilotCli) {
-        $installArgs += "--copilot-cli"
     }
 
     & $bashCmd.Source @installArgs

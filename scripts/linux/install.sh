@@ -17,8 +17,6 @@ SOURCE="$DEFAULT_SOURCE"
 INSTALL_MODE=copilot
 ANTIGRAVITY_FLAG=0
 BOTH_FLAG=0
-COPILOT_CLI_FLAG=0
-ALL_FLAG=0
 SOURCE_IS_LOCAL=0
 MIN_GIT_VERSION="2.20.0"
 MIN_AWK_VERSION="1.0.0"
@@ -32,20 +30,18 @@ usage() {
 Toji install.sh — copy framework into your repo, then enable Invisible Governance.
 
 Usage:
-  ./scripts/linux/install.sh [--source <path|url>] [--antigravity | --copilot-cli | --both | --all]
+  ./scripts/linux/install.sh [--source <path|url>] [--antigravity | --both]
 
 Flags:
   (none)         Install GitHub Copilot support (default)
   --antigravity  Install Antigravity support only
-  --copilot-cli  Install GitHub Copilot CLI support only
   --both         Install Copilot and Antigravity support
-  --all          Install Copilot, Copilot CLI, and Antigravity support
 
 Environment:
   TOJI_SOURCE  Path to a Toji checkout or a Git remote
                (default: kevsmir02/toji-agent main)
 
-Note: --antigravity, --copilot-cli, --both, and --all are mutually exclusive.
+Note: --antigravity and --both are mutually exclusive.
 
 Requires: git, and network access when using a remote URL.
 
@@ -227,16 +223,8 @@ while [[ $# -gt 0 ]]; do
     ANTIGRAVITY_FLAG=1
     shift
     ;;
-  --copilot-cli)
-    COPILOT_CLI_FLAG=1
-    shift
-    ;;
   --both)
     BOTH_FLAG=1
-    shift
-    ;;
-  --all)
-    ALL_FLAG=1
     shift
     ;;
   -h | --help)
@@ -249,19 +237,15 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-SELECTED_MODES=$((ANTIGRAVITY_FLAG + COPILOT_CLI_FLAG + BOTH_FLAG + ALL_FLAG))
+SELECTED_MODES=$((ANTIGRAVITY_FLAG + BOTH_FLAG))
 if [[ "$SELECTED_MODES" -gt 1 ]]; then
-  echo "install.sh: --antigravity, --copilot-cli, --both, and --all are mutually exclusive. Use one mode flag, or no flag for Copilot only." >&2
+  echo "install.sh: --antigravity and --both are mutually exclusive. Use one mode flag, or no flag for Copilot only." >&2
   exit 1
 fi
-if [[ "$ALL_FLAG" -eq 1 ]]; then
-  INSTALL_MODE=all
-elif [[ "$BOTH_FLAG" -eq 1 ]]; then
+if [[ "$BOTH_FLAG" -eq 1 ]]; then
   INSTALL_MODE=both
 elif [[ "$ANTIGRAVITY_FLAG" -eq 1 ]]; then
   INSTALL_MODE=antigravity
-elif [[ "$COPILOT_CLI_FLAG" -eq 1 ]]; then
-  INSTALL_MODE=copilot-cli
 else
   INSTALL_MODE=copilot
 fi
@@ -277,10 +261,8 @@ run_system_audit
 check_is_installed() {
   case "$INSTALL_MODE" in
   copilot) [[ -f ".github/copilot-instructions.md" ]] && return 0 ;;
-  copilot-cli) [[ -f ".github/copilot-instructions.md" ]] && return 0 ;;
   antigravity) [[ -f ".agent/agents/toji.agent.md" ]] && return 0 ;;
   both) [[ -f ".github/copilot-instructions.md" && -f ".agent/agents/toji.agent.md" ]] && return 0 ;;
-  all) [[ -f ".github/copilot-instructions.md" && -f ".agent/agents/toji.agent.md" ]] && return 0 ;;
   esac
   return 1
 }
@@ -326,9 +308,7 @@ fi
 
 UPDATE_ARGS=(--source "$SRC_ROOT")
 [[ "$INSTALL_MODE" == antigravity ]] && UPDATE_ARGS+=(--antigravity)
-[[ "$INSTALL_MODE" == copilot-cli ]] && UPDATE_ARGS+=(--copilot-cli)
 [[ "$INSTALL_MODE" == both ]] && UPDATE_ARGS+=(--both)
-[[ "$INSTALL_MODE" == all ]] && UPDATE_ARGS+=(--all)
 bash "$SRC_ROOT/scripts/linux/update.sh" "${UPDATE_ARGS[@]}"
 
 echo ""
@@ -336,21 +316,15 @@ case "$INSTALL_MODE" in
 copilot)
   echo "Toji install: complete (Copilot). Framework under .github/ and docs/ai/. Run /onboard in Copilot when ready."
   ;;
-copilot-cli)
-  echo "Toji install: complete (Copilot CLI). Repository instructions under .github/ and AGENTS.md are ready for Copilot CLI."
-  ;;
 antigravity)
   echo "Toji install: complete (Antigravity). Rules/workflows under .agent/ and docs/ai/ are ready."
   ;;
 both)
   echo "Toji install: complete (Copilot + Antigravity). Use ls .github/skills or ls .agent/workflows to confirm."
   ;;
-all)
-  echo "Toji install: complete (Copilot + Copilot CLI + Antigravity). Use ls .github/skills and ls .agent/workflows to confirm."
-  ;;
 esac
 
-if [[ "$INSTALL_MODE" == antigravity || "$INSTALL_MODE" == both || "$INSTALL_MODE" == all ]]; then
+if [[ "$INSTALL_MODE" == antigravity || "$INSTALL_MODE" == both ]]; then
   echo "Toji install: MCP template seeded at .agent/mcp_config.template.json. Copy to .agent/mcp_config.json and enable the servers you need."
 fi
 

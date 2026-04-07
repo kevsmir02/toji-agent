@@ -4,9 +4,7 @@ param(
     [string]$Target = ".",
     [switch]$DryRun,
     [switch]$Antigravity,
-    [switch]$CopilotCli,
     [switch]$Both,
-    [switch]$All,
     [switch]$Help
 )
 
@@ -18,15 +16,13 @@ function Show-Usage {
 Toji windows_uninstall.ps1 — Windows launcher for uninstall.sh.
 
 Usage:
-    ./windows_uninstall.ps1 [-Source <path|url>] [-Target <path>] [-DryRun] [-Antigravity | -CopilotCli | -Both | -All]
+    ./windows_uninstall.ps1 [-Source <path|url>] [-Target <path>] [-DryRun] [-Antigravity | -Both]
 
 Flags:
   -Target        Target project directory (default: current directory)
   -DryRun        Show what would be removed without changing files
   -Antigravity   Remove Antigravity Toji files only
-    -CopilotCli    Remove Copilot CLI instruction surfaces only
   -Both          Remove Copilot and Antigravity bundles
-    -All           Remove Copilot, Copilot CLI, and Antigravity bundles
   -Help          Show this help message
 
 Notes:
@@ -41,8 +37,8 @@ if ($Help) {
     exit 0
 }
 
-if ((@($Antigravity, $CopilotCli, $Both, $All) | Where-Object { $_ }).Count -gt 1) {
-    Write-Error "windows_uninstall.ps1: -Antigravity, -CopilotCli, -Both, and -All are mutually exclusive."
+if ((@($Antigravity, $Both) | Where-Object { $_ }).Count -gt 1) {
+    Write-Error "windows_uninstall.ps1: -Antigravity and -Both are mutually exclusive."
     exit 1
 }
 
@@ -81,17 +77,11 @@ try {
     if ($DryRun) {
         $uninstallArgs += "--dry-run"
     }
-    if ($All) {
-        $uninstallArgs += "--all"
-    }
-    elseif ($Both) {
+    if ($Both) {
         $uninstallArgs += "--both"
     }
     elseif ($Antigravity) {
         $uninstallArgs += "--antigravity"
-    }
-    elseif ($CopilotCli) {
-        $uninstallArgs += "--copilot-cli"
     }
 
     & $bashCmd.Source @uninstallArgs
