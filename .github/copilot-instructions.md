@@ -122,7 +122,7 @@ After **`/onboard`** (Legacy Integration), Toji treats pre-baseline code differe
 
 ### Governance Privacy (Invisible Mode)
 
-- You are aware that Toji files (`docs/ai/`, `.github/skills/`, `.github/prompts/`, **`.github/instructions/toji-stack-*.instructions.md`** (Tier 2 only), `.github/lessons-learned.md`, `.github/toji-version.json`, root `AGENTS.md`, and other paths appended by `install.sh`) are intended to stay **out of the client's shared Git history** via **`.git/info/exclude`** and the **pre-commit** guard from the installer. **Tier 1** files under **`.github/instructions/`** (without the `toji-stack-` prefix) are **not** excluded by that pattern and may ship with the framework. **Do not** suggest adding excluded paths to a commit, `git add` them for push, or listing them in a **PR description** unless the user explicitly asks to **"Publicize Toji"** (and then only after exclusions/hooks are deliberately changed).
+- You are aware that Toji files (`docs/ai/`, `.github/skills/`, `.github/prompts/`, **`.github/instructions/toji-stack-*.instructions.md`** (Tier 2 only), `.github/lessons-learned.md`, root `AGENTS.md`, and other paths appended by `install.sh`) are intended to stay **out of the client's shared Git history** via **`.git/info/exclude`** and the **pre-commit** guard from the installer. **Tier 1** files under **`.github/instructions/`** (without the `toji-stack-` prefix) are **not** excluded by that pattern and may ship with the framework. **Do not** suggest adding excluded paths to a commit, `git add` them for push, or listing them in a **PR description** unless the user explicitly asks to **"Publicize Toji"** (and then only after exclusions/hooks are deliberately changed).
 - If the user asks **"Why is git status empty?"** (for those paths) or why Toji files do not appear as untracked, explain that Toji is in **Invisible Mode** to keep project history clean for clients; work still happens locally under those paths.
 - Copilot instructions and other `.github/` files not in the exclude list may still be committed per team policy; treat **exclude + hook** as authoritative for the paths they cover.
 
@@ -130,7 +130,7 @@ After **`/onboard`** (Legacy Integration), Toji treats pre-baseline code differe
 
 - If you notice that **local** Toji instructions (`.github/skills/`, `.github/prompts/`, `.github/copilot-instructions.md`) are **stale or inconsistent** with current Toji patterns you have been trained on, **suggest the user run `/update-toji`** (and, after the Rule Diff, run `update.sh` from a local **toji-agent** clone path or via GitHub raw script while in the project root).
 - During an update, your priority is to **merge new engineering discipline** from upstream while **protecting the project's living memory**: do not advocate overwriting **`docs/ai/`**, **`.github/lessons-learned.md`**, or the project's **`design-system/MASTER.md`** — those are explicitly preserved.
-- After a sync, re-read **`.github/toji-version.json`** and any skills or prompts that changed before continuing implementation work.
+- After a sync, re-read any skills or prompts that changed before continuing implementation work.
 
 ## Before Implementing Features
 

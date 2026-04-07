@@ -199,12 +199,7 @@ echo ""
 echo -e "${BOLD}Toji Agent — Installation Health Check${RESET}"
 echo -e "  Repository: ${BOLD}$ROOT${RESET}"
 
-# Show installed version if available
-if [[ -f "$ROOT/.github/toji-version.json" ]]; then
-  ver=$(grep '"version"' "$ROOT/.github/toji-version.json" 2>/dev/null | sed 's/.*"version":[[:space:]]*"\([^"]*\)".*/\1/')
-  echo -e "  Framework version: ${GREEN}v${ver}${RESET}"
-fi
-echo ""
+
 
 # ── Copilot checks (always run unless antigravity only) ───────────────────────
 if [[ "$ANTIGRAVITY_FLAG" -eq 0 ]] || [[ "$BOTH_FLAG" -eq 1 ]]; then
@@ -213,7 +208,7 @@ if [[ "$ANTIGRAVITY_FLAG" -eq 0 ]] || [[ "$BOTH_FLAG" -eq 1 ]]; then
   check_dir_nonempty "prompts/ (slash commands)" ".github/prompts"
   check_dir_nonempty "instructions/ (Tier 1)"   ".github/instructions"
   check_dir_nonempty "skills/ (SKILL.md library)" ".github/skills"
-  check_file   "toji-version.json"               ".github/toji-version.json"
+
   check_dir    "agents/ (@toji agent)"           ".github/agents"
 fi
 

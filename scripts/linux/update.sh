@@ -320,9 +320,6 @@ if [[ ! -f "$SRC_ROOT/.github/copilot-instructions.md" ]]; then
   exit 1
 fi
 
-if [[ ! -f "$SRC_ROOT/.github/toji-version.json" ]]; then
-  echo "Toji update: warning: source missing .github/toji-version.json — sync anyway" >&2
-fi
 
 copy_file() {
   local from="$1" to="$2"
@@ -488,47 +485,7 @@ while IFS= read -r path || [[ -n "${path:-}" ]]; do
   fi
 done <<< "$STAGED_PATHS"
 
-if [[ -f "docs/maintainer/AI_SCALING_GUIDE.md" && -f "scripts/release/prepare-release.js" ]]; then
-  has_non_metadata_changes=0
-  version_staged=0
-  changelog_staged=0
 
-  while IFS= read -r path || [[ -n "${path:-}" ]]; do
-    [[ -z "${path:-}" ]] && continue
-
-    if [[ "$path" == ".github/toji-version.json" ]]; then
-      version_staged=1
-    fi
-    if [[ "$path" == "CHANGELOG.md" ]]; then
-      changelog_staged=1
-    fi
-
-    if [[ "$path" != "CHANGELOG.md" && "$path" != ".github/toji-version.json" ]]; then
-      has_non_metadata_changes=1
-    fi
-  done <<< "$STAGED_PATHS"
-
-  if [[ "$has_non_metadata_changes" -eq 1 && ( "$version_staged" -eq 0 || "$changelog_staged" -eq 0 ) ]]; then
-    if ! command -v node >/dev/null 2>&1; then
-      echo "❌ TOJI ERROR: node is required for maintainer release automation." >&2
-      echo "  Install Node.js, then retry commit." >&2
-      exit 1
-    fi
-
-    bump_type="${TOJI_RELEASE_BUMP:-patch}"
-    summary="${TOJI_RELEASE_SUMMARY:-Maintainer pre-commit automation}"
-
-    echo "Toji pre-commit: release metadata missing; running prepare-release ($bump_type)." >&2
-    if ! node scripts/release/prepare-release.js --bump "$bump_type" --summary "$summary" --allow-missing-docs; then
-      echo "❌ TOJI ERROR: release preparation failed." >&2
-      echo "  Update docs as needed, or run prepare-release manually and retry commit." >&2
-      exit 1
-    fi
-
-    git add .github/toji-version.json CHANGELOG.md
-    echo "Toji pre-commit: staged .github/toji-version.json and CHANGELOG.md" >&2
-  fi
-fi
 
 if git diff --cached --name-only --diff-filter=ACMRTUXB -- "AGENTS.md" | grep -q '^AGENTS.md$'; then
   echo "❌ TOJI ERROR: Local governance files detected. Run git reset <file> to unstage." >&2
@@ -553,7 +510,7 @@ apply_excludes_for_mode() {
     ensure_exclude_line ".github/agents/"
     ensure_exclude_line ".github/copilot-instructions.md"
     ensure_exclude_line ".github/lessons-learned.md"
-    ensure_exclude_line ".github/toji-version.json"
+
     ensure_exclude_line "AGENTS.md"
     ;;
   copilot-cli)
@@ -564,7 +521,7 @@ apply_excludes_for_mode() {
     ensure_exclude_line ".github/agents/"
     ensure_exclude_line ".github/copilot-instructions.md"
     ensure_exclude_line ".github/lessons-learned.md"
-    ensure_exclude_line ".github/toji-version.json"
+
     ensure_exclude_line "AGENTS.md"
     ;;
   antigravity)
@@ -575,7 +532,7 @@ apply_excludes_for_mode() {
     ensure_exclude_line ".github/agents/"
     ensure_exclude_line ".github/copilot-instructions.md"
     ensure_exclude_line ".github/lessons-learned.md"
-    ensure_exclude_line ".github/toji-version.json"
+
     ensure_exclude_line "AGENTS.md"
     ensure_exclude_line ".agent/"
     ensure_exclude_line ".agent/rules/toji-stack-*.md"
@@ -590,7 +547,7 @@ apply_excludes_for_mode() {
     ensure_exclude_line ".github/agents/"
     ensure_exclude_line ".github/copilot-instructions.md"
     ensure_exclude_line ".github/lessons-learned.md"
-    ensure_exclude_line ".github/toji-version.json"
+
     ensure_exclude_line "AGENTS.md"
     ensure_exclude_line ".agent/"
     ensure_exclude_line ".agent/rules/toji-stack-*.md"
@@ -605,7 +562,7 @@ apply_excludes_for_mode() {
     ensure_exclude_line ".github/agents/"
     ensure_exclude_line ".github/copilot-instructions.md"
     ensure_exclude_line ".github/lessons-learned.md"
-    ensure_exclude_line ".github/toji-version.json"
+
     ensure_exclude_line "AGENTS.md"
     ensure_exclude_line ".agent/"
     ensure_exclude_line ".agent/rules/toji-stack-*.md"
@@ -728,25 +685,7 @@ if [[ "$UPDATE_MODE" == copilot || "$UPDATE_MODE" == copilot-cli || "$UPDATE_MOD
     echo "Toji update: seeded .github/lessons-learned.md (legacy fallback; template missing)"
   fi
 
-  extract_version() {
-    local file="$1"
-    sed -n 's/^[[:space:]]*\"version\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p' "$file" | head -1
-  }
 
-  NOW_UTC=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  if [[ -f "$SRC_ROOT/.github/toji-version.json" ]]; then
-    UPSTREAM_VER=$(extract_version "$SRC_ROOT/.github/toji-version.json")
-    if [[ -z "$UPSTREAM_VER" ]]; then
-      UPSTREAM_VER="0.0.0"
-    fi
-    if [[ "$DRY_RUN" == true ]]; then
-      echo "[dry-run] would write .github/toji-version.json version=$UPSTREAM_VER last_update=$NOW_UTC"
-    else
-      mkdir -p "$ROOT/.github"
-      printf '{\n  "version": "%s",\n  "last_update": "%s"\n}\n' "$UPSTREAM_VER" "$NOW_UTC" >"$ROOT/.github/toji-version.json"
-      echo "Toji update: wrote .github/toji-version.json (version $UPSTREAM_VER, last_update $NOW_UTC)"
-    fi
-  fi
 fi
 
 cleanup_legacy_antigravity_rules() {

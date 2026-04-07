@@ -124,28 +124,7 @@ Anti-pattern:
 
 - Never create `.agent/rules/` skill mirrors. Skills are canonical under `.github/skills/` only.
 
-### 2.9 Release Metadata Discipline (Version + Changelog)
 
-Maintainers must keep version and changelog metadata synchronized with behavior changes.
-
-Command:
-
-```bash
-node scripts/release/prepare-release.js --bump <major|minor|patch> --summary "what changed"
-```
-
-Requirements:
-
-1. Use Semantic Versioning for `.github/toji-version.json`.
-2. Ensure `CHANGELOG.md` receives one entry per version bump.
-3. Do not bypass docs hygiene: if impactful non-doc changes occur, README/DOCUMENTATION/docs must be updated in the same release prep cycle.
-4. Run release prep before final commit so metadata reflects the actual change set.
-
-SemVer quick map:
-
-- `major`: breaking behavior or compatibility contract changes.
-- `minor`: backward-compatible new feature.
-- `patch`: backward-compatible fix or maintenance update.
 
 ---
 

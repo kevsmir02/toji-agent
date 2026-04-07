@@ -41,7 +41,7 @@ What this removes (default / Copilot):
   - .github/skills/
   - .github/agents/
   - .github/lessons-learned.md
-  - .github/toji-version.json
+
   - docs/ai/
   - .agent/rules/toji-*.md and skill-*.md
   - .agent/workflows/toji-*.md (legacy cleanup)
@@ -260,7 +260,7 @@ remove_toji_exclude_lines() {
       $0 == ".github/agents/" {next}
       $0 == ".github/copilot-instructions.md" {next}
       $0 == ".github/lessons-learned.md" {next}
-      $0 == ".github/toji-version.json" {next}
+
       $0 == "AGENTS.md" {next}
       $0 == ".agent/" {next}
       $0 == ".agent/rules/toji-stack-*.md" {next}
@@ -390,7 +390,6 @@ copilot)
   remove_path "$TARGET_DIR/.github/skills"
   remove_path "$TARGET_DIR/.github/agents"
   remove_path "$TARGET_DIR/.github/lessons-learned.md"
-  remove_path "$TARGET_DIR/.github/toji-version.json"
   remove_toji_agent_files "$TARGET_DIR"
   remove_path "$TARGET_DIR/docs/ai"
   remove_path "$TARGET_DIR/AGENTS.toji-bridge.md"
@@ -410,7 +409,6 @@ copilot-cli)
   remove_path "$TARGET_DIR/.github/skills"
   remove_path "$TARGET_DIR/.github/agents"
   remove_path "$TARGET_DIR/.github/lessons-learned.md"
-  remove_path "$TARGET_DIR/.github/toji-version.json"
   remove_toji_agent_files "$TARGET_DIR"
   remove_path "$TARGET_DIR/docs/ai"
   remove_path "$TARGET_DIR/AGENTS.toji-bridge.md"
@@ -438,7 +436,6 @@ both)
   remove_path "$TARGET_DIR/.github/skills"
   remove_path "$TARGET_DIR/.github/agents"
   remove_path "$TARGET_DIR/.github/lessons-learned.md"
-  remove_path "$TARGET_DIR/.github/toji-version.json"
   remove_toji_agent_files "$TARGET_DIR"
   remove_path "$TARGET_DIR/docs/ai"
   remove_path "$TARGET_DIR/AGENTS.toji-bridge.md"
@@ -458,7 +455,6 @@ all)
   remove_path "$TARGET_DIR/.github/skills"
   remove_path "$TARGET_DIR/.github/agents"
   remove_path "$TARGET_DIR/.github/lessons-learned.md"
-  remove_path "$TARGET_DIR/.github/toji-version.json"
   remove_toji_agent_files "$TARGET_DIR"
   remove_path "$TARGET_DIR/docs/ai"
   remove_path "$TARGET_DIR/AGENTS.toji-bridge.md"
