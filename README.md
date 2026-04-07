@@ -105,31 +105,7 @@ All bundles:
 
 This is not optional ceremony. It is the contract.
 
-## Operating Profiles
 
-Use one strong persona (Toji) and switch runtime profile per task.
-
-- `Operating profile: Fast` for quick Trivial and Small tasks with concise output.
-- `Operating profile: Balanced` as the default day-to-day profile.
-- `Operating profile: Audit` for deeper verification and risk reporting.
-
-Profiles tune execution style only. They do not replace persona governance and cannot weaken Iron Laws.
-
-Profile rationale is mandatory before substantive content:
-
-`[Profile: <Fast|Balanced|Audit>] Reason: <phrase>`
-
-Example prompt headers:
-
-```text
-Operating profile: Fast
-Implement the bug fix with minimal diff and focused tests.
-```
-
-```text
-Operating profile: Audit
-Review this change for edge cases and produce a risk-focused verification report.
-```
 
 ## Core Workflow Files
 

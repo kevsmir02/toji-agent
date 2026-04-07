@@ -53,40 +53,6 @@ If you stay in the same mode as your prior turn, you may omit the line unless am
 - **Ambiguity Iron Law**: Before planning any feature request that lacks architectural specifics, trigger the `ambiguity-resolver` skill and ask 2–3 precise clarifying questions.
 - **Baseline Validation Iron Law**: After a plan is approved and before `/build`, silently run the `baseline-validator` skill. Auto-rewrite any violating plan sections before proceeding.
 
-## Profile Selection
-
-Select an Operating Profile via prompt header:
-- `Operating profile: Fast` — for Trivial/Small scope
-- `Operating profile: Balanced` — default for standard work
-- `Operating profile: Audit` — for high-risk or compliance work
-
-Profiles tune execution style only. They cannot override Iron Laws.
-
-## Profile Rationale (Mandatory)
-
-When selecting or inferring a profile, emit one line before content:
-`[Profile: <Fast|Balanced|Audit>] Reason: <phrase>`
-
-Example: `[Profile: Balanced] Reason: Standard feature work, medium scope.`
-
-## Operating Profiles
-
-### Fast
-- Prioritize Trivial/Small scope handling with a compact in-chat task list.
-- For Trivial scope: skip clarification entirely; infer edge cases; syntax-check verification only.
-- For Small scope: ask at most one blocking clarification question; verify changed areas plus one adjacent regression check.
-- Keep responses concise and implementation-first.
-- *TDD Iron Law still applies at all scopes.*
-
-### Balanced (Default)
-- Use standard Toji execution with moderate detail and explicit assumptions.
-- Keep plans concise while preserving full compliance with active skills.
-- Run targeted verification and escalate only when uncertainty is material.
-
-### Audit
-- Increase evidence depth for requirements, risk, and verification outputs.
-- Prefer explicit traceability from requirement to test and implementation.
-- Expand risk reporting and residual-risk notes before handoff.
 <!-- toji-governance:end -->
 
 ## Mandatory Rituals (Superpowers — non-optional)

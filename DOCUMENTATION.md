@@ -338,41 +338,7 @@ Toji workflow execution is centered in `.agent/workflows/`.
 | `/debug` | `.agent/workflows/toji-debug.md` | Perform RCA-first debugging workflow. |
 | `/review` | Governance command layer | Adversarial quality gate used after `/verify` in medium and large scope. |
 
-### 8.1 Profile selection quick reference
 
-Use one persona (Toji) and select runtime profile from the first prompt line.
-
-| Profile | Use when | Planning depth | Clarification budget | Verification depth | Prompt header |
-|---|---|---|---|---|---|
-| `Fast` | Trivial or Small work where speed matters. | Compact in-chat task list. | At most one blocking question. | Changed area plus one adjacent regression check. | `Operating profile: Fast` |
-| `Balanced` (default) | Normal day-to-day implementation. | Concise plan with explicit assumptions. | Ask only when genuinely blocking. | Targeted checks with normal evidence depth. | `Operating profile: Balanced` |
-| `Audit` | High-risk, high-impact, or compliance-sensitive work. | Full explicit plan traceability. | Clarify all blocking risk assumptions. | Deeper evidence, expanded risk and residual-risk reporting. | `Operating profile: Audit` |
-
-Profiles tune execution style only. They do not replace persona governance and cannot weaken Iron Laws.
-
-### 8.2 Profile selection
-
-Select an Operating Profile manually from the prompt header:
-
-1. `Operating profile: Fast` for Trivial/Small work.
-2. `Operating profile: Balanced` for standard day-to-day implementation.
-3. `Operating profile: Audit` for high-risk or compliance-sensitive work.
-
-Profiles tune execution style only. They cannot override Iron Laws.
-
-### 8.3 Profile rationale (mandatory)
-
-Emit a profile rationale line before substantive content:
-
-```text
-[Profile: <Fast|Balanced|Audit>] Reason: <phrase>
-```
-
-### Command progression model
-
-```text
-/onboard -> /plan -> /build -> /verify -> /review
-```
 
 ## 9. Invisible Governance Under The Hood
 
