@@ -20,7 +20,7 @@ Toji does this with two pillars:
 
 The execution engine moved into `.agent/`, while canonical skills remain in `.github/skills/`.
 
-- Canonical skills live in `.github/skills/` (for example: `security/SKILL.md`, `ux-design/SKILL.md`).
+- Canonical skills live in `.github/skills/` (for example: `security/SKILL.md`, `ui-reasoning-engine/SKILL.md`).
 - Workflows now live in `.agent/workflows/` (for example: `toji-plan.md`, `toji-build.md`, `toji-verify.md`).
 - Antigravity and Copilot consume the same governance source via `docs/ai/governance-core.md` and sync tooling.
 

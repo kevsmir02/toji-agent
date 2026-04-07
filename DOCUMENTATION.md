@@ -27,7 +27,7 @@ Toji prevents drift through two hard systems:
 | 1% Rule | If a skill might apply, load it first. | Skills cannot be skipped for convenience. |
 | TDD Iron Law | Red-Green-Refactor required. | Production code before failing test is invalid. |
 | TDD Delete Rule | Premature implementation must be deleted and rewritten in-cycle. | Stops rubber-stamp testing after the fact. |
-| Research-First | Verify framework and API facts before coding integrations. | Reduces hallucinated APIs and outdated patterns. |
+
 | Security Iron Law | Evaluate OWASP boundary risk on sensitive changes. | Blocks insecure auth/input/query paths. |
 | RCA Rule | Debug from evidence before fix attempts. | Prevents speculative patch loops. |
 

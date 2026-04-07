@@ -72,7 +72,7 @@ Classify scope before choosing a workflow. See `.github/skills/dev-lifecycle/SKI
 - `/write-tests` — add and validate test coverage
 - `/review` — pre-push review against requirements and design
 - `/redesign` — UI/UX overhaul (visual audit + data contract check + functional minimalist React updates)
-- `/refactor` — delegates to `simplify-implementation` skill (required first if `/redesign` identifies backend contract changes)
+- `/refactor` — executes targeted code simplification and refactoring (required first if `/redesign` identifies backend contract changes)
 - `/lesson` — record an Atomic Instinct in `.github/lessons-learned.md`
 - `/document` — documentation + Session Handover to this file when closing major work
 - `/onboard` — Fresh Start or Legacy Integration; Line in the Sand, Legalization Scan (integration), Integrity Roadmap
