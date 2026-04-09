@@ -48,6 +48,28 @@ Purpose: translate Toji /plan behavior into Antigravity workflow execution. Enfo
     - Format: `- [ ] Task description`
 11. Emit profile rationale line per `docs/ai/governance-core.md` before substantive content.
 
+## Task Quality Rules (mandatory for every task in the plan)
+
+Every task in `.agent/implementation_plan.md` and `.agent/task.md` must meet all four criteria:
+
+1. **Exact file paths** — every task names the specific file(s) it touches (e.g. `src/components/Login.tsx`, not "the login component")
+2. **Exact commands** — every verification step includes the precise command to run and the expected output (e.g. `npm test -- --testPathPattern=Login` → "all tests pass")
+3. **2–5 minute granularity** — if a task would take longer than 5 minutes, split it. If a task is so small it has no verification step, merge it into an adjacent task.
+4. **No placeholders** — the following are forbidden in any task description:
+   - "TBD", "TODO", "similar to Task N", "as above", "etc."
+   - "add appropriate error handling", "implement accordingly", "handle edge cases"
+   - Any instruction that requires judgment a junior developer without context could not execute
+
+## Plan Self-Review Gate (mandatory before presenting the plan)
+
+After writing the plan but before presenting it to the user:
+
+1. Scan every task for placeholder violations listed above.
+2. If any are found: rewrite those tasks to be concrete before presenting.
+3. Confirm every task has at least one named file and one verification command.
+
+Do not present a plan that fails this gate.
+
 ## Guardrails
 
 - Single-shot planning; at most one blocking question.

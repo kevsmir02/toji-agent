@@ -32,6 +32,38 @@ Purpose: translate Toji /build behavior into Antigravity workflow execution. Enf
 	- Allow one-way escalation to `Audit` if qualifying new high-risk evidence appears.
 	- Forbid automatic deescalation.
 
+## When to Dispatch a Subagent
+
+Use a subagent when a task is self-contained and would benefit from a clean context (no accumulated state from the current session). Do not use subagents as a shortcut to avoid reading context — use them to isolate genuinely independent work.
+
+### Dispatch criteria (all must apply)
+
+1. The task has a single, clearly defined output (a file, a report, a set of test results)
+2. The task does not require knowledge accumulated during the current session
+3. The task scope is bounded enough that it can be described in a paragraph
+4. You can define the exact acceptance criteria the subagent should meet
+
+### Context to pass
+
+When dispatching a subagent, provide:
+- The exact task description (not a reference to "the plan")
+- The specific file paths involved
+- The verification command and expected output
+- The acceptance criteria from `docs/ai/features/` or `.agent/implementation_plan.md`
+
+Vague instructions produce vague output. Be precise.
+
+### How to review subagent output
+
+1. Read the subagent's completion report
+2. **Run the verification command yourself** — do not accept the subagent's claim of passing tests
+3. Review changed files against the task spec
+4. If output is incomplete or incorrect: describe the specific delta in a follow-up dispatch, or fix manually
+
+Subagent output is **unverified until you verify it**. The `verification-before-completion` skill applies to subagent delegation.
+
+---
+
 ## Turbo Blocks
 
 Use // turbo blocks for deterministic execution chunks that Antigravity can automate.

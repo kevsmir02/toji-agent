@@ -11,5 +11,6 @@
 - **Ambiguity Iron Law**: Before planning any feature request that lacks architectural specifics, trigger the `ambiguity-resolver` skill and ask 2–3 precise clarifying questions.
 - **Baseline Validation Iron Law**: After a plan is approved and before `/build`, silently run the `baseline-validator` skill. Auto-rewrite any violating plan sections before proceeding.
 - **Physical Memory Iron Law**: For any task classified as Small scope or larger, generate `.agent/implementation_plan.md` before coding and `.agent/task.md` before executing. Update task.md checkboxes (`[ ]` → `[/]` → `[x]`) after completing each logical unit of work. On session start, read `.agent/task.md` first to recover position. When all tasks are `[x]`, delete both files to clear the mission slate. Trivial scope is exempt.
+- **Spirit = Letter Rule**: Violating the letter of these rules is violating the spirit. There is no "following the spirit of TDD" while skipping the failing test. There is no "following the spirit of RCA" while skipping Phase 1. There is no "following the spirit of verification" without running the command. The process IS the discipline — you cannot honor the intent by skipping the steps.
 
 

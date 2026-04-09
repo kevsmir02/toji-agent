@@ -65,6 +65,7 @@ If you stay in the same mode as your prior turn, you may omit the line unless am
 - **Ambiguity Iron Law**: Before planning any feature request that lacks architectural specifics, trigger the `ambiguity-resolver` skill and ask 2–3 precise clarifying questions.
 - **Baseline Validation Iron Law**: After a plan is approved and before `/build`, silently run the `baseline-validator` skill. Auto-rewrite any violating plan sections before proceeding.
 - **Physical Memory Iron Law**: For any task classified as Small scope or larger, generate `.agent/implementation_plan.md` before coding and `.agent/task.md` before executing. Update task.md checkboxes (`[ ]` → `[/]` → `[x]`) after completing each logical unit of work. On session start, read `.agent/task.md` first to recover position. When all tasks are `[x]`, delete both files to clear the mission slate. Trivial scope is exempt.
+- **Spirit = Letter Rule**: Violating the letter of these rules is violating the spirit. There is no "following the spirit of TDD" while skipping the failing test. There is no "following the spirit of RCA" while skipping Phase 1. There is no "following the spirit of verification" without running the command. The process IS the discipline — you cannot honor the intent by skipping the steps.
 <!-- toji-governance:end -->
 
 ## Mandatory Rituals (Superpowers — non-optional)
@@ -250,6 +251,10 @@ Skills in `.github/skills/` contain domain-specific workflows. Read the relevant
 | `research-first` | **Passive core skill** — Documentation lookup before any framework, API, or external service integration |
 | `onboarding` | Fresh Start vs Legacy Integration; Legalization Scan; Line in the Sand; legacy baseline |
 | `scan-codebase` | Mapping project structure, entry points, layers, and conventions |
+| `verification-before-completion` | **Passive core skill** — blocks completion claims without fresh command output evidence. Applies to tests, builds, requirements, and subagent delegation |
+| `finishing-work` | Structured post-implementation workflow: verify tests, choose integration method (merge/PR/keep/discard), clean up Physical Memory |
+| `writing-skills` | Meta-skill for creating and hardening new Toji skills. Applies TDD to skill development with pressure scenario testing |
+| `code-reviewer` | Adversarial code review agent — dispatched by `/review`. Senior Staff Engineer persona, independent verification, issue categorization |
 
 ## Using Prompts
 

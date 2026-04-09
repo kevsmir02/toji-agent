@@ -29,6 +29,23 @@ If production code for a given behavior was written **before** a failing test ex
 
 ---
 
+## Anti-Rationalization
+
+If you are thinking any of the following, stop and re-read the Iron Law above.
+
+| Thought | What it actually means |
+| :--- | :--- |
+| "I'll write the tests after the implementation" | You are about to violate the Delete Rule. Delete the code and start from Red. |
+| "This is too simple to need a test" | There is no simplicity exemption. All production code requires a failing test first. |
+| "Deleting my implementation wastes hours of work" | Keeping untested code wastes more. Apply the Delete Rule. |
+| "TDD is dogmatic — being pragmatic means adapting it" | Violating the letter of the rules is violating the spirit. There is no pragmatic variant. |
+| "Tests already exist for this area — it's basically covered" | "Basically covered" is not a failing test for this specific behavior. Write the test. |
+| "I'll verify it works first, then formalize the test" | There is no formalize-after variant. Tests come first. Start from Red. |
+| "I'll write the test next (after this commit)" | It will not happen. Apply the Delete Rule now and start from Red. |
+| "The test would just be testing the framework" | Write the test. If it fails, the framework is fine. If it passes trivially, move on. |
+
+---
+
 ## Workflow
 
 ### 1. Identify behavior slices

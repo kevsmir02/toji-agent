@@ -8,10 +8,25 @@ globs: []
 
 Debug with evidence-first workflow. **No fix without proven root cause.**
 
+## Anti-Rationalization
+
+If you are thinking any of the following, stop and apply Phase 1 discipline before proceeding.
+
+| Thought | What it actually means |
+| :--- | :--- |
+| "The issue is obvious — I can see exactly what it is" | You must still complete Phase 1. Evidence first, fix second. No exceptions. |
+| "We're under time pressure, skip RCA" | Skipping RCA under pressure produces more failed fixes, not fewer. Phase 1 is faster than attempt 3. |
+| "I've seen this pattern before, I know the fix" | Then Phase 1 will be fast. Do it anyway. Pattern recognition without evidence is speculation. |
+| "Three attempts is an arbitrary limit" | Three failed attempts is a signal the current approach is wrong — not that attempt 4 will work. |
+| "One more targeted fix will definitely get it" | If you are on attempt 3, the problem is architectural. Stop patching. |
+| "I just need to tweak this one thing" | A speculative fix without Phase 1 evidence is forbidden by the Hard Rules. |
+
+---
+
 ## Hard rules (non-negotiable)
 
 - **No speculative fixes** — You are forbidden from proposing or applying a code fix until Phase 1 (Root Cause Investigation) is complete and documented.
-- **Three-attempt limit** — If **three** distinct fix attempts fail (same bug still reproduces or a new regression appears), you **must stop**. Acknowledge a possible **architectural or pattern failure**. Discuss fundamental design or approach changes with the user **before** any fourth attempt.
+- **Three-attempt architectural limit** — If **three** distinct fix attempts fail (same bug still reproduces or a new regression appears): **the problem is architectural.** Stop patching. You must: (1) explicitly acknowledge the pattern failure in your response, (2) question the fundamental design or approach — not just the code, (3) discuss the architectural pivot with the user **before** any fourth attempt. Attempting a fourth fix without this step is a governance violation.
 - **Approval after RCA** — After Phase 1, present findings and a fix hypothesis; do not modify production code until the user approves the plan (unless the user has already delegated full autonomy for this session — state that assumption explicitly if so).
 
 ---

@@ -77,6 +77,21 @@ For every code change that triggers this skill, the agent must **silently evalua
 - [ ] `.env` files are in `.gitignore`.
 - [ ] No API keys in frontend JavaScript bundles.
 
+## Anti-Rationalization
+
+If you are thinking any of the following, stop and run the Silent Evaluation Protocol before proceeding.
+
+| Thought | What it actually means |
+| :--- | :--- |
+| "This endpoint doesn't need auth, it's internal" | Internal APIs are still exploited. Evaluate the matrix. |
+| "Input is validated on the client side" | Client-side validation is not server-side security. Evaluate the matrix. |
+| "It's a small change — security evaluation is overkill" | You violated the 1% Rule. If there is a 1% chance it applies, run the matrix. |
+| "The route is already behind auth middleware" | Middleware does not guarantee ownership checks or IDOR prevention. Evaluate anyway. |
+| "We'll add proper security hardening in a future sprint" | Deferred security review is blocked by the Security Iron Law. Evaluate now. |
+| "This is just a read-only endpoint" | Read-only endpoints expose data. Evaluate for A01, A03, A07 at minimum. |
+
+---
+
 ## Silent Evaluation Protocol
 
 When this skill triggers, the agent must:
