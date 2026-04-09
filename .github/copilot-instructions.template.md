@@ -227,6 +227,8 @@ Skills in `.github/skills/` contain domain-specific workflows. Read the relevant
 | `stack-laravel-inertia-react` | Strict conventions for Laravel + Inertia + React |
 | `stack-mern` | Strict conventions for MERN projects |
 | `stack-react-native-bare` | Strict conventions for React Native Bare workflow projects |
+| `stack-nextjs` | Strict conventions for Next.js App Router projects |
+| `stack-generic-spa` | Fallback SPA conventions when no specific stack is detected |
 | `mcp-manager` | Manages Model Context Protocol configuration (Antigravity only) |
 | `ui-reasoning-engine` | **Core skill — always active when generating or modifying any frontend UI code (tsx, jsx, vue, blade, html, css).** Verifies a design system exists and adheres strictly to its tokens. Blocks generic or hallucinated Tailwind classes. |
 | `frontend-design-rn` | UI reasoning and stylistic conventions specialized for React Native |
@@ -234,6 +236,12 @@ Skills in `.github/skills/` contain domain-specific workflows. Read the relevant
 | `baseline-validator` | **Core skill — always active after an implementation plan is approved and before /build executes.** Silently validates the plan against all Toji Iron Laws and automatically rewrites any violating sections before proceeding. |
 | `ux-design` | UX framework: flows, navigation, forms, states, interaction patterns |
 | `ux-design-rn` | UX framework specialized for React Native mobile flows and interaction patterns |
+| `accessibility` | WCAG 2.1 AA passive checklist — silently evaluates all frontend UI for contrast, keyboard, ARIA, and semantic structure |
+| `state-management` | Decision tree for server state, local UI state, global client state, and form state |
+| `testing-strategy` | Test type selection (unit/integration/E2E/component/contract), fixture discipline, coverage guidance |
+| `deployment-safety` | Migration safety, zero-downtime deployments, feature flags, health checks, rollback patterns |
+| `defensive-coding` | **Passive core skill** — Resilience Matrix: error containment, async resilience, loading/error/empty/success states, external service boundaries |
+| `research-first` | **Passive core skill** — Documentation lookup before any framework, API, or external service integration |
 | `onboarding` | Fresh Start vs Legacy Integration; Legalization Scan; Line in the Sand; legacy baseline |
 | `scan-codebase` | Mapping project structure, entry points, layers, and conventions |
 

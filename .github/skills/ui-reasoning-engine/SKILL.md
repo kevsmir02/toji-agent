@@ -4,11 +4,39 @@ description: Intelligent Design System Generation. Use this skill BEFORE writing
 globs: ["**/*.tsx","**/*.jsx","**/*.css","**/*.scss","**/*.html","**/*.blade.php","**/*.vue"]
 ---
 
-This skill governs the creation of dynamic, context-aware, and extremely bold design systems using the Advanced Frontend Aesthetics Engine. It ensures all UI code is highly distinctive, avoiding generic AI-generated aesthetics.
+This skill governs the creation of dynamic, context-aware design systems using the Advanced Frontend Aesthetics Engine. It ensures all UI code is highly distinctive, avoiding generic AI-generated aesthetics while adapting to the intent of the interface being built.
 
 ## Design Thinking & Establishing the System (Non-Optional)
 
-Before you write or modify UI code for a new feature, page, or application, you **MUST** formulate its design constraints using the following framework. Do not invent unauthorized colors or fallback to generic defaults. 
+Before you write or modify UI code for a new feature, page, or application, you **MUST** formulate its design constraints using the following framework. Do not invent unauthorized colors or fallback to generic defaults.
+
+### Step 0: Context-Adaptive Mode Detection (Run First)
+
+Before any other step, classify the interface being built. This determines which design philosophy governs the session.
+
+**Application UI Mode** (default for most work):
+Trigger when the interface is a: dashboard, admin panel, CRUD form, settings page, data table, user profile, authentication flow, or any feature that prioritizes **task completion over aesthetic expression**.
+
+In Application UI Mode:
+- Consistency, usability, and accessibility come first — aesthetic boldness is secondary.
+- System fonts (Inter, system-ui) are acceptable if the design system uses them.
+- Use conservative, purposeful animation — no staggered reveals or parallax effects that delay task completion.
+- Adhere to established UI patterns (sidebar nav, top nav, card grids, data tables) unless a design system explicitly deviates.
+- Skip Steps 2–3 if a `design-system/MASTER.md` already exists — inherit its tokens directly.
+- **Do not** apply "Commit to a BOLD Aesthetic Direction" to utility interfaces. Apply consistent, legible, accessible defaults instead.
+- Apply accessibility rules from the `accessibility` skill silently before finalizing any component.
+
+**Marketing / Creative Mode**:
+Trigger when the interface is a: landing page, marketing site, portfolio, showcase, splash screen, or any surface where **brand expression and visual impact are the primary goals**.
+
+In Marketing / Creative Mode:
+- The full bold aesthetic engine (Steps 2–4 below) applies without restriction.
+- Differentiation, memorability, and standout visual identity are the success criteria.
+- System fonts, predictable layouts, and timid color choices are anti-patterns.
+
+**When unsure**: If the route/component name suggests task completion (Dashboard, Settings, Orders, Profile, Admin), default to **Application UI Mode**. If it suggests brand or discovery (Home, Landing, About, Portfolio, Showcase), default to **Marketing / Creative Mode**.
+
+---
 
 ### Step 1: Hierarchical Retrieval
 When starting a UI task, check the local design system files:

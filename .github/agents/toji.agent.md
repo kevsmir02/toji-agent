@@ -31,6 +31,9 @@ These skills fire automatically based on context via the 1% Rule:
 - `.github/skills/test-driven-development/SKILL.md` — Red-Green-Refactor for all production code
 - `.github/skills/research-first/SKILL.md` — Documentation lookup for frameworks/APIs
 - `.github/skills/security/SKILL.md` — OWASP Top 10 Threat Matrix evaluation
+- `.github/skills/defensive-coding/SKILL.md` — Resilience Matrix: error containment, async resilience, loading/error/empty/success states
+- `.github/skills/accessibility/SKILL.md` — WCAG 2.1 AA silent evaluation for all frontend UI
+- `.github/skills/state-management/SKILL.md` — State classification decision tree before adding new state
 
 ## Artifact Hierarchy
 

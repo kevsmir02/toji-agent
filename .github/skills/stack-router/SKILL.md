@@ -33,11 +33,14 @@ Keep this template generic by default while enabling strict stack conventions on
    - Tailwind, Pest, Vitest, and Ziggy strengthen evidence for the detected stack but do not replace the core framework markers
    - If MongoDB/Mongoose + Express + React markers are present → `mern`
    - If `package.json` contains `react-native` and does not include `expo` as a direct dependency, and `android/` or `ios/` exists at repo root, and `metro.config.js` or `react-native.config.js` is present → `react-native-bare`
+   - If `next` is in `package.json` dependencies and `next.config.*` exists at project root → `stack-nextjs`
+   - If React is present (`react` in deps) but none of the above stack markers match → `stack-generic-spa` (explicit SPA fallback)
 3. Resolve candidate skill paths in priority order:
    - `.github/skills/stack-{stack-id}/SKILL.md`
    - `.github/skills/{stack-id}/SKILL.md`
 4. If found, return that skill path for `/detect-stack` to write into the Active Stack Profile.
-5. If not found, return fallback recommendation and keep generic mode.
+5. If not found AND `stack-generic-spa` fallback is appropriate, activate `.github/skills/stack-generic-spa/SKILL.md` and include the following note in the output: *"No stack-specific skill matched — generic SPA conventions are active. Run `/detect-stack` after adding your framework for tighter guardrails."*
+6. If neither a specific skill nor the generic-spa fallback matches, return fallback recommendation and keep generic mode.
 
 ## Conflict Rules
 
@@ -103,12 +106,27 @@ react-native-bare:
 - Active Skill: `.github/skills/stack-react-native-bare/SKILL.md`
 - Tier 2 globs: `**/*.tsx,**/*.ts` (excluding `node_modules/`, `android/`, `ios/`)
 
+stack-nextjs:
+- Detection signals: `next` in `package.json` dependencies; `next.config.*` exists at project root
+- Stack ID: `stack-nextjs`
+- Active Skill: `.github/skills/stack-nextjs/SKILL.md`
+- Tier 2 globs: `**/*.tsx,**/*.ts,**/*.jsx,**/*.js,**/next.config.*,**/middleware.*`
+
+stack-generic-spa:
+- Detection signals: `react` in `package.json` dependencies; none of the above framework markers match
+- Stack ID: `stack-generic-spa`
+- Active Skill: `.github/skills/stack-generic-spa/SKILL.md`
+- Tier 2 globs: `**/*.tsx,**/*.ts,**/*.jsx,**/*.js`
+- Special rule: Always accompany activation with the message: *"No stack-specific skill matched — generic SPA conventions are active. Run `/detect-stack` after adding your framework for tighter guardrails."*
+
 | Stack ID (example) | Copilot file | Antigravity file | Globs / `applyTo` (example) | Skill path (example) |
 |--------------------|-------------|-------------------|-----------------------------|------------------------|
 | `laravel-inertia-react` | `toji-stack-php.instructions.md` | `toji-stack-php.md` | `**/*.php` | `.github/skills/stack-laravel-inertia-react/SKILL.md` |
 | `laravel-inertia-react` | `toji-stack-tsx.instructions.md` | `toji-stack-tsx.md` | `**/*.tsx,**/*.jsx` | `.github/skills/ui-reasoning-engine/SKILL.md` |
 | `mern` | `toji-stack-js-ts.instructions.md` | `toji-stack-js-ts.md` | `**/*.js,**/*.jsx,**/*.ts,**/*.tsx` | `.github/skills/stack-mern/SKILL.md` |
 | `react-native-bare` | `toji-stack-rn-ts.instructions.md` | `toji-stack-rn-ts.md` | `**/*.tsx,**/*.ts` (excluding `node_modules/`, `android/`, `ios/`) | `.github/skills/stack-react-native-bare/SKILL.md` |
+| `stack-nextjs` | `toji-stack-nextjs-ts.instructions.md` | `toji-stack-nextjs-ts.md` | `**/*.tsx,**/*.ts,**/next.config.*,**/middleware.*` | `.github/skills/stack-nextjs/SKILL.md` |
+| `stack-generic-spa` | `toji-stack-spa-ts.instructions.md` | `toji-stack-spa-ts.md` | `**/*.tsx,**/*.ts,**/*.jsx,**/*.js` | `.github/skills/stack-generic-spa/SKILL.md` |
 
 For other stack ids with a matching **`stack-*/SKILL.md`**, emit doublet wrappers per **primary source extensions** and apply diff-and-patch semantics.
 

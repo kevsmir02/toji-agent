@@ -40,6 +40,9 @@ These skills fire automatically via the 1% Rule. Read from `.github/skills/`:
 - `.github/skills/api-design/SKILL.md` — HTTP verb and response envelope enforcement
 - `.github/skills/ambiguity-resolver/SKILL.md` — Intercept vague feature requests before planning
 - `.github/skills/baseline-validator/SKILL.md` — Plan compliance gate before build
+- `.github/skills/defensive-coding/SKILL.md` — Resilience Matrix: error containment, async resilience, loading/error/empty/success states
+- `.github/skills/accessibility/SKILL.md` — WCAG 2.1 AA silent evaluation for all frontend UI
+- `.github/skills/state-management/SKILL.md` — State classification decision tree before adding new state
 
 ## Artifact Hierarchy
 
