@@ -48,6 +48,7 @@ These rules cannot be bypassed or skipped for convenience.
 | **Physical Memory Iron Law** | For Small scope or larger: create `.agent/implementation_plan.md` and `.agent/task.md` before coding. Update checkboxes after each task. On session start, read `task.md` first. Delete both files when all tasks are done. |
 | **UI Reasoning Engine Iron Law** | Before writing any frontend UI code, verify a design system exists. Adhere to its tokens. Block generic or hallucinated CSS/Tailwind classes. |
 | **Delete Rule** | When verify or design compliance fails for new or changed lines, remove the violating code and rewrite it with approved patterns. |
+| **Spirit = Letter Rule** | Violating the letter of these rules is violating the spirit. There is no “following the spirit of TDD” while skipping the failing test. The process IS the discipline — skipping steps is a violation. |
 
 ---
 
@@ -62,6 +63,7 @@ These rules cannot be bypassed or skipped for convenience.
 | `.github/copilot-instructions.template.md` | Source template — must stay in sync with `copilot-instructions.md` |
 | `.github/prompts/*.prompt.md` | Slash command implementations (`/plan`, `/build`, `/verify`, etc.) |
 | `.github/agents/toji.agent.md` | Toji agent persona for GitHub Copilot |
+| `.github/agents/code-reviewer.agent.md` | Adversarial code-reviewer persona, dispatched by `/review` |
 | `.github/instructions/*.instructions.md` | Path-specific instruction files auto-attached by Copilot |
 | `.github/lessons-learned.md` | Permanent project-level instinct log |
 
@@ -121,6 +123,7 @@ These fire automatically based on context via the 1% Rule:
 | `defensive-coding` | Data fetching, error handlers, list views, async operations |
 | `accessibility` | Any frontend UI file |
 | `state-management` | Adding stores, contexts, data fetching hooks, global state |
+| `verification-before-completion` | Before any completion claim — blocks "Done"/"should work" without fresh terminal evidence |
 | `simplify-implementation` | Code review, `/refactor`, Code Quality Iron Law trigger |
 | `ambiguity-resolver` | `/plan` or any feature request lacking architectural specifics |
 | `baseline-validator` | After plan approval, before `/build` |
@@ -147,6 +150,9 @@ These fire automatically based on context via the 1% Rule:
 | `frontend-design-rn` | React Native styling and design token conventions |
 | `testing-strategy` | Deciding which type of test to write for each layer |
 | `deployment-safety` | Migrations, CI/CD config, environment configuration |
+| `finishing-work` | Post-implementation: verify tests, choose integration method, clean up Physical Memory |
+| `writing-skills` | Creating or hardening new Toji skills using TDD and pressure scenario testing |
+| `code-reviewer` | Adversarial code review — dispatched by `/review`; finds problems, does not encourage |
 | `scan-codebase` | `/scan` — produces project architecture map |
 | `capture-knowledge` | `/document` — documents a module or function in depth |
 | `debug` | `/debug` — evidence-first root cause analysis |

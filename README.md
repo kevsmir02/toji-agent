@@ -6,10 +6,12 @@ Governance files stay off shared Git history by default. Your team sees only pro
 
 ## What it does
 
-- Loads domain-specific skill files before acting (`security`, `testing-strategy`, `accessibility`, `state-management`, and others).
+- Loads domain-specific skill files before acting (`security`, `testing-strategy`, `accessibility`, `verification-before-completion`, and others).
 - Enforces Iron Laws: write a failing test first, verify with evidence before fixing, validate inputs at boundaries, load documentation before integrating an API.
+- Blocks completion claims — "Done!", "should work", "I'm confident" — without fresh terminal output as evidence.
 - Keeps planning, task, and memory artifacts in `.agent/` and `docs/ai/` — locally excluded from commits via `.git/info/exclude` and a pre-commit hook.
 - Resumes where it left off across sessions using `.agent/task.md` as a checkpoint file.
+- Includes anti-rationalization tables in core skills that pre-emptively name the excuses agents use to skip process — and counter them.
 
 ## Install
 
@@ -112,7 +114,8 @@ Run `/onboard` and select **Legacy Integration** mode. This:
 /plan     →  generate implementation plan and task file
 /build    →  implement one task at a time, test-first
 /verify   →  confirm implementation matches requirements
-/review   →  adversarial quality gate before push
+/review   →  adversarial code review (dispatches dedicated reviewer agent)
+/finish   →  verify tests, choose integration method, clean up task files
 ```
 
 For debugging: `/debug`
