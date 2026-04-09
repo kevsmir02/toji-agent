@@ -1,118 +1,143 @@
 # Toji Agent
 
-Stop shipping AI-generated mediocrity.
+Toji is a governance layer for AI coding agents. It installs into any Git repository and enforces engineering discipline — structured planning, test-driven implementation, security checks, and evidence-first debugging — through skill files, Iron Laws, and local-only governance artifacts.
 
-Toji exists for one reason: most AI coding assistants optimize for speed, not engineering integrity. That creates lazy plans, fake confidence, skipped tests, and brittle code. Toji hard-locks the opposite behavior with adversarial governance.
+Governance files stay off shared Git history by default. Your team sees only product code.
 
-## Why Toji Exists
+## What it does
 
-- Enforce discipline when an agent would rather "just code".
-- Block hallucinated architecture and speculative fixes.
-- Require verification before trust.
-- Keep governance local and invisible to client-facing Git history.
+- Loads domain-specific skill files before acting (`security`, `testing-strategy`, `accessibility`, `state-management`, and others).
+- Enforces Iron Laws: write a failing test first, verify with evidence before fixing, validate inputs at boundaries, load documentation before integrating an API.
+- Keeps planning, task, and memory artifacts in `.agent/` and `docs/ai/` — locally excluded from commits via `.git/info/exclude` and a pre-commit hook.
+- Resumes where it left off across sessions using `.agent/task.md` as a checkpoint file.
 
-Toji does this with two pillars:
+## Install
 
-1. **Iron Laws**: non-negotiable rules such as the 1% Rule, TDD Delete Rule, Security checks, and RCA-first debugging.
-2. **Invisible Governance**: local `.git/info/exclude` + custom `pre-commit` guardrails that keep Toji artifacts out of shared commits by default.
+Run from the root of the target Git repository.
 
-## What Changed In The Refactor
-
-The execution engine moved into `.agent/`, while canonical skills remain in `.github/skills/`.
-
-- Canonical skills live in `.github/skills/` (for example: `security/SKILL.md`, `ui-reasoning-engine/SKILL.md`).
-- Workflows now live in `.agent/workflows/` (for example: `toji-plan.md`, `toji-build.md`, `toji-verify.md`).
-- Antigravity and Copilot consume the same governance source via `docs/ai/governance-core.md` and sync tooling.
-
-## Quick Start
-
-Run these commands from a Git repository root.
-
-### Linux and macOS
-
-Install default mode:
+**Linux / macOS**
 
 ```bash
+# GitHub Copilot (default)
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash
-```
 
-Install Antigravity-only mode:
-
-```bash
+# Antigravity only
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --antigravity
-```
 
-Install both bundles:
-
-```bash
+# Both
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --both
 ```
 
-### Windows (PowerShell wrapper)
-
-Windows support is native through PowerShell launchers that bridge into `bash` (Git Bash or WSL) and forward flags to Linux core scripts.
-
-Install default mode:
+**Windows (PowerShell — requires Git Bash or WSL)**
 
 ```powershell
+# GitHub Copilot (default)
 iwr https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/windows/windows_install.ps1 -OutFile windows_install.ps1
 ./windows_install.ps1
-```
 
-Antigravity-only:
-
-```powershell
+# Antigravity only
 ./windows_install.ps1 -Antigravity
-```
 
-Both bundles:
-
-```powershell
+# Both
 ./windows_install.ps1 -Both
 ```
 
-## Daily Lifecycle
+After install, verify:
 
-1. `/onboard`
-2. `/plan`
-3. `/build`
-4. `/verify`
-5. `/review`
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/check.sh | bash
 
-This is not optional ceremony. It is the contract.
+# Windows
+./windows_check.ps1
+```
 
+## Update
 
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/update.sh | bash
 
-## Core Workflow Files
+# Windows
+./windows_update.ps1
+```
 
-- `.agent/workflows/toji-onboard.md`
-- `.agent/workflows/toji-plan.md`
-- `.agent/workflows/toji-build.md`
-- `.agent/workflows/toji-verify.md`
-- `.agent/workflows/toji-debug.md`
-- `.agent/workflows/toji-clarify.md`
+The updater preserves `docs/ai/` and `.github/lessons-learned.md`. It re-applies governance excludes and refreshes the pre-commit hook idempotently.
 
-## Invisible Governance In One Minute
+## Uninstall
 
-During install and update, Toji:
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/uninstall.sh | bash -s -- --target .
 
-- appends protected paths to `.git/info/exclude` (idempotent, mode-aware)
-- injects a Toji `pre-commit` hook that blocks accidental staging of governance artifacts
-- preserves local project memory surfaces such as `docs/ai/` and lessons files
+# Windows
+./windows_uninstall.ps1 -Target .
+```
 
-Result: governance is always active locally, while client-facing commit history stays clean.
+## Onboarding
 
-## Commands You Will Actually Use
+### New project
 
-- `/onboard` - initialize governance baseline and Line in the Sand
-- `/plan` - produce implementation plan and execution tasks
-- `/build` - implement tasks under strict Red-Green-Refactor
-- `/verify` - spec compliance, quality checks, cleanup audit
-- `/review` - adversarial quality gate before push
-- `/debug` - evidence-first root cause workflow
+Run `/onboard` in your AI agent after installing Toji. This sets up:
+- The **Line in the Sand** (governance start date) in `docs/ai/README.md`.
+- `docs/ai/` as your local working memory for features, implementation notes, and test strategy.
+- Stack detection via `/detect-stack` to activate the correct stack skill.
 
+```
+1. Install Toji (see above)
+2. Open your AI agent (Copilot / Antigravity)
+3. Run: /onboard
+4. Run: /detect-stack
+5. Start work with: /plan
+```
 
+### Existing project
 
-## Read Next
+Run `/onboard` and select **Legacy Integration** mode. This:
+- Scans the codebase and baselines existing routes and components as **Legacy/Accepted** in `docs/ai/onboarding/legacy-baseline.md`.
+- Establishes the Line in the Sand so new code is governed while old code is not retroactively penalized.
+- Produces an **Integrity Roadmap** listing tech debt to address incrementally.
 
-- [DOCUMENTATION.md](DOCUMENTATION.md) for full architecture, script behavior, install and uninstall procedures, and governance internals.
+```
+1. Install Toji (see above)
+2. Run: /onboard  →  choose Legacy Integration
+3. Run: /detect-stack
+4. Review docs/ai/onboarding/legacy-baseline.md
+5. Start work with: /plan
+```
+
+## Daily workflow
+
+```
+/plan     →  generate implementation plan and task file
+/build    →  implement one task at a time, test-first
+/verify   →  confirm implementation matches requirements
+/review   →  adversarial quality gate before push
+```
+
+For debugging: `/debug`
+For ambiguous requests: `/clarify`
+For documentation: `/document`
+
+## Slash command reference
+
+| Command | Purpose |
+|---|---|
+| `/onboard` | Initialize governance baseline |
+| `/detect-stack` | Detect framework and activate stack skill |
+| `/plan` | Generate feature brief and task file |
+| `/build` | Implement a task under TDD |
+| `/build-tdd` | Like `/build` but writes failing tests first |
+| `/verify` | Spec compliance, quality, cleanup audit |
+| `/review` | Adversarial pre-push gate |
+| `/debug` | Evidence-first root cause analysis |
+| `/clarify` | Resolve ambiguity before planning |
+| `/refactor` | Simplify existing code |
+| `/document` | Document a module and create session handover |
+| `/commit` | Generate a Conventional Commits message |
+| `/scan` | Produce a codebase architecture map |
+| `/lesson` | Manually record a governance instinct |
+
+## Read more
+
+[DOCUMENTATION.md](DOCUMENTATION.md) — architecture, governance internals, folder structure, and script behavior.

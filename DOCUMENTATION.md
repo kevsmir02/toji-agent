@@ -1,318 +1,390 @@
-# Toji Agent Technical Manual
+# Toji Agent — Technical Manual
 
-This document is the operating contract for Toji after the architecture migration to the `.agent/` engine.
+Full reference for architecture, governance internals, scripts, and workflow behavior. For a quick start, see [README.md](README.md).
 
-If you need a fast overview, read `README.md`. If you need implementation detail, read this file end to end.
+---
 
-## 1. Core Philosophy
+## 1. Architecture
 
-Toji is built to counter AI engineering drift.
+Toji has two surfaces that work together:
 
-Drift means:
+| Surface | Purpose |
+|---|---|
+| `.github/skills/` | Canonical skill files (`*/SKILL.md`) shared across both Copilot and Antigravity |
+| `.agent/` | Execution engine: workflows, agent persona, task files, and MCP config |
 
-- writing code before requirements are pinned
-- skipping failing tests and calling it done
-- inventing APIs that do not exist
-- leaking governance noise into client-facing Git history
-
-Toji prevents drift through two hard systems:
-
-1. **Iron Laws** (behavior constraints)
-2. **Invisible Governance** (local Git-level containment)
-
-### Iron Laws (non-negotiable)
-
-| Law | Enforcement intent | Operational effect |
-|---|---|---|
-| 1% Rule | If a skill might apply, load it first. | Skills cannot be skipped for convenience. |
-| TDD Iron Law | Red-Green-Refactor required. | Production code before failing test is invalid. |
-| TDD Delete Rule | Premature implementation must be deleted and rewritten in-cycle. | Stops rubber-stamp testing after the fact. |
-
-| Security Iron Law | Evaluate OWASP boundary risk on sensitive changes. | Blocks insecure auth/input/query paths. |
-| RCA Rule | Debug from evidence before fix attempts. | Prevents speculative patch loops. |
-
-## 2. Architecture After Refactor
-
-The old skill and prompt center of gravity was under `.github/skills/` and `.github/prompts/`.
-
-The new core execution engine is under `.agent/`:
-
-- `.github/skills/` holds canonical skill packs (`*/SKILL.md`)
-- `.agent/workflows/` holds executable workflow contracts (`toji-plan.md`, `toji-build.md`, etc.)
-- `.agent/agents/` holds agent personas (for example, `toji.agent.md`)
-
-Legacy `.github` paths can still exist for compatibility and bridge behavior, but they are no longer the architectural center.
-
-### Runtime relationship diagram
+Both surfaces read from `docs/ai/governance-core.md` as the single truth source for Iron Laws, which is kept in sync via `scripts/sync-governance.js`.
 
 ```mermaid
 flowchart TD
-	A[User Command] --> B[Toji Agent Persona]
-	B --> C[.agent/workflows]
-	C --> D[.agent/rules]
-	D --> E[Iron Law Enforcement]
-	E --> F[Code and Docs Changes]
-	C --> G[.agent/implementation_plan.md]
-	C --> H[.agent/task.md]
-	F --> I[Invisible Governance Layer]
-	I --> J[.git/info/exclude]
-	I --> K[.git/hooks/pre-commit]
+  A[User Command] --> B[Toji Agent Persona]
+  B --> C[.agent/workflows/]
+  C --> D[.github/skills/]
+  D --> E[Iron Law Enforcement]
+  C --> F[.agent/implementation_plan.md]
+  C --> G[.agent/task.md]
+  E --> H[Code / Doc Changes]
+  H --> I[Invisible Governance]
+  I --> J[.git/info/exclude]
+  I --> K[.git/hooks/pre-commit]
 ```
 
-## 3. Folder Structure Reference
+---
+
+## 2. Iron Laws
+
+These rules cannot be bypassed or skipped for convenience.
+
+| Law | What it does |
+|---|---|
+| **1% Rule** | If a skill might apply, load it before acting. No exceptions for "simple" tasks. |
+| **TDD Iron Law** | Write a failing test first. Observe failure. Then implement. Production code written before a failing test must be deleted and rewritten. |
+| **Research-First Iron Law** | Before writing integration code for any external framework, API, or service, look up the documentation and cite the source. |
+| **Security Iron Law** | When touching auth, input handling, routes, uploads, queries, or async operations, silently evaluate the OWASP Threat Matrix. Block any code with a FAIL result. |
+| **Code Quality Iron Law** | Evaluate for nesting depth, duplication, over-abstraction, N+1 queries, unbounded loops, and incorrect HTTP verbs or status codes. Block violations. |
+| **RCA Rule** | Collect evidence and identify root cause before applying any fix. No speculative patches. |
+| **Ambiguity Iron Law** | Before planning any feature request that lacks architectural specifics, trigger `ambiguity-resolver` and ask 2–3 clarifying questions. |
+| **Baseline Validation Iron Law** | After a plan is approved, silently validate it against all Iron Laws before `/build` executes. Auto-rewrite violating sections. |
+| **Physical Memory Iron Law** | For Small scope or larger: create `.agent/implementation_plan.md` and `.agent/task.md` before coding. Update checkboxes after each task. On session start, read `task.md` first. Delete both files when all tasks are done. |
+| **UI Reasoning Engine Iron Law** | Before writing any frontend UI code, verify a design system exists. Adhere to its tokens. Block generic or hallucinated CSS/Tailwind classes. |
+| **Delete Rule** | When verify or design compliance fails for new or changed lines, remove the violating code and rewrite it with approved patterns. |
+
+---
+
+## 3. Folder Structure
+
+### `.github/`
+
+| Path | Purpose |
+|---|---|
+| `.github/skills/*/SKILL.md` | Canonical skill rules |
+| `.github/copilot-instructions.md` | Full Copilot agent configuration and skill index |
+| `.github/copilot-instructions.template.md` | Source template — must stay in sync with `copilot-instructions.md` |
+| `.github/prompts/*.prompt.md` | Slash command implementations (`/plan`, `/build`, `/verify`, etc.) |
+| `.github/agents/toji.agent.md` | Toji agent persona for GitHub Copilot |
+| `.github/instructions/*.instructions.md` | Path-specific instruction files auto-attached by Copilot |
+| `.github/lessons-learned.md` | Permanent project-level instinct log |
 
 ### `.agent/`
 
 | Path | Purpose |
 |---|---|
-| `.github/skills/*/SKILL.md` | Canonical skill rules shared across Copilot and Antigravity. |
-| `.agent/workflows/toji-plan.md` | Planning workflow contract for `/plan`. |
-| `.agent/workflows/toji-build.md` | Build workflow contract for `/build` with mandatory TDD sequence. |
-| `.agent/workflows/toji-verify.md` | Three-stage verification workflow for `/verify`. |
-| `.agent/workflows/toji-debug.md` | Evidence-first debugging workflow for `/debug`. |
-| `.agent/workflows/toji-onboard.md` | Governance bootstrap workflow for `/onboard`. |
-| `.agent/workflows/toji-clarify.md` | Ambiguity interception workflow for `/clarify`. |
-| `.agent/workflows/setup-mcps.md` | MCP setup automation workflow. |
-| `.agent/agents/toji.agent.md` | Toji persona and command-to-workflow mapping. |
-| `.agent/mcp_config.template.json` | MCP server template for local runtime configuration. |
+| `.agent/workflows/*.md` | Executable workflow contracts for each slash command |
+| `.agent/agents/toji.agent.md` | Toji persona for Antigravity |
+| `.agent/rules/` | Antigravity-specific rule wrappers |
+| `.agent/mcp_config.template.json` | MCP server template |
+| `.agent/implementation_plan.md` | Active implementation plan (Physical Memory — deleted on completion) |
+| `.agent/task.md` | Active task checklist (Physical Memory — deleted on completion) |
+
+### `docs/ai/`
+
+| Path | Purpose |
+|---|---|
+| `docs/ai/README.md` | Project state, governance log, backlog of intent |
+| `docs/ai/governance-core.md` | Canonical Iron Laws source — synced to both agent files |
+| `docs/ai/features/*.md` | Feature briefs — canonical source of requirements and acceptance criteria |
+| `docs/ai/implementation/*.md` | Implementation notes, patterns, setup details |
+| `docs/ai/testing/*.md` | Test strategy, coverage notes, validation checklists |
+| `docs/ai/deployment/README.md` | Deployment checklist and environment notes |
+| `docs/ai/onboarding/` | Onboarding artifacts: log, legacy baseline, integrity roadmap |
 
 ### `scripts/`
 
 | Path | Purpose |
 |---|---|
-| `scripts/linux/install.sh` | Main installer and governance bootstrapper. |
-| `scripts/linux/update.sh` | In-place sync and heal without clobbering local memory. |
-| `scripts/linux/check.sh` | Installation integrity checker. |
-| `scripts/linux/uninstall.sh` | Removes Toji-managed artifacts and governance hooks. |
+| `scripts/linux/install.sh` | Installer and governance bootstrapper |
+| `scripts/linux/update.sh` | In-place sync — preserves local memory |
+| `scripts/linux/check.sh` | Installation integrity checker |
+| `scripts/linux/uninstall.sh` | Removes Toji-managed artifacts |
+| `scripts/windows/windows_install.ps1` | Windows launcher for `install.sh` |
+| `scripts/windows/windows_update.ps1` | Windows launcher for `update.sh` |
+| `scripts/windows/windows_check.ps1` | Windows launcher for `check.sh` |
+| `scripts/windows/windows_uninstall.ps1` | Windows launcher for `uninstall.sh` |
+| `scripts/sync-governance.js` | Syncs Iron Laws from `docs/ai/governance-core.md` to both agent files |
+| `scripts/check-skill-refs.js` | Scans `.md` files for skill references and verifies SKILL.md files exist on disk |
 
-| `scripts/windows/windows_install.ps1` | Windows launcher for `install.sh` through Bash. |
-| `scripts/windows/windows_update.ps1` | Windows launcher for `update.sh` through Bash. |
-| `scripts/windows/windows_check.ps1` | Windows launcher for `check.sh` through Bash. |
-| `scripts/windows/windows_uninstall.ps1` | Windows launcher for `uninstall.sh` through Bash. |
+---
 
-## 4. Cross-Platform Support
+## 4. Skill System
 
-Toji supports Linux, macOS, and Windows.
+Skills live in `.github/skills/<name>/SKILL.md`. Each skill is a domain-specific workflow — the agent reads the relevant skill before acting in that domain.
 
-- Linux and macOS run shell scripts directly.
-- Windows uses PowerShell wrappers that require `bash` (Git Bash or WSL) and forward arguments to Linux scripts.
-- This keeps one source of truth for installer logic while preserving native Windows entry points.
+### Always-active (passive) skills
 
-## 5. Installation Guide
+These fire automatically based on context via the 1% Rule:
 
-Run commands from the target repository root.
+| Skill | Trigger |
+|---|---|
+| `test-driven-development` | Any production code change |
+| `research-first` | Integration with any external framework, API, or service |
+| `security` | Auth, input handling, routes, queries, uploads, async ops |
+| `defensive-coding` | Data fetching, error handlers, list views, async operations |
+| `accessibility` | Any frontend UI file |
+| `state-management` | Adding stores, contexts, data fetching hooks, global state |
+| `simplify-implementation` | Code review, `/refactor`, Code Quality Iron Law trigger |
+| `ambiguity-resolver` | `/plan` or any feature request lacking architectural specifics |
+| `baseline-validator` | After plan approval, before `/build` |
+| `performance` | Database queries, API endpoints, data processing |
+| `api-design` | API controller or resource files |
 
-### 5.1 Linux and macOS
+### Stack skills (activated by `/detect-stack`)
 
-Default install (Copilot bundle):
+| Stack ID | SKILL.md | Detection signals |
+|---|---|---|
+| `laravel-inertia-react` | `.github/skills/stack-laravel-inertia-react/SKILL.md` | `artisan` + Inertia + React deps |
+| `mern` | `.github/skills/stack-mern/SKILL.md` | MongoDB/Mongoose + Express + React |
+| `react-native-bare` | `.github/skills/stack-react-native-bare/SKILL.md` | `react-native` without `expo` + `android/` or `ios/` |
+| `stack-nextjs` | `.github/skills/stack-nextjs/SKILL.md` | `next` in deps + `next.config.*` |
+| `stack-generic-spa` | `.github/skills/stack-generic-spa/SKILL.md` | React present, no other stack marker matches |
+
+### Optional domain skills
+
+| Skill | When to use |
+|---|---|
+| `ux-design` | Multi-step flows, form-heavy pages, navigation design |
+| `ux-design-rn` | React Native screen or navigator work |
+| `ui-reasoning-engine` | All frontend UI code — verifies design system and token usage |
+| `frontend-design-rn` | React Native styling and design token conventions |
+| `testing-strategy` | Deciding which type of test to write for each layer |
+| `deployment-safety` | Migrations, CI/CD config, environment configuration |
+| `scan-codebase` | `/scan` — produces project architecture map |
+| `capture-knowledge` | `/document` — documents a module or function in depth |
+| `debug` | `/debug` — evidence-first root cause analysis |
+| `dev-lifecycle` | Scope classification (Trivial / Small / Medium / Large) |
+| `onboarding` | `/onboard` — Fresh Start or Legacy Integration |
+| `technical-writer` | Reviewing or improving documentation |
+
+---
+
+## 5. Governance — Invisible Mode
+
+Toji governance files are kept off shared Git history using two mechanisms.
+
+### `.git/info/exclude`
+
+During install and update, Toji appends protected paths to `.git/info/exclude` (never to `.gitignore`):
+
+```
+# Toji Agent - Invisible Governance
+docs/ai/
+.agent/
+.github/skills/
+.github/prompts/
+.github/agents/
+.github/instructions/toji-stack-*.instructions.md
+.github/lessons-learned.md
+```
+
+The operation is idempotent — re-running scripts does not duplicate lines.
+
+### Pre-commit hook
+
+Toji writes a guard block to `.git/hooks/pre-commit`. The hook:
+- blocks staging of governance paths
+- protects the Toji block inside `AGENTS.md`
+- reports exactly which paths were blocked
+
+If a non-Toji pre-commit hook already exists, the updater creates a timestamped backup before replacing it.
+
+### Publicizing Toji intentionally
+
+If your team wants governance files tracked in remote history:
+
+1. Remove the Toji lines from `.git/info/exclude`.
+2. Replace or disable the Toji pre-commit hook block.
+3. Stage and commit governance files explicitly.
+
+Do this only by explicit team decision. Client-facing repositories should leave Invisible Mode active.
+
+### Commits inside the toji-agent source repo
+
+The pre-commit hook will block staging of its own governance files. Use `--no-verify` when committing inside this repository:
 
 ```bash
+git commit --no-verify -m "..."
+```
+
+---
+
+## 6. Physical Memory
+
+Physical Memory is the session-persistence mechanism. It uses two files:
+
+| File | Purpose |
+|---|---|
+| `.agent/implementation_plan.md` | Full technical spec for the active mission |
+| `.agent/task.md` | Checkbox tracker — updated after each unit of work |
+
+Task states: `[ ]` not started → `[/]` in progress → `[x]` complete.
+
+On session start, Toji reads `.agent/task.md` first and resumes from the first unchecked or in-progress task.
+
+When all tasks are `[x]`, both files are deleted. They are local-only (covered by `.git/info/exclude`).
+
+Physical Memory does not replace `docs/ai/features/*.md`. Feature briefs are the canonical source of requirements and acceptance criteria. Physical Memory is the execution state.
+
+---
+
+## 7. Scope-Tiered Workflow
+
+Classify scope before choosing a workflow.
+
+| Scope | Signals | Workflow |
+|---|---|---|
+| **Trivial** | Single-file edit, no new entities | `/build` only |
+| **Small** | 1–3 files, no new domain entities | `/plan` → `/build` → `/verify` |
+| **Medium** | New domain entity, new API endpoints, schema changes | `/plan` → `/build` → `/verify` → `/review` |
+| **Large** | New subsystem, cross-cutting architecture | `/requirements` → `/plan` → `/build` → `/verify` → `/review` |
+
+All scopes: TDD Iron Law applies. Physical Memory required for Small and above.
+
+---
+
+## 8. Slash Commands
+
+| Command | Workflow file | Purpose |
+|---|---|---|
+| `/onboard` | `.agent/workflows/toji-onboard.md` | Governance baseline, Line in the Sand, legacy legalization |
+| `/clarify` | `.agent/workflows/toji-clarify.md` | Resolve ambiguity before planning |
+| `/plan` | `.agent/workflows/toji-plan.md` | Feature brief + implementation plan + task file |
+| `/build` | `.agent/workflows/toji-build.md` | TDD task execution |
+| `/build-tdd` | `.github/prompts/build-tdd.prompt.md` | Failing tests first, then implement |
+| `/verify` | `.agent/workflows/toji-verify.md` | Spec compliance, quality, cleanup |
+| `/review` | `.github/prompts/review.prompt.md` | Adversarial pre-push gate |
+| `/debug` | `.agent/workflows/toji-debug.md` | Evidence-first RCA workflow |
+| `/detect-stack` | `.github/prompts/detect-stack.prompt.md` | Detect framework, activate stack skill, update Tier 2 artifacts |
+| `/scan` | `.github/prompts/scan.prompt.md` | Produce codebase architecture map |
+| `/refactor` | `.github/prompts/refactor.prompt.md` | Simplify and reduce complexity |
+| `/document` | `.github/prompts/document.prompt.md` | Document module + session handover |
+| `/commit` | `.github/prompts/commit.prompt.md` | Generate Conventional Commits message |
+| `/lesson` | `.github/prompts/lesson.prompt.md` | Manually record a governance instinct |
+| `/update-toji` | `.github/prompts/update.prompt.md` | Version check + Rule Diff before running `update.sh` |
+
+---
+
+## 9. Install / Update / Uninstall
+
+### Prerequisites
+
+| OS | Requirements |
+|---|---|
+| Linux / macOS | `git`, `awk`, `sed` |
+| Windows | `git`, PowerShell, Git Bash or WSL |
+
+### Install
+
+```bash
+# Linux / macOS — Copilot (default)
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash
-```
 
-Antigravity-only:
-
-```bash
+# Linux / macOS — Antigravity only
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --antigravity
-```
 
-Both bundles:
-
-```bash
+# Linux / macOS — Both
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/install.sh | bash -s -- --both
 ```
 
-### 5.2 Windows (PowerShell wrappers)
-
-Default install:
-
 ```powershell
+# Windows — Copilot (default)
 iwr https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/windows/windows_install.ps1 -OutFile windows_install.ps1
 ./windows_install.ps1
-```
 
-Antigravity-only:
-
-```powershell
+# Antigravity only
 ./windows_install.ps1 -Antigravity
-```
 
-Both bundles:
-
-```powershell
+# Both
 ./windows_install.ps1 -Both
 ```
 
-### 5.3 Prerequisites
-
-Linux and macOS:
-
-- `git`
-- `awk`
-- `sed`
-
-Windows:
-
-- `git`
-- `powershell`
-- `bash` via Git Bash or WSL
-
-### 5.4 Post-install verification
-
-Linux and macOS:
+### Verify install
 
 ```bash
+# Linux / macOS
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/check.sh | bash
-```
 
-Windows:
-
-```powershell
-iwr https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/windows/windows_check.ps1 -OutFile windows_check.ps1
+# Windows
 ./windows_check.ps1
 ```
 
-## 6. Update Guide
-
-Linux and macOS:
+### Update
 
 ```bash
+# Linux / macOS
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/update.sh | bash
-```
 
-Windows:
-
-```powershell
-iwr https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/windows/windows_update.ps1 -OutFile windows_update.ps1
+# Windows
 ./windows_update.ps1
 ```
 
-Notable updater behavior:
+The updater:
+- preserves `docs/ai/`, `.github/lessons-learned.md`, and project-specific memory
+- re-applies `.git/info/exclude` idempotently
+- refreshes the pre-commit hook
+- backs up any non-Toji pre-commit hook before replacing it
 
-- preserves local memory surfaces such as `docs/ai/`
-- re-applies Invisible Governance excludes idempotently
-- installs or refreshes Toji pre-commit guardrails
-- supports dry run and mode-specific updates
+Before running `update.sh`, run `/update-toji` in your agent to get a Rule Diff showing what changed upstream.
 
-
-
-## 7. Uninstall Guide
-
-### 7.1 Linux and macOS
-
-Default uninstall from current repository:
+### Uninstall
 
 ```bash
+# Linux / macOS
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/uninstall.sh | bash -s -- --target .
-```
 
-Antigravity-only uninstall:
-
-```bash
+# Antigravity only
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/uninstall.sh | bash -s -- --target . --antigravity
-```
 
-Both bundles:
-
-```bash
+# Both bundles
 curl -fsSL https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/linux/uninstall.sh | bash -s -- --target . --both
 ```
 
-### 7.2 Windows
-
-Default uninstall:
-
 ```powershell
-iwr https://raw.githubusercontent.com/kevsmir02/toji-agent/main/scripts/windows/windows_uninstall.ps1 -OutFile windows_uninstall.ps1
+# Windows
 ./windows_uninstall.ps1 -Target .
-```
 
-Dry run:
-
-```powershell
+# Dry run
 ./windows_uninstall.ps1 -Target . -DryRun
-```
 
-Antigravity-only:
-
-```powershell
+# Antigravity only
 ./windows_uninstall.ps1 -Target . -Antigravity
 ```
 
-Both bundles:
+---
 
-```powershell
-./windows_uninstall.ps1 -Target . -Both
+## 10. Governance Sync
+
+`scripts/sync-governance.js` keeps Iron Laws consistent between:
+- `docs/ai/governance-core.md` (source)
+- `.agent/agents/toji.agent.md` (Antigravity)
+- `.github/agents/toji.agent.md` (Copilot)
+
+Run after editing `governance-core.md`:
+
+```bash
+node scripts/sync-governance.js
 ```
 
-## 8. Workflow Commands
+`scripts/check-governance-sync.js` verifies sync without making changes:
 
-Toji workflow execution is centered in `.agent/workflows/`.
+```bash
+node scripts/check-governance-sync.js
+```
 
-| Command | Primary workflow source | Purpose |
-|---|---|---|
-| `/onboard` | `.agent/workflows/toji-onboard.md` | Establish governance baseline and Line in the Sand. |
-| `/clarify` | `.agent/workflows/toji-clarify.md` | Resolve architecture ambiguities before planning. |
-| `/plan` | `.agent/workflows/toji-plan.md` | Generate implementation plan and task artifact. |
-| `/build` | `.agent/workflows/toji-build.md` | Execute one task with mandatory Red-Green-Refactor cycles. |
-| `/verify` | `.agent/workflows/toji-verify.md` | Run spec, quality, and cleanup verification gates. |
-| `/debug` | `.agent/workflows/toji-debug.md` | Perform RCA-first debugging workflow. |
-| `/review` | Governance command layer | Adversarial quality gate used after `/verify` in medium and large scope. |
+### Skill reference integrity
 
+`scripts/check-skill-refs.js` scans all `.md` files for `.github/skills/<name>/SKILL.md` references and verifies each exists on disk:
 
+```bash
+node scripts/check-skill-refs.js --verbose
+```
 
-## 9. Invisible Governance Under The Hood
+Exit 0 = all references valid. Exit 1 = phantom references found with a report of which files contain them.
 
-Invisible Governance is implemented by script logic, not documentation convention.
+---
 
-### 9.1 Exclude strategy
+## 11. Lessons Learned
 
-During install and update, Toji appends a marker and protected paths to `.git/info/exclude`:
+`.github/lessons-learned.md` is the permanent, project-scoped instinct log.
 
-- marker: `# Toji Agent - Invisible Governance (install.sh)`
-- path groups: `docs/ai/`, `.agent/`, selected `.github/*` governance surfaces, and governance bridge files
+Toji appends to it automatically when a response produces a **Pattern Change**, **RCA Discovery**, or **Course Correction** insight. Use `/lesson` to force an entry.
 
-The operation is idempotent. Re-running scripts does not duplicate lines.
-
-### 9.2 Pre-commit strategy
-
-Toji writes `.git/hooks/pre-commit` with a Toji guard marker and executable permissions.
-
-Behavior includes:
-
-- block staging of governance paths (for example `.agent/`, `docs/ai/`, skills and prompts surfaces)
-- protect the Toji block inside `AGENTS.md`
-- fail commit with explicit blocked path reporting
-
-If a non-Toji pre-commit already exists, updater logic creates a timestamped backup before replacement.
-
-### 9.3 Why this matters
-
-- Clients receive product code, not governance scaffolding.
-- Teams can evolve AI process rigor locally without polluting shared history.
-- Toji memory (`docs/ai`, lessons) remains high-signal and private by default.
-
-### 9.4 Publicizing Toji intentionally
-
-If your team intentionally wants Toji files tracked in remote history:
-
-1. Remove relevant Toji lines from `.git/info/exclude`.
-2. Replace or disable the Toji pre-commit hook.
-3. Stage and commit governance files explicitly.
-
-Do this only by explicit team decision.
-
-## 10. Operational Notes
-
-- `install.sh` bootstraps by invoking `update.sh` with mode flags.
-- Windows scripts are wrappers; they do not duplicate install logic.
-- `update.sh` and `install.sh` include rollback protections around `.github/` and `.agent/` snapshots.
-- `uninstall.sh` removes Toji-managed artifacts while attempting to preserve unrelated project files.
-
-## 11. Recommended Daily Practice
-
-1. Run `/onboard` once per repository.
-2. Use `/plan` for all non-trivial tasks.
-3. Execute `/build` task-by-task with TDD discipline.
-4. Require `/verify` before considering work complete.
-5. Gate merges with `/review` on medium and large scope changes.
+This file is local-only (Invisible Governance) and survives framework updates. It is not replaced by `update.sh`.
