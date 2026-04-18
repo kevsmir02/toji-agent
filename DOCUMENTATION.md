@@ -10,8 +10,10 @@ Toji has two surfaces that work together:
 
 | Surface | Purpose |
 |---|---|
-| `.github/skills/` | Canonical skill files (`*/SKILL.md`) shared across both Copilot and Antigravity |
-| `.agent/` | Execution engine: workflows, agent persona, task files, and MCP config |
+| `.github/skills/` | Canonical skill files (`*/SKILL.md`) utilizing the Agent Skills Open Standard |
+| `.github/agents/` | Executable Code structure for Copilot's Native Agent workflows (`toji`, `toji-planner`, `toji-builder`, `code-reviewer`) |
+| `.github/hooks/` | Native Copilot Hooks to strictly enforce deterministic outcomes for Security validation and UI generation |
+| `.agent/` | Antigravity Engine execution: workflows, agent persona, task files, and MCP config |
 
 Both surfaces read from `docs/ai/governance-core.md` as the single truth source for Iron Laws, which is kept in sync via `scripts/sync-governance.js`.
 
@@ -62,8 +64,13 @@ These rules cannot be bypassed or skipped for convenience.
 | `.github/copilot-instructions.md` | Full Copilot agent configuration and skill index |
 | `.github/copilot-instructions.template.md` | Source template — must stay in sync with `copilot-instructions.md` |
 | `.github/prompts/*.prompt.md` | Slash command implementations (`/plan`, `/build`, `/verify`, etc.) |
-| `.github/agents/toji.agent.md` | Toji agent persona for GitHub Copilot |
-| `.github/agents/code-reviewer.agent.md` | Adversarial code-reviewer persona, dispatched by `/review` |
+| `.github/agents/toji.agent.md` | Toji Governance Coordinator persona |
+| `.github/agents/toji-planner.agent.md` | Toji Planner persona |
+| `.github/agents/toji-builder.agent.md` | Toji Builder persona |
+| `.github/agents/code-reviewer.agent.md` | Adversarial code-reviewer persona |
+| `.github/agents/researcher.agent.md` | Hidden Researcher subagent persona |
+| `.github/agents/tdd-runner.agent.md` | Hidden TDD Runner subagent persona |
+| `.github/hooks/governance.json` | Master Hooks configuration |
 | `.github/instructions/*.instructions.md` | Path-specific instruction files auto-attached by Copilot |
 | `.github/lessons-learned.md` | Permanent project-level instinct log |
 
@@ -98,6 +105,7 @@ These rules cannot be bypassed or skipped for convenience.
 | `scripts/linux/update.sh` | In-place sync — preserves local memory |
 | `scripts/linux/check.sh` | Installation integrity checker |
 | `scripts/linux/uninstall.sh` | Removes Toji-managed artifacts |
+| `scripts/hooks/*.sh` | Hook lifecycle scripts executed natively by VS Code Copilot |
 | `scripts/windows/windows_install.ps1` | Windows launcher for `install.sh` |
 | `scripts/windows/windows_update.ps1` | Windows launcher for `update.sh` |
 | `scripts/windows/windows_check.ps1` | Windows launcher for `check.sh` |
@@ -175,6 +183,8 @@ During install and update, Toji appends protected paths to `.git/info/exclude` (
 docs/ai/
 .agent/
 .github/skills/
+.github/hooks/
+scripts/hooks/
 .github/prompts/
 .github/agents/
 .github/instructions/toji-stack-*.instructions.md

@@ -1,17 +1,28 @@
 # Toji Agent
 
-Toji is a governance layer for AI coding agents. It installs into any Git repository and enforces engineering discipline — structured planning, test-driven implementation, security checks, and evidence-first debugging — through skill files, Iron Laws, and local-only governance artifacts.
+Toji is a governance layer for AI coding agents. It installs into any Git repository and enforces engineering discipline — structured planning, test-driven implementation, security checks, and evidence-first debugging — using a **modular, multi-agent architecture**, native **Hooks**, and local-only governance artifacts.
 
 Governance files stay off shared Git history by default. Your team sees only product code.
 
 ## What it does
 
-- Loads domain-specific skill files before acting (`security`, `testing-strategy`, `accessibility`, `verification-before-completion`, and others).
+- **Specialized Multi-Agent architecture**: Deploys localized domain experts like `Toji Builder`, `Toji Planner`, and `Code Reviewer`, with seamless handoffs and sub-agent workflows. 
+- Loads domain-specific **Skill files** before acting (`security`, `testing-strategy`, `accessibility`, `verification-before-completion`, and others), compatible with the Agent Skills open standard.
 - Enforces Iron Laws: write a failing test first, verify with evidence before fixing, validate inputs at boundaries, load documentation before integrating an API.
-- Blocks completion claims — "Done!", "should work", "I'm confident" — without fresh terminal output as evidence.
+- Native **VS Code Copilot Hooks** actively enforce Security guardrails (blocking destructive shell commands) and trigger Code Quality checks (Post-edit validation) deterministically, regardless of AI prompt decisions.
 - Keeps planning, task, and memory artifacts in `.agent/` and `docs/ai/` — locally excluded from commits via `.git/info/exclude` and a pre-commit hook.
-- Resumes where it left off across sessions using `.agent/task.md` as a checkpoint file.
-- Includes anti-rationalization tables in core skills that pre-emptively name the excuses agents use to skip process — and counter them.
+- Resumes where it left off across sessions utilizing **Copilot Memory** and `.agent/task.md` as a checkpoint file.
+
+## Specific Scenario: Building a New Feature
+
+Here is what the Toji multi-agent workflow looks like when building a new "User Profile Setup" feature:
+
+1. **Start the Session:** Open Copilot Chat, select the main **@Toji** agent and ask to build the feature: "I want to build a User Profile Setup page."
+2. **Context Auto-Injection:** Because of the `SessionStart` hook, Toji immediately knows your project details and what tech stack is being used.
+3. **The Handoff:** Since you asked for a new feature, Toji prompts you with a guided click button to hand off to **@Toji Planner**. 
+4. **Planning & Research:** You click the handoff. **@Toji Planner** spins up a hidden **Researcher** sub-agent to analyze the best way to integrate with your existing Database, and then asks you 2-3 precise questions to resolve edge cases (Ambiguity Resolver skill). Once resolved, it writes out the implementation plan to `.agent/implementation_plan.md` and generates tasks.
+5. **Implementation:** A new handoff button appears: "Build It". Clicking it transitions the context to **@Toji Builder**. It uses the TDD Runner sub-agent in read/write mode to write the tests and construct the UI based precisely on the agreed specs. Security hooks silently ensure you don't execute dangerous bash codes.
+6. **Code Review:** After the builder is done, click the "Review Code" handoff. The **@Code Reviewer** adversarial persona evaluates everything the builder did and ensures all requirements passed!
 
 ## Install
 
@@ -90,7 +101,7 @@ Run `/onboard` in your AI agent after installing Toji. This sets up:
 2. Open your AI agent (Copilot / Antigravity)
 3. Run: /onboard
 4. Run: /detect-stack
-5. Start work with: /plan
+5. Ask Toji Planner to build something and let the multi-agent system handoffs carry the work!
 ```
 
 ### Existing project
@@ -105,34 +116,28 @@ Run `/onboard` and select **Legacy Integration** mode. This:
 2. Run: /onboard  →  choose Legacy Integration
 3. Run: /detect-stack
 4. Review docs/ai/onboarding/legacy-baseline.md
-5. Start work with: /plan
+5. Begin your work with Toji Planner!
 ```
 
 ## Daily workflow
 
+The standard operating procedure leverages handoffs natively via custom agents. Start a session with **Toji**, and follow the action buttons:
 ```
-/plan     →  generate implementation plan and task file
-/build    →  implement one task at a time, test-first
-/verify   →  confirm implementation matches requirements
-/review   →  adversarial code review (dispatches dedicated reviewer agent)
-/finish   →  verify tests, choose integration method, clean up task files
+📋 Plan Feature   →  @Toji Planner generates implementation plan and task file natively.
+🔨 Build It       →  @Toji Builder implements tasks sequentially.
+🔍 Review Code    →  @Code Reviewer runs adversarial validation to ensure rules didn't drift.
 ```
 
-For debugging: `/debug`
-For ambiguous requests: `/clarify`
-For documentation: `/document`
+The agent will seamlessly navigate the lifecycle dynamically resolving problems.
 
-## Slash command reference
+## Slash command reference (Legacy/Optional)
+You can still directly invoke workflows manually via chat skills if you need to perform an isolated operation without the handoff flow:
 
 | Command | Purpose |
 |---|---|
 | `/onboard` | Initialize governance baseline |
 | `/detect-stack` | Detect framework and activate stack skill |
-| `/plan` | Generate feature brief and task file |
-| `/build` | Implement a task under TDD |
-| `/build-tdd` | Like `/build` but writes failing tests first |
 | `/verify` | Spec compliance, quality, cleanup audit |
-| `/review` | Adversarial pre-push gate |
 | `/debug` | Evidence-first root cause analysis |
 | `/clarify` | Resolve ambiguity before planning |
 | `/refactor` | Simplify existing code |

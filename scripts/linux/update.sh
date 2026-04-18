@@ -489,6 +489,9 @@ apply_excludes_for_mode() {
   copilot)
     ensure_exclude_line "docs/ai/"
     ensure_exclude_line ".github/skills/"
+    ensure_exclude_line ".github/hooks/"
+    ensure_exclude_line "scripts/hooks/"
+    ensure_exclude_line ".vscode/"
     ensure_exclude_line ".github/prompts/"
     ensure_exclude_line ".github/instructions/"
     ensure_exclude_line ".github/agents/"
@@ -500,6 +503,9 @@ apply_excludes_for_mode() {
   antigravity)
     ensure_exclude_line "docs/ai/"
     ensure_exclude_line ".github/skills/"
+    ensure_exclude_line ".github/hooks/"
+    ensure_exclude_line "scripts/hooks/"
+    ensure_exclude_line ".vscode/"
     ensure_exclude_line ".github/prompts/"
     ensure_exclude_line ".github/instructions/"
     ensure_exclude_line ".github/agents/"
@@ -515,6 +521,9 @@ apply_excludes_for_mode() {
   both)
     ensure_exclude_line "docs/ai/"
     ensure_exclude_line ".github/skills/"
+    ensure_exclude_line ".github/hooks/"
+    ensure_exclude_line "scripts/hooks/"
+    ensure_exclude_line ".vscode/"
     ensure_exclude_line ".github/prompts/"
     ensure_exclude_line ".github/instructions/"
     ensure_exclude_line ".github/agents/"
@@ -646,6 +655,40 @@ if [[ "$UPDATE_MODE" == copilot || "$UPDATE_MODE" == antigravity || "$UPDATE_MOD
       copy_file "$f" "$dest"
     done < <(find "$SRC_ROOT/.github/agents" -type f -print0 2>/dev/null || true)
     echo "Toji update: synced .github/agents/"
+  fi
+
+  # Sync .github/hooks/ directory
+  if [[ -d "$SRC_ROOT/.github/hooks" ]]; then
+    mkdir -p "$ROOT/.github/hooks"
+    while IFS= read -r -d '' f; do
+      rel="${f#"$SRC_ROOT/.github/hooks"/}"
+      [[ -z "$rel" ]] && continue
+      dest="$ROOT/.github/hooks/$rel"
+      copy_file "$f" "$dest"
+    done < <(find "$SRC_ROOT/.github/hooks" -type f -print0 2>/dev/null || true)
+    echo "Toji update: synced .github/hooks/"
+  fi
+
+  # Sync scripts/hooks/ directory
+  if [[ -d "$SRC_ROOT/scripts/hooks" ]]; then
+    mkdir -p "$ROOT/scripts/hooks"
+    while IFS= read -r -d '' f; do
+      rel="${f#"$SRC_ROOT/scripts/hooks"/}"
+      [[ -z "$rel" ]] && continue
+      dest="$ROOT/scripts/hooks/$rel"
+      copy_file "$f" "$dest"
+      chmod +x "$dest" 2>/dev/null || true
+    done < <(find "$SRC_ROOT/scripts/hooks" -type f -print0 2>/dev/null || true)
+    echo "Toji update: synced scripts/hooks/"
+  fi
+
+  # Sync .vscode/settings.json
+  if [[ -f "$SRC_ROOT/.vscode/settings.json" ]]; then
+    if [[ ! -f "$ROOT/.vscode/settings.json" ]]; then
+      mkdir -p "$ROOT/.vscode"
+      copy_file "$SRC_ROOT/.vscode/settings.json" "$ROOT/.vscode/settings.json"
+      echo "Toji update: seeded .vscode/settings.json"
+    fi
   fi
 
   if [[ -f "$ROOT/.github/lessons-learned.md" ]]; then

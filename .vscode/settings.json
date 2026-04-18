@@ -1,0 +1,6 @@
+{
+  "github.copilot.chat.tools.memory.enabled": true,
+  "github.copilot.chat.copilotMemory.enabled": true,
+  "chat.useCustomAgentHooks": true,
+  "chat.subagents.allowInvocationsFromSubagents": false
+}

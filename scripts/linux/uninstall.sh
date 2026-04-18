@@ -35,6 +35,8 @@ What this removes (default / Copilot):
   - .github/prompts/
   - .github/instructions/
   - .github/skills/
+  - .github/hooks/
+  - scripts/hooks/
   - .github/agents/
   - .github/lessons-learned.md
 
@@ -247,6 +249,9 @@ remove_toji_exclude_lines() {
       $0 == "# Toji Agent — Invisible Governance (install.sh)" {next}
       $0 == "docs/ai/" {next}
       $0 == ".github/skills/" {next}
+      $0 == ".github/hooks/" {next}
+      $0 == "scripts/hooks/" {next}
+      $0 == ".vscode/" {next}
       $0 == ".github/prompts/" {next}
       $0 == ".github/instructions/" {next}
       $0 == ".github/instructions/toji-stack-*.instructions.md" {next}
@@ -368,6 +373,8 @@ copilot)
   remove_path "$TARGET_DIR/.github/copilot-instructions.md"
   remove_path "$TARGET_DIR/.github/prompts"
   remove_path "$TARGET_DIR/.github/instructions"
+  remove_path "$TARGET_DIR/.github/hooks"
+  remove_path "$TARGET_DIR/scripts/hooks"
   remove_path "$TARGET_DIR/.github/skills"
   remove_path "$TARGET_DIR/.github/agents"
   remove_path "$TARGET_DIR/.github/lessons-learned.md"
@@ -396,6 +403,8 @@ both)
   remove_path "$TARGET_DIR/.github/copilot-instructions.md"
   remove_path "$TARGET_DIR/.github/prompts"
   remove_path "$TARGET_DIR/.github/instructions"
+  remove_path "$TARGET_DIR/.github/hooks"
+  remove_path "$TARGET_DIR/scripts/hooks"
   remove_path "$TARGET_DIR/.github/skills"
   remove_path "$TARGET_DIR/.github/agents"
   remove_path "$TARGET_DIR/.github/lessons-learned.md"
