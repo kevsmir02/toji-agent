@@ -35,7 +35,7 @@ if ($Help) {
     exit 0
 }
 
-if ((@($Antigravity, $Both) | Where-Object { $_ }).Count -gt 1) {
+if ($Antigravity -and $Both) {
     Write-Error "windows_install.ps1: -Antigravity and -Both are mutually exclusive."
     exit 1
 }
